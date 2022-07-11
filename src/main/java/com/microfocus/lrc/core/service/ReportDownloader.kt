@@ -1,0 +1,200 @@
+package com.microfocus.lrc.core.service
+
+import com.google.gson.Gson
+import com.google.gson.JsonObject
+import com.google.gson.JsonSyntaxException
+import com.microfocus.lrc.core.ApiClient
+import com.microfocus.lrc.core.XmlReport
+import com.microfocus.lrc.core.entity.*
+import com.microfocus.lrc.jenkins.LoggerProxy
+import java.io.IOException
+
+class ReportDownloader(
+    private val apiClient: ApiClient,
+    private val loggerProxy: LoggerProxy,
+) {
+    fun download(testRun: LoadTestRun, reportTypes: Array<String>) {
+        // validate report types
+        val validReportTypes = reportTypes.filter {
+            it in arrayOf("docx", "pdf", "csv")
+        };
+        if (validReportTypes.isEmpty()) {
+            this.loggerProxy.info("Invalid report types: ${reportTypes.joinToString(", ")}");
+            this.loggerProxy.info("Skip downloading reports");
+            return;
+        }
+
+        // request reports generating
+        validReportTypes.map { reportType ->
+            val reportId = this.requestReportId(testRun.id, reportType);
+            // wait for the report to be ready
+            var retryWaitingTimes = 0;
+            var reportContent: ByteArray? = null;
+            val maxRetry = 3;
+            while (retryWaitingTimes < maxRetry && reportContent == null) {
+                reportContent = this.isReportReady(reportId);
+                if (reportContent == null) {
+                    Thread.sleep(5000);
+                    retryWaitingTimes += 1;
+                }
+            }
+
+            if (reportContent == null) {
+                this.loggerProxy.info("Report is not ready after $retryWaitingTimes retries, giving up.");
+                return;
+            }
+
+            val fileName = genFileName(reportType, testRun);
+            testRun.reports[fileName] = reportContent;
+            this.loggerProxy.info("Report $fileName downloaded.");
+        }
+
+        genXmlFile(testRun);
+    }
+
+    private fun requestReportId(runId: Int, reportType: String): Int {
+        val apiPath = ApiGenTestRunReport(
+            mapOf(
+                "projectId" to "${this.apiClient.getServerConfiguration().projectId}",
+                "runId" to "$runId",
+            )
+        ).path;
+
+        val payload = JsonObject();
+        payload.addProperty("reportType", reportType);
+
+        val res = this.apiClient.post(apiPath, payload);
+        val body = res.body?.string();
+        if (res.code != 200) {
+            throw Exception("Failed to request report: ${res.code}, $body");
+        }
+        this.loggerProxy.debug("Requested report: $body");
+        val result = Gson().fromJson(body, JsonObject::class.java);
+        if (!result.has("reportId")) {
+            throw Exception("Failed to request report: $body");
+        }
+
+        val reportId = result.get("reportId").asInt;
+
+        return reportId;
+    }
+
+    private fun isReportReady(reportId: Int): ByteArray? {
+        val apiPath = ApiTestRunReport(
+            mapOf(
+                "reportId" to "$reportId",
+            )
+        ).path;
+
+        val res = this.apiClient.get(apiPath);
+        if (res.code != 200) {
+            this.loggerProxy.info("Report is not ready: ${res.code}, ${res.body?.string()}");
+            return null;
+        }
+        val contentType = res.header("content-type", null);
+        if (contentType?.contains("application/json") == true) {
+            val body = res.body?.string();
+            val result = Gson().fromJson(body, JsonObject::class.java);
+            if (result["message"]?.asString == "In progress") {
+                this.loggerProxy.info("Report $reportId is not ready yet...");
+                return null;
+            } else {
+                throw Exception("Report $reportId invalid status: $body");
+            }
+        }
+
+        if (contentType?.contains("application/octet-stream") == true) {
+            this.loggerProxy.info("Report $reportId is ready.");
+
+            return res.body?.bytes();
+        }
+
+        throw Exception("Unknown content type: $contentType");
+    }
+
+    private fun genFileName(reportType: String, testRun: LoadTestRun): String {
+        return "lrc_report_${this.apiClient.getServerConfiguration().tenantId}-${testRun.id}.${reportType}";
+    }
+
+    private fun genXmlFile(testRun: LoadTestRun) {
+        val fileName = genFileName("xml", testRun);
+        val content = XmlReport.write(
+            testRun.loadTest.id,
+            testRun.id,
+            testRun.loadTest.name,
+            testRun.detailedStatus,
+            testRun.status,
+            testRun.startTime,
+            testRun.endTime,
+            testRun.testRunCompletelyEnded(),
+            "${this.apiClient.getServerConfiguration().url}/run-overview/${testRun.id}/report/?TENANTID=${this.apiClient.getServerConfiguration().tenantId}&projectId=${this.apiClient.getServerConfiguration().projectId}",
+            "${this.apiClient.getServerConfiguration().url}/run-overview/${testRun.id}/dashboard/?TENANTID=${this.apiClient.getServerConfiguration().tenantId}&projectId=${this.apiClient.getServerConfiguration().projectId}",
+            null,
+            testRun.statusCode,
+        );
+        testRun.reports[fileName] = content;
+    }
+
+    private fun fetchTestRunResults(runId: Int): TestRunResultsResponse {
+        val apiPath = ApiTestRunResults(
+            mapOf(
+                "runId" to "$runId",
+            )
+        ).path;
+
+        val res = this.apiClient.get(apiPath);
+        if (res.code != 200) {
+            val msg = "Failed to fetch test-run results: ${res.code}, ${res.body?.string()}"
+            this.loggerProxy.info(msg);
+            throw IOException(msg);
+        }
+
+        val body = res.body?.string();
+        this.loggerProxy.debug("Fetched test-run results: $body");
+        try {
+            val results = Gson().fromJson(body, TestRunResultsResponse::class.java);
+            return results;
+        } catch (e: JsonSyntaxException) {
+            this.loggerProxy.info("Failed to parse test-run results: $body");
+            throw e;
+        }
+    }
+    private fun fetchTestRunTx(runId: Int): Array<TestRunTransactionsResponse> {
+        val apiPath = ApiTestRunTx(
+            mapOf(
+                "runId" to "$runId",
+            )
+        ).path;
+
+        val res = this.apiClient.get(apiPath);
+        if (res.code != 200) {
+            val msg = "Failed to fetch test-run transactions: ${res.code}, ${res.body?.string()}"
+            this.loggerProxy.info(msg);
+            throw IOException(msg);
+        }
+
+        val body = res.body?.string();
+        this.loggerProxy.debug("Fetched transactions results: $body");
+        try {
+            val results = Gson().fromJson(body, Array<TestRunTransactionsResponse>::class.java);
+            return results;
+        } catch (e: JsonSyntaxException) {
+            this.loggerProxy.info("Failed to parse test-run transactions: $body");
+            throw e;
+        }
+    }
+
+    fun fetchTrending(testRun: LoadTestRun, benchmarkId: Int?): TrendingDataWrapper {
+        val results = this.fetchTestRunResults(testRun.id);
+        val txArr = this.fetchTestRunTx(testRun.id);
+        val trendingDataWrapper = TrendingDataWrapper(
+            testRun,
+            results,
+            txArr,
+            this.apiClient.getServerConfiguration().tenantId,
+            benchmarkId
+        );
+
+        return trendingDataWrapper;
+    }
+}

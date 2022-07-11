@@ -1,0 +1,334 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{pageTitle}}</title>
+    <style>
+        {{pureCss}}
+    </style>
+    <style>
+        body{
+            font-size: 15px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .impr {
+            color: #008000;
+        }
+
+        .minorRegr {
+            color: #a8a800;
+        }
+
+        .majorRegr {
+            color: #9b0000;
+        }
+
+        .trend > span {
+            display: none;
+        }
+
+        /*.trend:hover > span {*/
+            /*display: inline-block;*/
+        /*}*/
+    </style>
+<body>
+<div class="pure-g">
+    <div class="pure-u-3-24"></div>
+    <div class="pure-u-18-24" style="overflow-x: none;">
+        <h1 id="pageTitle">{{pageTitle}}</h1>
+        <div>
+            <h3>Test Id: {{testId}}</h3>
+            <h3>Test Name: {{testName}}</h3>
+        </div>
+        <hr>
+        <h2>Overview</h2>
+        <div style="overflow-x: auto;">
+        <table class="pure-table pure-table-striped">
+            <thead>
+            <tr>
+                <th nowrap>Run#</th>
+                <th nowrap>Build#</th>
+                <th nowrap>Hits per second (hits/s)</th>
+                <th nowrap>Avg Throughput (bytes/s)</th>
+                <th nowrap>Errors per second</th>
+                <th nowrap>Transactions per second</th>
+                {% if(extraContent) %}
+                <th nowrap>Init</th>
+                {% endif %}
+                <th nowrap>Duration</th>
+                <th nowrap>Vusers</th>
+                <th nowrap>Status</th>
+                <th nowrap>Date</th>
+            </tr>
+            </thead>
+            <tbody id="metrics">
+            </tbody>
+        </table>
+        </div>
+        <hr>
+        <h2>Transaction Response Time</h2>
+
+
+        <div style="overflow-x: auto;">
+            <table class="pure-table pure-table-striped">
+                <thead id="trtHeads">
+
+                </thead>
+                <tbody id="trt">
+
+                </tbody>
+            </table>
+            <ul>
+                {% if (benchmark) %}
+                <li>Benchmark: Run#{{benchmark}}</li>
+                {% else %}
+                <li>Benchmark: Previous</li>
+                {% endif %}
+                <li class="impr">
+                    Improvement: Avg &lt; -{{trtAvgTholdImpr}}%, Percentile &lt; -{{trtPctlTholdImpr}}%
+                </li>
+                <li class="minorRegr">
+                    Minor Regression: Avg &gt; {{trtAvgTholdMinorRegr}}%, Percentile &gt; {{trtPctlTholdMinorRegr}}%
+                </li>
+                <li class="majorRegr">
+                    Major Regression: Avg &gt; {{trtAvgTholdMajorRegr}}%, Percentile &gt; {{trtPctlTholdMajorRegr}}%
+                </li>
+            </ul>
+        </div>
+        <hr>
+        <p style="color: grey; font-size: small">* Build jobs that do not have LoadRunner Cloud test run data are not included in this report.</p>
+        <textarea style="display: none;" id="generatorLogs" cols="30" rows="10">
+            {{ generatorLogs }}
+        </textarea>
+    </div>
+    <div class="pure-u-3-24"></div>
+</div>
+<script type="template" id="tmpl_overview_item">
+    <td><%= runId %></td>
+    <td><%= buildNo %></td>
+    <td><%= avgHits %></td>
+    <td><%= avgThroughput %></td>
+    <td><%= errorsPerSec %></td>
+    <td><% print(tps.toFixed(3)) %></td>
+    {% if(extraContent) %}
+    <td><%= initDurationStr %></td>
+    {% endif %}
+    <td><%= durationStr %></td>
+    <td><%= vusers %></td>
+    <td><%= status %></td>
+    <td><%= date %></td>
+</script>
+<script>
+    {{lodashjs | raw}}
+</script>
+<script>
+    {{momentjs | raw}}
+</script>
+<script>
+    // https://github.com/uxitten/polyfill/blob/master/string.polyfill.js
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/padStart
+
+    String.prototype.padStart = function padStart(targetLength,padString) {
+        targetLength = targetLength>>0; //truncate if number or convert non-number to 0;
+        padString = String((typeof padString !== 'undefined' ? padString : ' '));
+        if (this.length > targetLength) {
+            return String(this);
+        }
+        else {
+            targetLength = targetLength-this.length;
+            if (targetLength > padString.length) {
+                padString += padString.repeat(targetLength/padString.length); //append to original to ensure we are longer than needed
+            }
+            return padString.slice(0,targetLength) + String(this);
+        }
+    };
+
+</script>
+<script>
+    var data = {{data | raw}};
+    _.each(data, function(val, key) {
+        try {
+            data[key] = JSON.parse(val);
+        } catch (e) {
+            data[key] = val;
+        }
+    });
+</script>
+<script>
+    const timeFormatter = function (sec) {
+        sec = Math.ceil(sec);
+
+        if (sec < 0) {
+            sec = 0;
+        }
+
+        var hours = Math.floor(sec / 3600);
+        var minutes = Math.floor((sec - (hours * 3600)) / 60);
+        var seconds = sec - (hours * 3600) - (minutes * 60);
+        // round millisecond part
+        seconds = Math.round(seconds * 1000) / 1000;
+
+        if (hours < 10) {
+            hours = '0' + hours;
+        }
+        if (minutes < 10) {
+            minutes = '0' + minutes;
+        }
+        if (seconds < 10) {
+            seconds = '0' + seconds;
+        }
+
+        return hours + ':' + minutes + ':' + seconds;
+    };
+
+    var renderMetrics = function () {
+        var metricsTableDOM = document.getElementById('metrics');
+        var metricsTmplStr = document.getElementById('tmpl_overview_item').innerHTML;
+        var metricsRowTmpl = _.template(metricsTmplStr);
+
+        _.each(data.metrics, function (item) {
+            var rowNode = document.createElement("tr");
+            item.extraContent = data.extraContent;
+            if (item.duration && !_.isNaN(item.duration)) {
+                item.durationStr = timeFormatter(item.duration)
+            } else {
+                item.durationStr = "N/A";
+            }
+
+            if (item.initDuration && item.initDuration !== -1 && !_.isNaN(item.initDuration)) {
+                item.initDurationStr = timeFormatter(item.initDuration / 1000)
+            } else {
+                item.initDurationStr = 'N/A';
+            }
+            rowNode.innerHTML = metricsRowTmpl(item);
+            metricsTableDOM.appendChild(rowNode);
+        });
+    };
+    var renderTRT = function () {
+        var trtTbodyDOM = document.getElementById('trt');
+        var trtHeadsDOM = document.getElementById('trtHeads');
+
+        var trtRowTmpl = _.template('<td nowrap><%= transactionName %>, <%= scriptName %></td>');
+        var trtRowEachRunTmpl = _.template('' +
+            '<td class="trend ' +
+            '   <% if (isAvgImpr) {print(\"impr\")} ' +
+            '       else if (isAvgMinorRegr) {print(\"minorRegr\")} ' +
+            '       else if (isAvgMajorRegr) {print(\"majorRegr\")} %>' +
+            '">' +
+            '<% if (avg === 0 && avgTrend !== 0) { print("< 0.001") } else { print(avg) } %> <% if (avgTrend !== 0) {print("(" + avgTrend + "%)")} %>' +
+            '<% if (avgTrend > 0) { print("&#8593;") } else if (avgTrend < 0) { print("&#8595;") } %>' +
+            '<span><%= avgTrendCalc %></span>' +
+            '</td>' +
+            '<td class="trend ' +
+            '   <% if (is90thImpr) {print("impr")} ' +
+            '       else if (is90thMinorRegr) {print("minorRegr")} ' +
+            '       else if (is90thMajorRegr) {print("majorRegr")} %>' +
+            '">' +
+            '<% if (ninetieth === 0 && ninetiethTrend !== 0) { print("< 0.001") } else { print(ninetieth) } %> <% if (ninetiethTrend !== 0) {print("(" + ninetiethTrend + "%)")} %>' +
+            '<% if (ninetiethTrend > 0) { print("&#8593;") } else if (ninetiethTrend < 0) { print("&#8595;") } %>' +
+            '<span><%= ninetiethTrendCalc %></span>' +
+            '</td>');
+        var trtHeadTmlpStr = '<th>Transaction & Script</th>';
+        var trtRunHeadTmpl =_.template('<th nowrap colspan="2" id="<%= runId %>">Run#<%= runId %> (Build#<%= buildNo %>)</th>');
+        var trtSecondHeadTmplStr = '<th></th>';
+
+        var runsFromTrt = [];
+        //sort the runIds desc first;
+        _.each(data.trt, function (transactionGroup) {
+            _.each(transactionGroup.trtDataArr, function (transactionItem) {
+                var existedRun = _.find(runsFromTrt, {runId: transactionItem.runId});
+                if (existedRun) {
+                    return;
+                }
+
+                runsFromTrt.splice(_.sortedLastIndex(_.map(runsFromTrt, "runId"), transactionItem.runId), 0, transactionItem);
+            });
+        });
+
+        runsFromTrt = _.reverse(runsFromTrt);
+
+        _.each(runsFromTrt, function (transactionItem) {
+            trtHeadTmlpStr += trtRunHeadTmpl(transactionItem);
+            trtSecondHeadTmplStr += '<td> Avg </td><td>'+ transactionItem.percentile +'th% </td>';
+        });
+
+        var trtHeadRow = document.createElement('tr');
+        trtHeadRow.innerHTML = trtHeadTmlpStr;
+        var trt2ndHeadRow = document.createElement('tr');
+        trt2ndHeadRow.innerHTML = trtSecondHeadTmplStr;
+        trtHeadsDOM.appendChild(trtHeadRow);
+        trtHeadsDOM.appendChild(trt2ndHeadRow);
+
+        let orderedTrt = [];
+        if (data && data.trt && _.isFunction(data.trt.sort)) {
+            orderedTrt = data.trt.sort((a, b) => {
+                if (!a || !b) {
+                    return 1;
+                }
+
+                const aTitle = `${a.transactionName} ${a.scriptName}`.toLowerCase();
+                const bTitle = `${b.transactionName} ${b.scriptName}`.toLowerCase();
+
+                return aTitle.localeCompare(bTitle);
+            });
+        }
+
+        _.each(orderedTrt, function (item) {
+           var row = trtRowTmpl(item);
+           _.each(runsFromTrt, function (run) {
+               var correspondRun = _.find(item.trtDataArr, {runId: run.runId});
+               if (correspondRun) {
+                   row += trtRowEachRunTmpl(correspondRun);
+               } else {
+                   row += '<td>N/A</td><td>N/A</td>'
+               }
+           });
+           var rowDOM = document.createElement('tr');
+           rowDOM.innerHTML = row;
+           trtTbodyDOM.appendChild(rowDOM);
+        });
+
+    };
+
+    window.onload = function () {
+        renderMetrics();
+
+        renderTRT();
+
+        var pageTitleDOM = document.getElementById('pageTitle');
+        var debugSwitcherTimer = null;
+        var clickingFlag = 0;
+        pageTitleDOM.onclick = function () {
+            clickingFlag += 1;
+            clearInterval(debugSwitcherTimer);
+            debugSwitcherTimer = null;
+            if (clickingFlag === 5) {
+                var style=document.createElement('style');
+                style.type='text/css';
+                if(style.styleSheet){
+                    style.styleSheet.cssText=".trend:hover > span { display: inline-block; }";
+                }else{
+                    style.appendChild(document.createTextNode('.trend:hover > span { display: inline-block; }'));
+                }
+                document.getElementsByTagName('head')[0].appendChild(style);
+
+                document.getElementById('generatorLogs').style = '';
+            }
+            console.log(clickingFlag);
+            if (!debugSwitcherTimer) {
+                debugSwitcherTimer = setInterval(function () {
+                    clickingFlag = 0;
+                }, 3000);
+            }
+        };
+    };
+
+</script>
+</body>
+</html>

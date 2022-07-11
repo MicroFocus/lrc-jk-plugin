@@ -1,0 +1,63 @@
+<?jelly escape-by-default='true'?>
+<j:jelly
+        xmlns:j="jelly:core"
+        xmlns:f="/lib/form">
+    <!--
+      This Jelly script is used to produce the global configuration option.
+
+      Jenkins uses a set of tag libraries to provide uniformity in forms.
+      To determine where this tag is defined, first check the namespace URI,
+      and then look under $JENKINS/views/. For example, <f:section> is defined
+      in $JENKINS/views/lib/form/section.jelly.
+
+      It's also often useful to just check other similar scripts to see what
+      tags they use. Views are always organized according to its owner class,
+      so it should be straightforward to find them.
+    -->
+    <f:section title="LoadRunner Cloud">
+        <f:entry title="Username" field="username" description="Your username login to LoadRunner Cloud, for example: loadrunner.cloud@microfocus.com">
+            <f:textbox />
+        </f:entry>
+        <f:entry title="Password" field="password" description="Your password login to LoadRunner Cloud">
+            <f:password />
+        </f:entry>
+        <f:entry title="URL" field="url" description="LoadRunner Cloud URL, for example: https://loadrunner-cloud.saas.microfocus.com">
+            <f:textbox />
+        </f:entry>
+        <f:block>
+            <f:optionalBlock checked="${descriptor.useOAuth}" name="useOAuth" field="useOAuth" inline="true" title="Use OAuth token">
+                <f:entry title="Client ID" field="clientId" description="If set, all jobs will use this instead of username and password">
+                    <f:textbox />
+                </f:entry>
+                <f:entry title="Client Secret" field="clientSecret">
+                    <f:password />
+                </f:entry>
+                <f:entry title="Tenant ID" field="tenantId">
+                    <f:textbox />
+                </f:entry>
+            </f:optionalBlock>
+        </f:block>
+        <f:block>
+            <f:optionalBlock checked="${descriptor.useProxy}" name="useProxy" field="useProxy" inline="true" title="Use proxy connecting to LoadRunner Cloud server">
+                <f:entry title="Proxy Host" field="proxyHost" description="If set, all other proxy settings will be ignored while connecting to LoadRunner Cloud server.">
+                    <f:textbox />
+                </f:entry>
+                <f:entry title="Proxy Port" field="proxyPort" >
+                    <f:textbox />
+                </f:entry>
+                <f:entry title="Proxy Username" field="proxyUsername" >
+                    <f:textbox />
+                </f:entry>
+                <f:entry title="Proxy Password" field="proxyPassword" >
+                    <f:password />
+                </f:entry>
+            </f:optionalBlock>
+        </f:block>
+
+        <f:validateButton title="Test Connection" progress="Testing..."
+                          method="testConnection"
+                          with="username,password,url,useProxy,proxyHost,proxyPort,proxyUsername,proxyPassword,useOAuth,clientId,clientSecret,tenantId"
+        />
+
+    </f:section>
+</j:jelly>
