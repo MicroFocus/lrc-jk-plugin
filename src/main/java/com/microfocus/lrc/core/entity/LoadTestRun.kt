@@ -1,11 +1,12 @@
 package com.microfocus.lrc.core.entity
 
 import com.google.gson.JsonObject
+import java.io.Serializable
 
 class LoadTestRun(
     val id: Int,
     val loadTest: LoadTest
-) {
+): Serializable {
     val statusCode: Int = 200;
     var hasReport: Boolean = false;
     var detailedStatus: String = "NA";

@@ -105,7 +105,7 @@ class TestRunPublisherTest {
                 val testRun = LoadTestRun(-1, lt);
                 testRun.statusEnum = TestRunStatus.PASSED;
 
-                buildResultObj.addProperty("testRun", Gson().toJson(testRun).toString());
+                buildResultObj.addProperty("testRun", Gson().toJson(testRun));
 
                 build.workspace!!.child("build_result_${build.id}").write(
                     buildResultObj.toString(),

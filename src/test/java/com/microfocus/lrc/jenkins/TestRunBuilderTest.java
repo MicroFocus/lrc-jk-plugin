@@ -6,6 +6,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.microfocus.lrc.MockServerResponseGenerator;
+import com.microfocus.lrc.core.entity.LoadTestRun;
 import com.microfocus.lrc.core.entity.OptionInEnvVars;
 import com.microfocus.lrc.core.entity.TestRunStatus;
 import hudson.EnvVars;
@@ -128,6 +129,8 @@ public class TestRunBuilderTest {
             responseReportContent.setHeader("Content-Type", "application/octet-stream");
             mockserver.enqueue(responseReportContent);
         }
+
+        MockServerResponseGenerator.mockTransactions(mockserver);
     }
 
     @Test
@@ -167,15 +170,15 @@ public class TestRunBuilderTest {
         Assert.assertTrue(workspace.child("lrc_report_FAKE_TENANT_ID--1.docx").exists());
         Assert.assertTrue(workspace.child("lrc_report_FAKE_TENANT_ID--1.pdf").exists());
         Assert.assertTrue(workspace.child("lrc_report_FAKE_TENANT_ID--1.csv").exists());
+        Assert.assertTrue(workspace.child("lrc_report_trans_FAKE_TENANT_ID--1.csv").exists());
         FilePath buildResultFile = workspace.child("build_result_" + b.getId());
 
         Assert.assertTrue(buildResultFile.exists());
         // assert build result file contains correct data
         String buildResult = buildResultFile.readToString();
         JsonObject resultObj = new Gson().fromJson(buildResult, JsonObject.class);
-        resultObj.get("testRun").getAsJsonObject().remove("reports");
+        LoadTestRun testRun = new Gson().fromJson(resultObj.get("testRun").getAsString(), LoadTestRun.class);
         System.out.println(resultObj);
-
-        Assert.assertEquals(resultObj.get("testRun").getAsJsonObject().get("id").getAsInt(), -1);
+        Assert.assertEquals(testRun.getId(), -1);
     }
 }

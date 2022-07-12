@@ -72,5 +72,10 @@ class TestRunTransactionsResponse(
     val avgTRT: Float,
     val percentileTRT: Float,
     val breakers: Float,
+    val slaStatus: String,
     val slaThreshold: Int,
+    val stdDeviation: Float,
+    val passed: Int,
+    val failed: Int,
+    val slaTrend: Float,
 )

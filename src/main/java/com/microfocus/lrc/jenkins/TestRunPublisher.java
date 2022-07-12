@@ -177,51 +177,17 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
 
 
         JsonObject buildResult = new Gson().fromJson(buildResultPath.readToString(), JsonObject.class);
-        TestRunBuilder.DescriptorImpl descriptor = Jenkins
-                .getInstanceOrNull()
-                .getDescriptorByType(TestRunBuilder.DescriptorImpl.class);
-        JsonObject serverConfigJSON = new JsonObject();
-
-        serverConfigJSON.addProperty("url", descriptor.getUrl());
-        serverConfigJSON.addProperty("username", descriptor.getUsername());
-        serverConfigJSON.addProperty("password", Secret.fromString(descriptor.getPassword()).getPlainText());
-        serverConfigJSON.addProperty("tenantId", buildResult.get("tenantId").getAsString());
-        serverConfigJSON.addProperty("projectId", buildResult.get("projectId").getAsInt());
-        serverConfigJSON.addProperty("sendEmail", buildResult.get("sendEmail").getAsBoolean());
-        serverConfigJSON.addProperty("useOAuth", descriptor.getUseOAuth());
-        serverConfigJSON.addProperty("clientId", descriptor.getClientId());
-        if (StringUtils.isNotEmpty(descriptor.getClientSecret())) {
-            serverConfigJSON.addProperty(
-                    "clientSecret",
-                    Secret.fromString(descriptor.getClientSecret()).getPlainText()
-            );
-        } else {
-            serverConfigJSON.addProperty("clientSecret", "");
+        Jenkins instance = Jenkins.getInstanceOrNull();
+        if (instance == null) {
+            logger.println("Failed to get Jenkins instance");
+            build.setResult(Result.FAILURE);
+            return;
         }
 
-        ServerConfiguration serverConfiguration;
-        if (serverConfigJSON.get("useOAuth").getAsBoolean()) {
-            serverConfiguration = new ServerConfiguration(
-                    serverConfigJSON.get("url").getAsString(),
-                    serverConfigJSON.get("clientId").getAsString(),
-                    serverConfigJSON.get("clientSecret").getAsString(),
-                    serverConfigJSON.get("tenantId").getAsString(),
-                    serverConfigJSON.get("projectId").getAsInt(),
-                    serverConfigJSON.get("sendEmail").getAsBoolean(),
-                    "jenkins-plugin"
-            );
-        } else {
-            serverConfiguration = new ServerConfiguration(
-                    serverConfigJSON.get("url").getAsString(),
-                    serverConfigJSON.get("username").getAsString(),
-                    serverConfigJSON.get("password").getAsString(),
-                    serverConfigJSON.get("tenantId").getAsString(),
-                    serverConfigJSON.get("projectId").getAsInt(),
-                    serverConfigJSON.get("sendEmail").getAsBoolean(),
-                    "jenkins-plugin"
-            );
-        }
-
+        TestRunBuilder.DescriptorImpl descriptor = instance.getDescriptorByType(
+                TestRunBuilder.DescriptorImpl.class
+        );
+        ServerConfiguration serverConfiguration = readServerConfiguration(buildResult, descriptor);
         ProxyConfiguration proxyConfig = ProxyConfigurationFactory.createProxyConfiguration(
                 serverConfiguration.getUrl(),
                 descriptor.getUseProxy(),
@@ -233,8 +199,12 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
         );
         serverConfiguration.setProxyConfiguration(proxyConfig);
 
-
         LoadTestRun testRun = new Gson().fromJson(buildResult.get("testRun").getAsString(), LoadTestRun.class);
+        if (testRun == null) {
+            logger.println("Test run not found in build result file. Make sure the test run ended successfully.");
+            build.setResult(Result.FAILURE);
+            return;
+        }
         String uiStatus = testRun.getDetailedStatus();
 
         TrendingConfiguration trendingCfg = this.getTrendingConfig();
@@ -308,6 +278,55 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
         } catch (Exception ex) {
             logger.println("failed to write trending report html, " + ex.getMessage());
         }
+    }
+
+    @NonNull
+    private ServerConfiguration readServerConfiguration(
+            final JsonObject buildResult,
+            final TestRunBuilder.DescriptorImpl descriptor
+    ) {
+        JsonObject serverConfigJSON = new JsonObject();
+
+        serverConfigJSON.addProperty("url", descriptor.getUrl());
+        serverConfigJSON.addProperty("username", descriptor.getUsername());
+        serverConfigJSON.addProperty("password", Secret.fromString(descriptor.getPassword()).getPlainText());
+        serverConfigJSON.addProperty("tenantId", buildResult.get("tenantId").getAsString());
+        serverConfigJSON.addProperty("projectId", buildResult.get("projectId").getAsInt());
+        serverConfigJSON.addProperty("sendEmail", buildResult.get("sendEmail").getAsBoolean());
+        serverConfigJSON.addProperty("useOAuth", descriptor.getUseOAuth());
+        serverConfigJSON.addProperty("clientId", descriptor.getClientId());
+        if (StringUtils.isNotEmpty(descriptor.getClientSecret())) {
+            serverConfigJSON.addProperty(
+                    "clientSecret",
+                    Secret.fromString(descriptor.getClientSecret()).getPlainText()
+            );
+        } else {
+            serverConfigJSON.addProperty("clientSecret", "");
+        }
+
+        ServerConfiguration serverConfiguration;
+        if (serverConfigJSON.get("useOAuth").getAsBoolean()) {
+            serverConfiguration = new ServerConfiguration(
+                    serverConfigJSON.get("url").getAsString(),
+                    serverConfigJSON.get("clientId").getAsString(),
+                    serverConfigJSON.get("clientSecret").getAsString(),
+                    serverConfigJSON.get("tenantId").getAsString(),
+                    serverConfigJSON.get("projectId").getAsInt(),
+                    serverConfigJSON.get("sendEmail").getAsBoolean(),
+                    "jenkins-plugin"
+            );
+        } else {
+            serverConfiguration = new ServerConfiguration(
+                    serverConfigJSON.get("url").getAsString(),
+                    serverConfigJSON.get("username").getAsString(),
+                    serverConfigJSON.get("password").getAsString(),
+                    serverConfigJSON.get("tenantId").getAsString(),
+                    serverConfigJSON.get("projectId").getAsInt(),
+                    serverConfigJSON.get("sendEmail").getAsBoolean(),
+                    "jenkins-plugin"
+            );
+        }
+        return serverConfiguration;
     }
 
     @SuppressWarnings({"checkstyle:MissingJavadocMethod", "checkstyle:ParameterNumber"})

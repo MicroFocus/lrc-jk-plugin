@@ -7,12 +7,28 @@ import com.microfocus.lrc.core.ApiClient
 import com.microfocus.lrc.core.XmlReport
 import com.microfocus.lrc.core.entity.*
 import com.microfocus.lrc.jenkins.LoggerProxy
+import java.io.ByteArrayOutputStream
 import java.io.IOException
 
 class ReportDownloader(
     private val apiClient: ApiClient,
     private val loggerProxy: LoggerProxy,
 ) {
+    companion object {
+        @JvmStatic
+        fun writeCsvBytesArray(transactions: Array<TestRunTransactionsResponse>): ByteArray {
+            val stream = ByteArrayOutputStream();
+            val writer = stream.writer();
+            writer.appendLine("Script Name, Transaction, %Breakers, SLA Status, AVG Duration, Min, Max, STD. Deviation, Passed, Failed, Percentile, SLA Threshold, Percentile Trend");
+            transactions.forEach { tx ->
+                writer.appendLine("${tx.scriptName}, ${tx.name}, ${tx.breakers}, ${tx.slaStatus}, ${tx.avgTRT}, ${tx.minTRT}, ${tx.maxTRT}, ${tx.stdDeviation}, ${tx.passed}, ${tx.failed}, ${tx.percentileTRT}, ${tx.slaThreshold}, ${tx.slaTrend}");
+            }
+            writer.flush();
+
+            return stream.toByteArray();
+        }
+    }
+
     fun download(testRun: LoadTestRun, reportTypes: Array<String>) {
         // validate report types
         val validReportTypes = reportTypes.filter {
@@ -50,6 +66,7 @@ class ReportDownloader(
         }
 
         genXmlFile(testRun);
+        genTxCsv(testRun);
     }
 
     private fun requestReportId(runId: Int, reportType: String): Int {
@@ -159,6 +176,7 @@ class ReportDownloader(
             throw e;
         }
     }
+
     private fun fetchTestRunTx(runId: Int): Array<TestRunTransactionsResponse> {
         val apiPath = ApiTestRunTx(
             mapOf(
@@ -182,6 +200,13 @@ class ReportDownloader(
             this.loggerProxy.info("Failed to parse test-run transactions: $body");
             throw e;
         }
+    }
+
+    private fun genTxCsv(testRun: LoadTestRun) {
+        // #TODO: could the tx be cached?
+        val txArr = fetchTestRunTx(testRun.id);
+        val fileName = "lrc_report_trans_${this.apiClient.getServerConfiguration().tenantId}-${testRun.id}.csv";
+        testRun.reports[fileName] = writeCsvBytesArray(txArr);
     }
 
     fun fetchTrending(testRun: LoadTestRun, benchmarkId: Int?): TrendingDataWrapper {

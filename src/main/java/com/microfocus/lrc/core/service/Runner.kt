@@ -7,6 +7,7 @@ import com.microfocus.lrc.jenkins.LoggerProxy
 import java.io.Closeable
 import java.io.IOException
 import java.io.PrintStream
+import java.io.Serializable
 
 enum class RunStatus(val value: String) {
     RUNNING("RUNNING"),
@@ -17,35 +18,40 @@ enum class RunStatus(val value: String) {
 
 class Runner(
     private val serverConfiguration: ServerConfiguration,
-    private val logger: PrintStream = System.out,
-    private val options: Map<String, String> = mapOf()
-) : Closeable {
+    @Transient private val logger: PrintStream = System.out,
+    options: Map<String, String> = mapOf()
+) : Serializable, Closeable {
 
     private val isDebugLoggingEnabled = options.getOrDefault(
         OptionInEnvVars.LRC_DEBUG_LOG.name,
         "false"
     ) == "true";
 
+    @Transient
     private val loggerProxy = LoggerProxy(
         this.logger,
         LoggerOptions(this.isDebugLoggingEnabled, "Runner")
     );
 
+    @Transient
     private val apiClient = ApiClientFactory.getClient(
         this.serverConfiguration,
         LoggerProxy(this.logger, LoggerOptions(this.isDebugLoggingEnabled, "ApiClient"))
     );
 
+    @Transient
     private val loadTestService = LoadTestService(
         this.apiClient,
         LoggerProxy(this.logger, LoggerOptions(this.isDebugLoggingEnabled, "LoadTestService"))
     );
 
+    @Transient
     private val loadTestRunService = LoadTestRunService(
         this.apiClient,
         LoggerProxy(this.logger, LoggerOptions(this.isDebugLoggingEnabled, "LoadTestRunService"))
     );
 
+    @Transient
     private val reportDownloader = ReportDownloader(
         this.apiClient,
         LoggerProxy(this.logger, LoggerOptions(this.isDebugLoggingEnabled, "ReportDownloader"))

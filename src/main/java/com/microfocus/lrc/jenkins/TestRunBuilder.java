@@ -632,6 +632,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
             FilePath file = workspace.child(fileName);
             try (OutputStream out = file.write()) {
                 out.write(content);
+                logger.println("Report file " + file.getRemote() + " created.");
             } catch (IOException | InterruptedException e) {
                 logger.println("Error during writing file " + fileName + ", " + e.getMessage());
             }
@@ -767,9 +768,9 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
             logger.println("execution ended gracefully");
 
             JsonObject resultObj = new Gson().fromJson(result, JsonObject.class);
-            JsonObject testRunObj = resultObj.get("testRun").getAsJsonObject();
+            String testRunObj = resultObj.get("testRun").getAsString();
             testRun = new Gson().fromJson(testRunObj, LoadTestRun.class);
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             this.logger.println("failed to get run result after interruption: " + ex.getMessage());
         }
         return testRun;
@@ -830,8 +831,8 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
                 );
                 testRun = this.runner.getTestRun();
                 testRun = this.runner.run(this.testRunOptions);
-                JSONObject buildResult = JSONObject.fromObject(this.resultStr);
-                buildResult.put("testRun", testRun);
+                JsonObject buildResult = new Gson().fromJson(this.resultStr, JsonObject.class);
+                buildResult.addProperty("testRun", new Gson().toJson(testRun));
 
                 try {
                     resultFilePath.write(buildResult.toString(), "UTF-8");
@@ -862,8 +863,8 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
                         this.listener.getLogger().println("interruption handler exception: " + e.getMessage());
                     }
                 } finally {
-                    JSONObject buildResult = JSONObject.fromObject(this.resultStr);
-                    buildResult.put("testRun", testRun);
+                    JsonObject buildResult = new Gson().fromJson(this.resultStr, JsonObject.class);
+                    buildResult.addProperty("testRun", new Gson().toJson(testRun));
 
                     try {
                         resultFilePath.write(buildResult.toString(), "UTF-8");
