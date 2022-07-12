@@ -31,15 +31,16 @@ class LoadTestService(
         return lt;
     }
 
-    fun startTestRun(id: Int): Int {
-        val emptyPayload = JsonObject();
+    fun startTestRun(id: Int, sendEmail: Boolean): Int {
+        val payload = JsonObject();
+        payload.addProperty("sendEmail", sendEmail);
         val apiPath = ApiStartTestRun(
             mapOf(
                 "projectId" to "${this.client.getServerConfiguration().projectId}",
                 "loadTestId" to "$id"
             )
         ).path;
-        val res = this.client.post(apiPath, emptyPayload);
+        val res = this.client.post(apiPath, payload);
         val bodyString = res.body?.string();
         if (res.code == 200) {
             val resObj = Gson().fromJson(bodyString, JsonObject::class.java);

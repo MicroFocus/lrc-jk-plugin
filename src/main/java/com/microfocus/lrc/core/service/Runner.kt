@@ -66,7 +66,7 @@ class Runner(
         this.loggerProxy.info("fetching load test ${options.testId}...");
         val lt = this.loadTestService.fetch(options.testId);
         this.loggerProxy.info("load test [${lt.name}] is going to start...");
-        val runId = this.loadTestService.startTestRun(lt.id);
+        val runId = this.loadTestService.startTestRun(lt.id, options.sendEmail);
         this.loggerProxy.info("test run [$runId] started.");
         val testRun = LoadTestRun(runId, lt);
         this.testRun = testRun;
