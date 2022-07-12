@@ -34,7 +34,7 @@
         <jenkins.version>2.289.2</jenkins.version>
         <java.level>8</java.level>
         <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
-        <kotlin.version>1.7.0</kotlin.version>
+        <kotlin.version>1.7.10</kotlin.version>
         <kotlin.compiler.incrementail>true</kotlin.compiler.incrementail>
     </properties>
 
