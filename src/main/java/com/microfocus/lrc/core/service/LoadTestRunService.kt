@@ -46,8 +46,6 @@ class LoadTestRunService(
             throw IOException("abort test run [${testRun.id}] failed");
         }
 
-        this.loggerProxy.info("abort test run result: $body");
-
         this.loggerProxy.info("aborting test run successfully.");
     }
 

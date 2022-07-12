@@ -447,7 +447,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
                         url,
                         username,
                         Secret.fromString(password).getPlainText(),
-                        "",
+                        tenantId,
                         0,
                         false,
                         ""

@@ -56,8 +56,8 @@ class ApiClient internal constructor(
             .addHeader("Content-Type", contentType)
             .addHeader("cache-control", "no-cache");
 
-        val csrf = this.csrfCookieStr;
-        if (csrf != null) {
+        if (this.csrfCookieStr != null) {
+            val csrf = "LWSSO_COOKIE_KEY=${this.csrfCookieStr}";
             reqBuilder.addHeader("Cookie", csrf);
         }
 

@@ -24,6 +24,9 @@
         <f:entry title="URL" field="url" description="LoadRunner Cloud URL, for example: https://loadrunner-cloud.saas.microfocus.com">
             <f:textbox />
         </f:entry>
+        <f:entry title="Tenant ID" field="tenantId">
+            <f:textbox />
+        </f:entry>
         <f:block>
             <f:optionalBlock checked="${descriptor.useOAuth}" name="useOAuth" field="useOAuth" inline="true" title="Use OAuth token">
                 <f:entry title="Client ID" field="clientId" description="If set, all jobs will use this instead of username and password">
@@ -31,9 +34,6 @@
                 </f:entry>
                 <f:entry title="Client Secret" field="clientSecret">
                     <f:password />
-                </f:entry>
-                <f:entry title="Tenant ID" field="tenantId">
-                    <f:textbox />
                 </f:entry>
             </f:optionalBlock>
         </f:block>
