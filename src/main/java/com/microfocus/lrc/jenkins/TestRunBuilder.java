@@ -97,7 +97,6 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         public boolean configure(final StaplerRequest req, final JSONObject formData) throws FormException {
             // set all properties from formData
             // validate all properties, throw FormException if invalid
-            System.out.println(formData.toString());
             this.username = formData.getString("username").trim();
             this.password = Secret.fromString(formData.getString("password").trim()).getEncryptedValue();
             this.url = org.apache.commons.lang.StringUtils.stripEnd(formData.getString("url").trim(), "/");
@@ -123,7 +122,6 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
             this.tenantId = formData.getString("tenantId").trim();
 
             save();
-            System.out.println("save done.");
             return super.configure(req, formData);
         }
 

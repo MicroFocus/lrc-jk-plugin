@@ -87,8 +87,6 @@ class ApiClient internal constructor(
         val reqBuilder = this.prepareRequestBuilder(urlBuilder.build(), contentType).get();
 
         try {
-            val fullPath = reqBuilder.build();
-            this.loggerProxy.debug("fullPath:$fullPath");
             return this.getOkhttpClient().newCall(reqBuilder.build()).execute();
         } catch (ex: UnknownHostException) {
             throw IOException("Cannot resolve hostname: ${ex.message}, please check your configuration");
@@ -104,8 +102,6 @@ class ApiClient internal constructor(
         reqBuilder.post(payload.toString().toRequestBody(MEDIA_TYPE_JSON));
 
         try {
-            val fullPath = reqBuilder.build();
-            this.loggerProxy.debug("fullPath:$fullPath");
             return this.getOkhttpClient().newCall(reqBuilder.build()).execute();
         } catch (ex: UnknownHostException) {
             throw IOException("Cannot resolve hostname: ${ex.message}, please check your configuration");
@@ -126,8 +122,6 @@ class ApiClient internal constructor(
         reqBuilder.put(payload.toString().toRequestBody(MEDIA_TYPE_JSON));
 
         try {
-            val fullPath = reqBuilder.build();
-            this.loggerProxy.debug("fullPath:$fullPath");
             return this.getOkhttpClient().newCall(reqBuilder.build()).execute();
         } catch (ex: UnknownHostException) {
             throw IOException("Cannot resolve hostname: ${ex.message}, please check your configuration");
@@ -170,7 +164,6 @@ class ApiClient internal constructor(
         val resObj = Gson().fromJson(body, JsonObject::class.java);
         if (resObj.has("token")) {
             this.tokenAuth = resObj["token"].asString;
-            this.loggerProxy.debug("got token: ${this.tokenAuth}");
         } else {
             throw IOException("login to ${this.serverConfiguration.url} failed, invalid response ${res.body?.string()}");
         }
