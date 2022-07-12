@@ -507,6 +507,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
     }
 
     private transient PrintStream logger = System.out;
+    private transient LoggerProxy loggerProxy = new LoggerProxy();
 
     @DataBoundConstructor
     public TestRunBuilder(
@@ -541,11 +542,12 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
             final @NonNull TaskListener listener
     ) throws InterruptedException, IOException {
         logger = listener.getLogger();
+        this.loggerProxy = new LoggerProxy(logger, new LoggerOptions(false, ""));
         printEnvInfo(run);
 
         TestRunBuilder.DescriptorImpl descriptor = (TestRunBuilder.DescriptorImpl) this.getDescriptor();
         if (isDescriptorEmpty()) {
-            logger.println(
+            this.loggerProxy.error(
                     "failed to read configuration of LoadRunner Cloud Plugin. "
                             + "Please check it in System Configuration and try again."
             );
@@ -594,20 +596,26 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
                 testRun = channel.call(callable);
             }
         } catch (IOException e) {
-            logger.println("[ERROR] " + e.getMessage());
+            this.loggerProxy.info("[ERROR] " + e.getMessage());
         } catch (InterruptedException e) {
             //#region this catch block will only be executed when the job runs on slave
 
-            logger.println("interruption occurred, waiting for execution ending.");
+            this.loggerProxy.info("interruption occurred, waiting for execution ending.");
             interruptionDone = "unknown";
             int elapsedWaiting = 0;
-            while ("unknown".equals(interruptionDone) && elapsedWaiting < 1000 * 60) {
-                Thread.sleep(3000);
-                elapsedWaiting += 3000;
+            while ("unknown".equals(interruptionDone) && elapsedWaiting < 1000 * 60 * 3) {
+                Thread.sleep(10000);
+                elapsedWaiting += 10000;
                 interruptionDone = EnvVars.getRemote(launcher.getChannel()).get(testIdVal + "_INTERRUPTION");
-                this.logger.println("still waiting for execution ending...");
+                this.loggerProxy.info("still waiting for execution ending...");
             }
             testRun = checkInterruptionDone(run, testRun, resultFile, interruptionDone);
+            this.loggerProxy.debug(
+                    new StringBuilder()
+                            .append("interruption done: ").append(interruptionDone)
+                            .append(", test run restored: ").append(testRun == null ? "null" : testRun.getId())
+                            .toString()
+            );
             //#endregion
         }
 
@@ -621,7 +629,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         }
 
         if (testRun == null) {
-            logger.println("run test failed, job end.");
+            this.loggerProxy.info("run test failed, job end.");
             run.setResult(Result.FAILURE);
             return;
         }
@@ -630,9 +638,9 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
             FilePath file = workspace.child(fileName);
             try (OutputStream out = file.write()) {
                 out.write(content);
-                logger.println("Report file " + file.getRemote() + " created.");
+                this.loggerProxy.info("Report file " + file.getRemote() + " created.");
             } catch (IOException | InterruptedException e) {
-                logger.println("Error during writing file " + fileName + ", " + e.getMessage());
+                this.loggerProxy.error("Error during writing file " + fileName + ", " + e.getMessage());
             }
         });
     }
@@ -642,7 +650,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         for (OptionInEnvVars key : OptionInEnvVars.values()) {
             String value = EnvVarsUtil.getEnvVar(run, launcher, key.name());
             if (StringUtils.isNotBlank(value) && !value.equals("0") && !value.equals("false")) {
-                this.logger.println("read " + key.name() + " from env vars: " + value);
+                this.loggerProxy.info("read " + key.name() + " from env vars: " + value);
                 map.put(key.name(), "true");
             }
         }
@@ -650,26 +658,26 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
     }
 
     private void printEnvInfo(final Run<?, ?> build) {
-        logger.println("=====================================");
-        logger.println("Current environment:");
+        this.loggerProxy.info("=====================================");
+        this.loggerProxy.info("Current environment:");
         VersionNumber ver = jenkins.model.Jenkins.getVersion();
         String verStr = "N/A";
         if (ver != null) {
             verStr = ver.toString();
         }
-        logger.println("  Jenkins version: " + verStr);
-        logger.println("  Java version: " + System.getProperty("java.version"));
+        this.loggerProxy.info("  Jenkins version: " + verStr);
+        this.loggerProxy.info("  Java version: " + System.getProperty("java.version"));
         Jenkins instance = Jenkins.getInstanceOrNull();
         String pluginVerStr = "N/A";
         if (instance != null) {
-            PluginWrapper plugin = instance.pluginManager.getPlugin("jenkinsStormPlugin");
+            PluginWrapper plugin = instance.pluginManager.getPlugin("loadrunner_cloud");
             if (plugin != null) {
                 pluginVerStr = plugin.getVersion();
             }
         }
-        logger.println("  LoadRunner Cloud plugin version: " + pluginVerStr);
-        logger.println("  Currently running on Jenkins node: " + build.getDisplayName());
-        logger.println("=====================================");
+        this.loggerProxy.info("  LoadRunner Cloud plugin version: " + pluginVerStr);
+        this.loggerProxy.info("  Currently running on Jenkins node: " + build.getDisplayName());
+        this.loggerProxy.info("=====================================");
     }
 
     private boolean isDescriptorEmpty() {
@@ -685,9 +693,9 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         JSONObject display = JSONObject.fromObject(config);
         display.remove("password");
         display.remove("proxyConfiguration");
-        logger.println("start job with parameters: ");
-        logger.println(display);
-        logger.println("=====================================");
+        this.loggerProxy.info("start job with parameters: ");
+        this.loggerProxy.info(display.toString());
+        this.loggerProxy.info("=====================================");
     }
 
     private ServerConfiguration createServerConfiguration(
@@ -734,7 +742,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         }
         boolean isFieldLoggedInCurrentBuild = isLogPrinted.containsKey(key) && isLogPrinted.get(key);
         if (!isFieldLoggedInCurrentBuild) {
-            logger.println(fieldName + " from parameter: " + fieldValue.toString());
+            this.loggerProxy.info(fieldName + " from parameter: " + fieldValue.toString());
             isLogPrinted.put(key, true);
         }
     }
@@ -747,8 +755,8 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
     ) throws InterruptedException {
         LoadTestRun restored = testRun;
         if ("unknown".equals(interruptionDone)) {
-            this.logger.println("Jenkins job interruption handler failed, stop waiting.");
-            this.logger.println(
+            this.loggerProxy.error("Jenkins job interruption handler failed, stop waiting.");
+            this.loggerProxy.info(
                     "you may need to go to the LoadRunner Cloud website "
                             + "to check if you need to stop the test manually."
             );
@@ -763,13 +771,13 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         LoadTestRun testRun = null;
         try {
             String result = resultFile.readToString();
-            logger.println("execution ended gracefully");
+            this.loggerProxy.info("execution ended gracefully");
 
             JsonObject resultObj = new Gson().fromJson(result, JsonObject.class);
             String testRunObj = resultObj.get("testRun").getAsString();
             testRun = new Gson().fromJson(testRunObj, LoadTestRun.class);
         } catch (Exception ex) {
-            this.logger.println("failed to get run result after interruption: " + ex.getMessage());
+            this.loggerProxy.error("failed to get run result after interruption: " + ex.getMessage());
         }
         return testRun;
     }
@@ -820,6 +828,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         @Override
         public LoadTestRun call() {
             String interruptionDoneFlagName = this.testRunOptions.getTestId() + "_INTERRUPTION";
+            LoggerProxy loggerProxy = new LoggerProxy(this.logger(), new LoggerOptions(false, ""));
             try {
                 EnvVars.masterEnvVars.remove(interruptionDoneFlagName);
                 this.runner = new Runner(
@@ -836,14 +845,14 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
                     resultFilePath.write(buildResult.toString(), "UTF-8");
 //                    Utils.getSystemLogger().log(Level.INFO, "result file " + resultFilePath.getRemote());
                 } catch (Exception e) {
-                    this.listener.getLogger().println(
+                    loggerProxy.error(
                             "Writing file [" + resultFilePath.getName() + "] failed, " + e.getMessage()
                     );
                 }
                 return testRun;
             } catch (InterruptedException | IOException ex) {
                 if (ex instanceof IOException && !"thread interrupted".equals(ex.getMessage())) {
-                    this.logger().println("error during [call]: " + ex.getMessage());
+                    loggerProxy.error("error during [call]: " + ex.getMessage());
                     if (runner != null) {
                         return testRun;
                     }
@@ -856,11 +865,17 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
                     this.listener.getLogger().println("job being interrupted...");
                     abortResult = runner.interruptHandler();
                 } catch (IOException | InterruptedException e) {
-                    this.listener.getLogger().println("interruption handler failed.");
+                    loggerProxy.error("interruption handler failed.");
                     if (e.getMessage() != null) {
-                        this.listener.getLogger().println("interruption handler exception: " + e.getMessage());
+                        loggerProxy.error("interruption handler exception: " + e.getMessage());
                     }
                 } finally {
+                    testRun = runner.getTestRun();
+                    if (testRun != null) {
+                        loggerProxy.debug("testRun: " + testRun.getId() + " ready to be written to file");
+                    } else {
+                        loggerProxy.debug("got null testRun from interruptHandler");
+                    }
                     JsonObject buildResult = new Gson().fromJson(this.resultStr, JsonObject.class);
                     buildResult.addProperty("testRun", new Gson().toJson(testRun));
 
@@ -868,12 +883,12 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
                         resultFilePath.write(buildResult.toString(), "UTF-8");
 //                        Utils.getSystemLogger().log(Level.INFO, "result file " + resultFilePath.getRemote());
                     } catch (Exception e) {
-                        this.listener.getLogger().println(
+                        loggerProxy.error(
                                 "Writing file [" + resultFilePath.getName() + "] failed, " + e.getMessage()
                         );
                     }
-                    this.listener.getLogger().println("job interruption handler end.");
-                    this.listener.getLogger().println(
+                    loggerProxy.info("job interruption handler end.");
+                    loggerProxy.info(
                             "the final status of LoadRunner Cloud test run is: " + abortResult
                     );
                     EnvVars.masterEnvVars.put(interruptionDoneFlagName, abortResult);

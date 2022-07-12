@@ -30,7 +30,7 @@ class LoadTestRunService(
         testRun.update(obj);
     }
 
-    private fun abort(testRun: LoadTestRun) {
+    fun abort(testRun: LoadTestRun) {
         val apiPath = ApiChangeTestRunStatus(
             mapOf(
                 "runId" to "${testRun.id}",
@@ -56,7 +56,7 @@ class LoadTestRunService(
         val maxRetry = 5;
         var retryTimes = 0;
         while (retryTimes < maxRetry && !testRun.statusEnum.isEnded) {
-            Thread.sleep(3000);
+            Thread.sleep(10000);
             this.fetchStatus(testRun);
             retryTimes += 1;
         }

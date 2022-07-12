@@ -126,16 +126,27 @@ class Runner(
         }
 
         this.loadTestRunService.fetchStatus(testRun);
-        return if (!testRun.hasReport) {
+
+        if (testRun.statusEnum == TestRunStatus.INITIALIZING) {
             this.loggerProxy.info("test run is initializing, abort...")
-            this.loadTestRunService.stop(testRun);
-            "ABORTED"
-        } else {
-            this.loggerProxy.info("test run is ${testRun.statusEnum.statusName}, stop it and fetch results before abort.")
-            this.loadTestRunService.stop(testRun);
-            this.reportDownloader.download(testRun, arrayOf("csv", "pdf", "docx"));
-            testRun.statusEnum.statusName;
+            this.loadTestRunService.abort(testRun);
+            this.testRun = testRun;
+            return TestRunStatus.ABORTED.statusName;
         }
+
+        this.loggerProxy.info("test run is ${testRun.statusEnum.statusName}, stop it and fetch results before abort.")
+        this.loadTestRunService.stop(testRun);
+        if (!testRun.testRunCompletelyEnded()) {
+            this.testRun = testRun;
+            return TestRunStatus.ABORTED.statusName;
+        }
+
+        this.waitingForReportReady(testRun);
+        if (testRun.hasReport) {
+            this.reportDownloader.download(testRun, arrayOf("csv", "pdf", "docx"));
+        }
+        this.testRun = testRun;
+        return testRun.statusEnum.statusName;
     }
 
     fun fetchTrending(testRun: LoadTestRun, benchmark: Int?): TrendingDataWrapper {
