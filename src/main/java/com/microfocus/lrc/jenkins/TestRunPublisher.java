@@ -290,7 +290,7 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
         serverConfigJSON.addProperty("url", descriptor.getUrl());
         serverConfigJSON.addProperty("username", descriptor.getUsername());
         serverConfigJSON.addProperty("password", Secret.fromString(descriptor.getPassword()).getPlainText());
-        serverConfigJSON.addProperty("tenantId", buildResult.get("tenantId").getAsString());
+        serverConfigJSON.addProperty("tenantId", descriptor.getTenantId());
         serverConfigJSON.addProperty("projectId", buildResult.get("projectId").getAsInt());
         serverConfigJSON.addProperty("sendEmail", buildResult.get("sendEmail").getAsBoolean());
         serverConfigJSON.addProperty("useOAuth", descriptor.getUseOAuth());

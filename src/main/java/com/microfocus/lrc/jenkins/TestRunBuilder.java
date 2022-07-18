@@ -36,15 +36,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class TestRunBuilder extends Builder implements SimpleBuildStep {
-    //#region getter/setter
-    public String getTenant() {
-        return tenant;
-    }
-
-    @DataBoundSetter
-    public void setTenant(final String tenant) {
-        this.tenant = tenant;
-    }
 
     public String getTestId() {
         return testId;
@@ -475,7 +466,6 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
 
     }
 
-    private String tenant;
     private String testId;
     private boolean sendEmail;
     private String projectId;
@@ -511,12 +501,10 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
 
     @DataBoundConstructor
     public TestRunBuilder(
-            final String tenant,
             final String projectId,
             final String testId,
             final boolean sendEmail
     ) {
-        this.setTenant(tenant.trim());
         this.setProjectId(projectId.trim());
         this.setTestId(testId.trim());
         this.setSendEmail(sendEmail);
@@ -569,7 +557,6 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         serverConfiguration.setProxyConfiguration(proxyConfiguration);
 
         JsonObject buildResult = new JsonObject();
-        buildResult.addProperty("tenantId", this.getTenant());
         buildResult.addProperty("projectId", this.getProjectIdAtRunTime(run, launcher));
         buildResult.addProperty("sendEmail", this.isSendEmail());
         String resultStr = buildResult.toString();
@@ -643,6 +630,12 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
                 this.loggerProxy.error("Error during writing file " + fileName + ", " + e.getMessage());
             }
         });
+
+        if (testRun.getStatusEnum().isSuccess()) {
+            run.setResult(Result.SUCCESS);
+        } else {
+            run.setResult(Result.FAILURE);
+        }
     }
 
     private Map<String, String> readConfigFromEnvVars(final Run<?, ?> run, final Launcher launcher) {
@@ -708,7 +701,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
                     descriptor.getUrl(),
                     descriptor.getClientId(),
                     Secret.fromString(descriptor.getClientSecret()).getPlainText(),
-                    this.tenant,
+                    descriptor.getTenantId(),
                     Integer.parseInt(this.getProjectIdAtRunTime(run, launcher)),
                     this.sendEmail,
                     "jenkins-plugin"
@@ -718,7 +711,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
                     descriptor.getUrl(),
                     descriptor.getUsername(),
                     Secret.fromString(descriptor.getPassword()).getPlainText(),
-                    this.tenant,
+                    descriptor.getTenantId(),
                     Integer.parseInt(this.getProjectIdAtRunTime(run, launcher)),
                     this.sendEmail,
                     "jenkins-plugin"

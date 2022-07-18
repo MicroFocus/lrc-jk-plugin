@@ -42,7 +42,7 @@ public class TestRunBuilderTest {
     @Test
     public void testConfigRoundtrip() throws Exception {
         FreeStyleProject project = jenkins.createFreeStyleProject();
-        TestRunBuilder builder = new TestRunBuilder("FAKETENANT", "FAKEPROJECT", "FAKETESTID", false);
+        TestRunBuilder builder = new TestRunBuilder("FAKEPROJECT", "FAKETESTID", false);
         TestRunBuilder.DescriptorImpl descriptor = jenkins.get(TestRunBuilder.DescriptorImpl.class);
         String baseUrl = mockserver.url("/").toString();
         descriptor.setUrl(baseUrl);
@@ -138,7 +138,7 @@ public class TestRunBuilderTest {
         EnvVars.masterEnvVars.put(OptionInEnvVars.LRC_DEBUG_LOG.name(), "false");
 
         FreeStyleProject project = jenkins.createFreeStyleProject();
-        TestRunBuilder builder = new TestRunBuilder("FAKE_TENANT_ID", "99", "999", false);
+        TestRunBuilder builder = new TestRunBuilder("99", "999", false);
         project.getBuildersList().add(builder);
         TestRunBuilder.DescriptorImpl descriptor = jenkins.get(TestRunBuilder.DescriptorImpl.class);
         String baseUrl = mockserver.url("/").toString();
@@ -153,10 +153,6 @@ public class TestRunBuilderTest {
         this.mockResponseNormal();
 
         FreeStyleBuild b = jenkins.buildAndAssertStatus(Result.SUCCESS, project);
-//        QueueTaskFuture<FreeStyleBuild> build = project.scheduleBuild2(0);
-//        FreeStyleBuild b = build.waitForStart();
-//        Thread.sleep(1000 * 10);
-////        b.doStop();
         BufferedReader rd = new BufferedReader(b.getLogReader());
         while (rd.ready()) {
             // print jenkins logs for debugging

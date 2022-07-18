@@ -16,7 +16,6 @@ class LoadTestRun(
     var startTime: Int = -1;
     var endTime: Int = -1;
 
-    @Transient
     var statusEnum: TestRunStatus = TestRunStatus.NA
         set(value) {
             field = value;

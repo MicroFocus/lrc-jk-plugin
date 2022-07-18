@@ -80,7 +80,7 @@ class ReportDownloader(
         val payload = JsonObject();
         payload.addProperty("reportType", reportType);
 
-        val res = this.apiClient.post(apiPath, payload);
+        val res = this.apiClient.post(apiPath, payload = payload);
         val body = res.body?.string();
         if (res.code != 200) {
             throw Exception("Failed to request report: ${res.code}, $body");

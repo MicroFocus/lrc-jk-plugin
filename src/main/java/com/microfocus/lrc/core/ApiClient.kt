@@ -95,8 +95,11 @@ class ApiClient internal constructor(
         }
     }
 
-    fun post(apiPath: String, payload: JsonObject): Response {
+    fun post(apiPath: String, queryParams: Map<String, String>? = null, payload: JsonObject): Response {
         val urlBuilder = this.prepareUrlBuilder(apiPath);
+        if (!queryParams.isNullOrEmpty()) {
+            queryParams.forEach { (k, v) -> run { urlBuilder.addQueryParameter(k, v); } }
+        }
         val reqBuilder = this.prepareRequestBuilder(urlBuilder.build());
 
         reqBuilder.post(payload.toString().toRequestBody(MEDIA_TYPE_JSON));
@@ -139,7 +142,7 @@ class ApiClient internal constructor(
         payload.addProperty("user", this.serverConfiguration.username);
         payload.addProperty("password", this.serverConfiguration.password);
 
-        val res = this.post("v1/auth", payload);
+        val res = this.post("v1/auth", payload = payload);
         if (res.code != 200) {
             throw IOException("login to ${this.serverConfiguration.url} failed: ${res.code}, ${res.body?.string()}, ${res.message}");
         }
@@ -156,7 +159,7 @@ class ApiClient internal constructor(
         payload.addProperty("client_id", this.serverConfiguration.username);
         payload.addProperty("client_secret", this.serverConfiguration.password);
 
-        val res = this.post("v1/auth-client", payload);
+        val res = this.post("v1/auth-client", payload = payload);
         if (res.code != 200) {
             throw IOException("login to ${this.serverConfiguration.url} failed: ${res.code}, ${res.body?.string()}, ${res.message}");
         }
