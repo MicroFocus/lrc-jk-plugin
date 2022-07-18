@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>4.38</version>
+        <version>4.42</version>
         <relativePath />
     </parent>
     <artifactId>loadrunner_cloud</artifactId>
@@ -34,7 +34,7 @@
         <jenkins.version>2.289.2</jenkins.version>
         <java.level>8</java.level>
         <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
-        <kotlin.version>1.7.0</kotlin.version>
+        <kotlin.version>1.7.10</kotlin.version>
         <kotlin.compiler.incrementail>true</kotlin.compiler.incrementail>
     </properties>
 
@@ -44,7 +44,7 @@
                 <!-- Pick up common dependencies for the selected LTS line: https://github.com/jenkinsci/bom#usage -->
                 <groupId>io.jenkins.tools.bom</groupId>
                 <artifactId>bom-2.289.x</artifactId>
-                <version>1210.vcd41f6657f03</version>
+                <version>1478.v81d3dc4f9a_43</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -124,7 +124,7 @@
                     <dependency>
                         <groupId>com.puppycrawl.tools</groupId>
                         <artifactId>checkstyle</artifactId>
-                        <version>10.3</version>
+                        <version>10.3.1</version>
                     </dependency>
                 </dependencies>
                 <configuration>
