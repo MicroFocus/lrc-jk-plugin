@@ -1,4 +1,4 @@
-[![CodeQL](https://github.com/MicroFocus/lrc-jk-plugin/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/MicroFocus/lrc-jk-plugin/actions/workflows/codeql.yml)
+[![CodeQL](https://github.com/MicroFocus/lrc-jk-plugin/actions/workflows/codeql.yml/badge.svg)](https://github.com/MicroFocus/lrc-jk-plugin/actions/workflows/codeql.yml)
 
 # Jenkins plugin for LoadRunner Cloud
 
