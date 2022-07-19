@@ -15,9 +15,7 @@ package com.microfocus.lrc.core.service
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.microfocus.lrc.core.ApiClient
-import com.microfocus.lrc.core.entity.ApiChangeTestRunStatus
-import com.microfocus.lrc.core.entity.ApiGetRunStatus
-import com.microfocus.lrc.core.entity.LoadTestRun
+import com.microfocus.lrc.core.entity.*
 import com.microfocus.lrc.jenkins.LoggerProxy
 import java.io.IOException
 
@@ -25,6 +23,29 @@ class LoadTestRunService(
     private val client: ApiClient,
     private val loggerProxy: LoggerProxy,
 ) {
+    fun fetch(runId: String): LoadTestRun? {
+        val apiPath = ApiGetTestRun(
+            mapOf("runId" to runId)
+        ).path
+        val response = client.get(apiPath)
+        if (response.isSuccessful) {
+            val json = response.body?.string() ?: return null
+            val jsonObj = Gson().fromJson(json, JsonObject::class.java)
+            val lt = LoadTest(client.getServerConfiguration().projectId, jsonObj.get("testId").asInt);
+            val testRun = LoadTestRun(
+                runId.toInt(),
+                lt
+            )
+            testRun.status = jsonObj.get("status").asString;
+            testRun.detailedStatus = jsonObj.get("uiStatus").asString;
+            testRun.isTerminated = jsonObj.get("isTerminated").asBoolean;
+
+            return testRun;
+        } else {
+            loggerProxy.error("Failed to fetch run $runId: ${response.code}")
+            return null
+        }
+    }
 
     fun fetchStatus(testRun: LoadTestRun) {
         val apiPath = ApiGetRunStatus(

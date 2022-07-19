@@ -221,7 +221,7 @@ class ReportDownloader(
         testRun.reports[fileName] = writeCsvBytesArray(txArr);
     }
 
-    fun fetchTrending(testRun: LoadTestRun, benchmarkId: Int?): TrendingDataWrapper {
+    fun fetchTrending(testRun: LoadTestRun, benchmark: TrendingDataWrapper?): TrendingDataWrapper {
         val results = this.fetchTestRunResults(testRun.id);
         val txArr = this.fetchTestRunTx(testRun.id);
         val trendingDataWrapper = TrendingDataWrapper(
@@ -229,7 +229,7 @@ class ReportDownloader(
             results,
             txArr,
             this.apiClient.getServerConfiguration().tenantId,
-            benchmarkId
+            benchmark
         );
 
         return trendingDataWrapper;

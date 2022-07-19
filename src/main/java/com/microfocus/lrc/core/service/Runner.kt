@@ -162,6 +162,15 @@ class Runner(
     }
 
     fun fetchTrending(testRun: LoadTestRun, benchmark: Int?): TrendingDataWrapper {
-        return this.reportDownloader.fetchTrending(testRun, benchmark);
+        var benchmarkRun: LoadTestRun? = null;
+        var benchmarkTrending: TrendingDataWrapper? = null;
+        if (benchmark != null) {
+            benchmarkRun = this.loadTestRunService.fetch(benchmark.toString());
+            if (benchmarkRun != null) {
+                benchmarkTrending = this.reportDownloader.fetchTrending(benchmarkRun, null);
+            }
+        }
+
+        return this.reportDownloader.fetchTrending(testRun, benchmarkTrending);
     }
 }

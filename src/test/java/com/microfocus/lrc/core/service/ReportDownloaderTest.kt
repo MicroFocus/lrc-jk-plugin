@@ -36,7 +36,7 @@ class ReportDownloaderTest {
             resultObj,
             transactionObj,
             "FAKE_TENANT_ID",
-            0
+            null
         );
 
         assert(trending.trendingData.percentile == resultObj.percentileValue);

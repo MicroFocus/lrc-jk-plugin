@@ -67,11 +67,14 @@ public final class TrendingDataWrapper implements Serializable {
             final TestRunResultsResponse results,
             final TestRunTransactionsResponse[] tx,
             final String tenantId,
-            final Integer benchmarkId
+            final TrendingDataWrapper benchmark
     ) {
         this.tenantId = tenantId;
-        this.benchmarkId = benchmarkId;
         this.trendingData = new TrendingData(testRun, results, tx);
+        if (benchmark != null) {
+            this.benchmark = benchmark.getTrendingData();
+            this.benchmarkId = benchmark.getBenchmarkId();
+        }
     }
 
     public TrendingData getTrendingData() {
