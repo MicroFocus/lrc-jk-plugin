@@ -17,8 +17,8 @@ import java.net.Proxy;
 public final class ProxyConfiguration implements Serializable {
     private static final int MAX_PORT_RANGE = 65525;
 
-    private String host;
-    private int port;
+    private final String host;
+    private final int port;
     private String username;
     private String password;
     private transient Proxy proxy;
@@ -68,7 +68,7 @@ public final class ProxyConfiguration implements Serializable {
         }
         int portNum;
         try {
-            portNum = Integer.valueOf(port);
+            portNum = Integer.parseInt(port);
         } catch (NumberFormatException ex) {
             portNum = -1;
         }
