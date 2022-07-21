@@ -14,6 +14,7 @@ package com.microfocus.lrc.core.entity;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.microfocus.lrc.core.Constants;
 import com.microfocus.lrc.core.JsonObj;
 
 import java.io.Serializable;
@@ -42,9 +43,9 @@ public final class TrendingDataWrapper implements Serializable {
         this.trendingData = new TrendingData(json);
         this.benchmarkId = benchmarkId;
         this.tenantId = tenantId;
-        if (json.has("benchmark") && json.get("benchmark") != null) {
+        if (json.has(Constants.BENCHMARK) && json.get(Constants.BENCHMARK) != null) {
             try {
-                this.benchmark = new TrendingData(json.get("benchmark").getAsJsonObject());
+                this.benchmark = new TrendingData(json.get(Constants.BENCHMARK).getAsJsonObject());
             } catch (Exception e) {
                 //ignore
             }

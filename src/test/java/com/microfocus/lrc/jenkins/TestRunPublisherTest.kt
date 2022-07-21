@@ -15,6 +15,7 @@ package com.microfocus.lrc.jenkins
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.microfocus.lrc.MockServerResponseGenerator
+import com.microfocus.lrc.core.Constants
 import com.microfocus.lrc.core.entity.LoadTest
 import com.microfocus.lrc.core.entity.LoadTestRun
 import com.microfocus.lrc.core.entity.OptionInEnvVars
@@ -110,14 +111,14 @@ class TestRunPublisherTest {
         project.buildersList.add(object : TestBuilder() {
             override fun perform(build: AbstractBuild<*, *>, launcher: Launcher, listener: BuildListener): Boolean {
                 val buildResultObj = JsonObject();
-                buildResultObj.addProperty("tenantId", "FAKE_TENANT_ID");
-                buildResultObj.addProperty("projectId", 99);
-                buildResultObj.addProperty("sendEmail", false);
+                buildResultObj.addProperty(Constants.TENANTID, "FAKE_TENANT_ID");
+                buildResultObj.addProperty(Constants.PROJECTID, 99);
+                buildResultObj.addProperty(Constants.SENDEMAIL, false);
                 val lt = LoadTest(-1, 99);
                 val testRun = LoadTestRun(-1, lt);
                 testRun.statusEnum = TestRunStatus.PASSED;
 
-                buildResultObj.addProperty("testRun", Gson().toJson(testRun));
+                buildResultObj.addProperty(Constants.TESTRUN, Gson().toJson(testRun));
 
                 build.workspace!!.child("build_result_${build.id}").write(
                     buildResultObj.toString(),

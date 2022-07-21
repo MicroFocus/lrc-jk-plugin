@@ -162,10 +162,9 @@ class Runner(
     }
 
     fun fetchTrending(testRun: LoadTestRun, benchmark: Int?): TrendingDataWrapper {
-        var benchmarkRun: LoadTestRun? = null;
         var benchmarkTrending: TrendingDataWrapper? = null;
         if (benchmark != null) {
-            benchmarkRun = this.loadTestRunService.fetch(benchmark.toString());
+            val benchmarkRun = this.loadTestRunService.fetch(benchmark.toString());
             if (benchmarkRun != null) {
                 benchmarkTrending = this.reportDownloader.fetchTrending(benchmarkRun, null);
             }

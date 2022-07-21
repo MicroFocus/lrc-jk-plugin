@@ -31,7 +31,7 @@ class ApiClient internal constructor(
     private val loggerProxy: LoggerProxy
 ): Closeable {
     private companion object {
-        val MEDIA_TYPE_JSON = "application/json".toMediaType();
+        val MEDIA_TYPE_JSON = Constants.APPLICATION_JSON.toMediaType();
 
         @JvmStatic
         fun isOAuthClientId(username: String?): Boolean {
@@ -61,7 +61,7 @@ class ApiClient internal constructor(
 
     private fun prepareRequestBuilder(
         url: HttpUrl,
-        contentType: String = "application/json"
+        contentType: String = Constants.APPLICATION_JSON
     ): Request.Builder {
         val reqBuilder: Request.Builder = Request.Builder()
             .url(url)
@@ -84,7 +84,7 @@ class ApiClient internal constructor(
         apiPath: String,
         queryParams: Map<String, String>? = null,
         encodedQueryParams: Map<String, String>? = null,
-        contentType: String = "application/json"
+        contentType: String = Constants.APPLICATION_JSON
     ): Response {
         val urlBuilder = this.prepareUrlBuilder(apiPath);
 

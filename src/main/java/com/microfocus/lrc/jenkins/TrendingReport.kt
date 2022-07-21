@@ -16,6 +16,7 @@ import com.google.common.collect.ImmutableMap
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import com.microfocus.lrc.core.Constants
 import com.microfocus.lrc.core.HTMLTemplate
 import com.microfocus.lrc.core.entity.TrendingConfiguration
 import com.microfocus.lrc.core.entity.TrendingDataWrapper
@@ -295,7 +296,7 @@ class TrendingReport {
             data.get("data").asJsonObject.add("trt", trts)
             data.addProperty("testId", latestBuildAction.trendingDataWrapper.trendingData.testId)
             data.addProperty("testName", latestBuildAction.trendingDataWrapper.trendingData.testName)
-            data.addProperty("benchmark", latestBuildAction.trendingDataWrapper.benchmarkId)
+            data.addProperty(Constants.BENCHMARK, latestBuildAction.trendingDataWrapper.benchmarkId)
             data.addProperty("generatorLogs", generatorLogs.toString())
             data.addProperty("extraContent", extraContent)
             val slotContent: Map<String, String>

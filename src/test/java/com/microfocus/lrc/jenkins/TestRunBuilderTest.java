@@ -18,6 +18,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.microfocus.lrc.MockServerResponseGenerator;
+import com.microfocus.lrc.core.Constants;
 import com.microfocus.lrc.core.entity.LoadTestRun;
 import com.microfocus.lrc.core.entity.OptionInEnvVars;
 import com.microfocus.lrc.core.entity.TestRunStatus;
@@ -133,7 +134,7 @@ public class TestRunBuilderTest {
             JsonObject reportStatusResObj = new JsonObject();
             reportStatusResObj.addProperty("message", "In progress");
             MockResponse responseReportStatus = new MockResponse().setBody(reportStatusResObj.toString());
-            responseReportStatus.setHeader("Content-Type", "application/json");
+            responseReportStatus.setHeader("Content-Type", Constants.APPLICATION_JSON);
             mockserver.enqueue(responseReportStatus);
 
             String fakeReportContent = "FAKE_REPORT_CONTENT";
@@ -185,7 +186,7 @@ public class TestRunBuilderTest {
         // assert build result file contains correct data
         String buildResult = buildResultFile.readToString();
         JsonObject resultObj = new Gson().fromJson(buildResult, JsonObject.class);
-        LoadTestRun testRun = new Gson().fromJson(resultObj.get("testRun").getAsString(), LoadTestRun.class);
+        LoadTestRun testRun = new Gson().fromJson(resultObj.get(Constants.TESTRUN).getAsString(), LoadTestRun.class);
         System.out.println(resultObj);
         Assert.assertEquals(testRun.getId(), -1);
     }

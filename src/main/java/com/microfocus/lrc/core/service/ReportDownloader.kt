@@ -16,6 +16,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.JsonSyntaxException
 import com.microfocus.lrc.core.ApiClient
+import com.microfocus.lrc.core.Constants
 import com.microfocus.lrc.core.XmlReport
 import com.microfocus.lrc.core.entity.*
 import com.microfocus.lrc.jenkins.LoggerProxy
@@ -121,7 +122,7 @@ class ReportDownloader(
             return null;
         }
         val contentType = res.header("content-type", null);
-        if (contentType?.contains("application/json") == true) {
+        if (contentType?.contains(Constants.APPLICATION_JSON) == true) {
             val body = res.body?.string();
             val result = Gson().fromJson(body, JsonObject::class.java);
             if (result["message"]?.asString == "In progress") {

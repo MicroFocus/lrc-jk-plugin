@@ -14,6 +14,7 @@ package com.microfocus.lrc.jenkins;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.microfocus.lrc.core.Constants;
 import com.microfocus.lrc.core.entity.*;
 import com.microfocus.lrc.core.service.Runner;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -203,7 +204,7 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
         );
         serverConfiguration.setProxyConfiguration(proxyConfig);
 
-        LoadTestRun testRun = new Gson().fromJson(buildResult.get("testRun").getAsString(), LoadTestRun.class);
+        LoadTestRun testRun = new Gson().fromJson(buildResult.get(Constants.TESTRUN).getAsString(), LoadTestRun.class);
         if (testRun == null) {
             logger.println("Test run not found in build result file. Make sure the test run ended successfully.");
             build.setResult(Result.FAILURE);
@@ -291,42 +292,42 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
     ) {
         JsonObject serverConfigJSON = new JsonObject();
 
-        serverConfigJSON.addProperty("url", descriptor.getUrl());
-        serverConfigJSON.addProperty("username", descriptor.getUsername());
-        serverConfigJSON.addProperty("password", Secret.fromString(descriptor.getPassword()).getPlainText());
-        serverConfigJSON.addProperty("tenantId", descriptor.getTenantId());
-        serverConfigJSON.addProperty("projectId", buildResult.get("projectId").getAsInt());
-        serverConfigJSON.addProperty("sendEmail", buildResult.get("sendEmail").getAsBoolean());
-        serverConfigJSON.addProperty("useOAuth", descriptor.getUseOAuth());
-        serverConfigJSON.addProperty("clientId", descriptor.getClientId());
+        serverConfigJSON.addProperty(Constants.URL, descriptor.getUrl());
+        serverConfigJSON.addProperty(Constants.USERNAME, descriptor.getUsername());
+        serverConfigJSON.addProperty(Constants.PASSWORD, Secret.fromString(descriptor.getPassword()).getPlainText());
+        serverConfigJSON.addProperty(Constants.TENANTID, descriptor.getTenantId());
+        serverConfigJSON.addProperty(Constants.PROJECTID, buildResult.get(Constants.PROJECTID).getAsInt());
+        serverConfigJSON.addProperty(Constants.SENDEMAIL, buildResult.get(Constants.SENDEMAIL).getAsBoolean());
+        serverConfigJSON.addProperty(Constants.USE_OAUTH, descriptor.getUseOAuth());
+        serverConfigJSON.addProperty(Constants.CLIENT_ID, descriptor.getClientId());
         if (StringUtils.isNotEmpty(descriptor.getClientSecret())) {
             serverConfigJSON.addProperty(
-                    "clientSecret",
+                    Constants.CLIENT_SECRET,
                     Secret.fromString(descriptor.getClientSecret()).getPlainText()
             );
         } else {
-            serverConfigJSON.addProperty("clientSecret", "");
+            serverConfigJSON.addProperty(Constants.CLIENT_SECRET, "");
         }
 
         ServerConfiguration serverConfiguration;
-        if (serverConfigJSON.get("useOAuth").getAsBoolean()) {
+        if (serverConfigJSON.get(Constants.USE_OAUTH).getAsBoolean()) {
             serverConfiguration = new ServerConfiguration(
-                    serverConfigJSON.get("url").getAsString(),
-                    serverConfigJSON.get("clientId").getAsString(),
-                    serverConfigJSON.get("clientSecret").getAsString(),
-                    serverConfigJSON.get("tenantId").getAsString(),
-                    serverConfigJSON.get("projectId").getAsInt(),
-                    serverConfigJSON.get("sendEmail").getAsBoolean(),
+                    serverConfigJSON.get(Constants.URL).getAsString(),
+                    serverConfigJSON.get(Constants.CLIENT_ID).getAsString(),
+                    serverConfigJSON.get(Constants.CLIENT_SECRET).getAsString(),
+                    serverConfigJSON.get(Constants.TENANTID).getAsString(),
+                    serverConfigJSON.get(Constants.PROJECTID).getAsInt(),
+                    serverConfigJSON.get(Constants.SENDEMAIL).getAsBoolean(),
                     "jenkins-plugin"
             );
         } else {
             serverConfiguration = new ServerConfiguration(
-                    serverConfigJSON.get("url").getAsString(),
-                    serverConfigJSON.get("username").getAsString(),
-                    serverConfigJSON.get("password").getAsString(),
-                    serverConfigJSON.get("tenantId").getAsString(),
-                    serverConfigJSON.get("projectId").getAsInt(),
-                    serverConfigJSON.get("sendEmail").getAsBoolean(),
+                    serverConfigJSON.get(Constants.URL).getAsString(),
+                    serverConfigJSON.get(Constants.USERNAME).getAsString(),
+                    serverConfigJSON.get(Constants.PASSWORD).getAsString(),
+                    serverConfigJSON.get(Constants.TENANTID).getAsString(),
+                    serverConfigJSON.get(Constants.PROJECTID).getAsInt(),
+                    serverConfigJSON.get(Constants.SENDEMAIL).getAsBoolean(),
                     "jenkins-plugin"
             );
         }

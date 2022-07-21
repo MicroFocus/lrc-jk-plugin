@@ -16,6 +16,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.microfocus.lrc.core.ApiClient;
 import com.microfocus.lrc.core.ApiClientFactory;
+import com.microfocus.lrc.core.Constants;
 import com.microfocus.lrc.core.entity.ProxyConfiguration;
 import com.microfocus.lrc.core.entity.*;
 import com.microfocus.lrc.core.service.Runner;
@@ -40,7 +41,6 @@ import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
-import javax.servlet.ServletException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -100,9 +100,9 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         public boolean configure(final StaplerRequest req, final JSONObject formData) throws FormException {
             // set all properties from formData
             // validate all properties, throw FormException if invalid
-            this.username = formData.getString("username").trim();
-            this.password = Secret.fromString(formData.getString("password").trim()).getEncryptedValue();
-            this.url = org.apache.commons.lang.StringUtils.stripEnd(formData.getString("url").trim(), "/");
+            this.username = formData.getString(Constants.USERNAME).trim();
+            this.password = Secret.fromString(formData.getString(Constants.PASSWORD).trim()).getEncryptedValue();
+            this.url = org.apache.commons.lang.StringUtils.stripEnd(formData.getString(Constants.URL).trim(), "/");
             this.useProxy = Boolean.valueOf(formData.getString("useProxy").trim());
             this.proxyHost = formData.getString("proxyHost").trim();
 
@@ -119,10 +119,10 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
             }
 
             this.proxyPassword = Secret.fromString(formData.getString("proxyPassword").trim()).getEncryptedValue();
-            this.useOAuth = Boolean.valueOf(formData.getString("useOAuth").trim());
-            this.clientId = formData.getString("clientId").trim();
-            this.clientSecret = formData.getString("clientSecret").trim();
-            this.tenantId = formData.getString("tenantId").trim();
+            this.useOAuth = Boolean.valueOf(formData.getString(Constants.USE_OAUTH).trim());
+            this.clientId = formData.getString(Constants.CLIENT_ID).trim();
+            this.clientSecret = formData.getString(Constants.CLIENT_SECRET).trim();
+            this.tenantId = formData.getString(Constants.TENANTID).trim();
 
             save();
             return super.configure(req, formData);
@@ -130,8 +130,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
 
         private String url;
 
-        public FormValidation doCheckUrl(@QueryParameter final String value)
-                throws IOException, ServletException {
+        public FormValidation doCheckUrl(@QueryParameter final String value) {
             String errorMsg = "Please input a valid URL";
             if (value == null || value.trim().length() == 0) {
                 return FormValidation.error(errorMsg);
@@ -146,8 +145,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
 
         private String tenantId;
 
-        public FormValidation doCheckTenantId(@QueryParameter final String value)
-                throws IOException, ServletException {
+        public FormValidation doCheckTenantId(@QueryParameter final String value) {
             if (value == null || value.trim().length() == 0) {
                 return FormValidation.error("Please input a Tenant");
             }
@@ -161,8 +159,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         public FormValidation doCheckUsername(
                 @QueryParameter final String value,
                 @QueryParameter final String useOAuth
-        )
-                throws IOException, ServletException {
+        ) {
             if (Boolean.parseBoolean(useOAuth)) {
                 return FormValidation.ok();
             }
@@ -180,8 +177,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         public FormValidation doCheckPassword(
                 @QueryParameter final String value,
                 final @QueryParameter String useOAuth
-        )
-                throws IOException, ServletException {
+        ) {
             if (Boolean.parseBoolean(useOAuth)) {
                 return FormValidation.ok();
             }
@@ -200,7 +196,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         public FormValidation doCheckClientId(
                 @QueryParameter final String value,
                 @QueryParameter final String useOAuth
-        ) throws IOException, ServletException {
+        ) {
             if (!Boolean.parseBoolean(useOAuth)) {
                 return FormValidation.ok();
             }
@@ -218,7 +214,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         public FormValidation doCheckClientSecret(
                 @QueryParameter final String value,
                 @QueryParameter final String useOAuth
-        ) throws IOException, ServletException {
+        ) {
             if (!Boolean.parseBoolean(useOAuth)) {
                 return FormValidation.ok();
             }
@@ -237,7 +233,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         public FormValidation doCheckProxyHost(
                 @QueryParameter final String value,
                 @QueryParameter final String useProxy
-        ) throws IOException, ServletException {
+        ) {
             if (!Boolean.parseBoolean(useProxy)) {
                 return FormValidation.ok();
             }
@@ -256,7 +252,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         public FormValidation doCheckProxyPort(
                 @QueryParameter final String value,
                 @QueryParameter final String useProxy
-        ) throws IOException, ServletException {
+        ) {
             if (!Boolean.parseBoolean(useProxy)) {
                 return FormValidation.ok();
             }
@@ -280,8 +276,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         private String proxyUsername;
         private String proxyPassword;
 
-        public FormValidation doCheckTenant(@QueryParameter final String value)
-                throws IOException, ServletException {
+        public FormValidation doCheckTenant(@QueryParameter final String value) {
             if (value == null || value.trim().length() == 0) {
                 return FormValidation.error("Please input a Tenant");
             }
@@ -289,8 +284,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
             return FormValidation.ok();
         }
 
-        public FormValidation doCheckProjectID(@QueryParameter final String value)
-                throws IOException, ServletException {
+        public FormValidation doCheckProjectID(@QueryParameter final String value) {
             if (value == null || value.trim().length() == 0) {
                 return FormValidation.error("Please input a ProjectID");
             }
@@ -416,8 +410,6 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
          * @param useOAuth
          * @param useProxy
          * @return FormValidation
-         * @throws IOException
-         * @throws ServletException
          */
         @SuppressWarnings({"checkstyle:ParameterNumber", "checkstyle:HiddenField"})
         public FormValidation doTestConnection(
@@ -433,7 +425,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
                 @QueryParameter("tenantId") final String tenantId,
                 @QueryParameter("useOAuth") final String useOAuth,
                 @QueryParameter("useProxy") final String useProxy
-        ) throws IOException, ServletException {
+        ) {
             ServerConfiguration config;
             if (Boolean.parseBoolean(useOAuth)) {
                 config = new ServerConfiguration(
@@ -475,7 +467,6 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
                 return FormValidation.error("Ping connection failed, error: " + e.getMessage());
             }
         }
-
     }
 
     private String testId;
@@ -567,8 +558,8 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         serverConfiguration.setProxyConfiguration(proxyConfiguration);
 
         JsonObject buildResult = new JsonObject();
-        buildResult.addProperty("projectId", this.getProjectIdAtRunTime(run, launcher));
-        buildResult.addProperty("sendEmail", this.isSendEmail());
+        buildResult.addProperty(Constants.PROJECTID, this.getProjectIdAtRunTime(run, launcher));
+        buildResult.addProperty(Constants.SENDEMAIL, this.isSendEmail());
         String resultStr = buildResult.toString();
         FilePath resultFile = workspace.child("build_result_" + run.getId());
         int testIdVal = Integer.parseInt(this.getTestIdAtRunTime(run, launcher));
@@ -597,9 +588,9 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
             //#region this catch block will only be executed when the job runs on slave
 
             this.loggerProxy.info("interruption occurred, waiting for execution ending.");
-            interruptionDone = "unknown";
+            interruptionDone = Constants.UNKNOWN;
             int elapsedWaiting = 0;
-            while ("unknown".equals(interruptionDone) && elapsedWaiting < 1000 * 60 * 3) {
+            while (Constants.UNKNOWN.equals(interruptionDone) && elapsedWaiting < 1000 * 60 * 3) {
                 Thread.sleep(10000);
                 elapsedWaiting += 10000;
                 interruptionDone = EnvVars.getRemote(launcher.getChannel()).get(testIdVal + "_INTERRUPTION");
@@ -756,7 +747,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
             final String interruptionDone
     ) throws InterruptedException {
         LoadTestRun restored = testRun;
-        if ("unknown".equals(interruptionDone)) {
+        if (Constants.UNKNOWN.equals(interruptionDone)) {
             this.loggerProxy.error("Jenkins job interruption handler failed, stop waiting.");
             this.loggerProxy.info(
                     "you may need to go to the LoadRunner Cloud website "
@@ -776,7 +767,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
             this.loggerProxy.info("execution ended gracefully");
 
             JsonObject resultObj = new Gson().fromJson(result, JsonObject.class);
-            String testRunObj = resultObj.get("testRun").getAsString();
+            String testRunObj = resultObj.get(Constants.TESTRUN).getAsString();
             testRun = new Gson().fromJson(testRunObj, LoadTestRun.class);
         } catch (Exception ex) {
             this.loggerProxy.error("failed to get run result after interruption: " + ex.getMessage());
@@ -841,7 +832,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
                 testRun = this.runner.getTestRun();
                 testRun = this.runner.run(this.testRunOptions);
                 JsonObject buildResult = new Gson().fromJson(this.resultStr, JsonObject.class);
-                buildResult.addProperty("testRun", new Gson().toJson(testRun));
+                buildResult.addProperty(Constants.TESTRUN, new Gson().toJson(testRun));
 
                 try {
                     resultFilePath.write(buildResult.toString(), "UTF-8");
@@ -861,7 +852,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
                     return null;
                 }
 
-                String abortResult = "unknown";
+                String abortResult = Constants.UNKNOWN;
                 EnvVars.masterEnvVars.put(interruptionDoneFlagName, abortResult);
                 try {
                     this.listener.getLogger().println("job being interrupted...");
@@ -879,7 +870,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
                         loggerProxy.debug("got null testRun from interruptHandler");
                     }
                     JsonObject buildResult = new Gson().fromJson(this.resultStr, JsonObject.class);
-                    buildResult.addProperty("testRun", new Gson().toJson(testRun));
+                    buildResult.addProperty(Constants.TESTRUN, new Gson().toJson(testRun));
 
                     try {
                         resultFilePath.write(buildResult.toString(), "UTF-8");
