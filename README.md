@@ -2,17 +2,14 @@
 
 # Jenkins plugin for LoadRunner Cloud
 
-Jenkins plugin for LoadRunner Cloud
-
 # Introduction
 
-This plugin allows you to run LoadRunner Cloud tests from Jenkins.
+The plugin enables users to run [LoadRunner Cloud tests](https://admhelp.microfocus.com/lrc/en/Latest/Content/Storm/c_Getting_started.htm) from Jenkins. For details, refer to [Use the Jenkins plugin](https://admhelp.microfocus.com/lrc/en/Latest/Content/Storm/t_ci_plugins.htm#mt-item-0) in LRC DOC.
 
 # Getting started
 
-The plugin provides a build step "LoadRunner Cloud" to run LoadRunner Cloud tests, and a post-build action "Generate LoadRunner Cloud Trending" to generate trending reports.
-
-This two action are also available in pipeline jobs as `srlRunTest` and `srlGetTrendingReport`.
+The plugin provides a build step **LoadRunner Cloud** to run LoadRunner Cloud tests, and a post-build action **Generate LoadRunner Cloud Trending** to generate trending reports.  
+They are also exposed in pipeline jobs as `srlRunTest` and `srlGetTrendingReport`.
 
 ## Usage
 
@@ -52,6 +49,3 @@ For freestyle jobs, simply provides same parameters in the job configuration.
 After the build step "LoadRunner Cloud" finished, several reports will be downloaded to the workspace if available, including "csv", "pdf" and "docx". A JUnit format XML report will also be generated. All those reports will be named as "srl_report_{TENANTID}_{RUNID}".
 
 Besides, if post-action "Generate LoadRunner Cloud Trending" is configured, a trending report html will also be generated in workspace. A menu button on the left panel named "LoadRunner Cloud Trend" will be added to the job page. You can view the trending report directly by clicking the button.
-
-
-
