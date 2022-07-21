@@ -12,6 +12,7 @@
     <version>${revision}${changelist}</version>
     <packaging>hpi</packaging>
     <name>LoadRunner Cloud</name>
+    <description>The plugin enables you to run tests in LoadRunner Cloud</description>
     <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
     <licenses>
         <license>
