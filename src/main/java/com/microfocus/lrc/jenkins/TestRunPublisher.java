@@ -98,7 +98,6 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
         private final ServerConfiguration serverConfiguration;
         private final TrendingConfiguration trendingConfiguration;
         private final LoadTestRun testRun;
-        private final boolean skipLogin;
         private final TaskListener listener;
 
         private PrintStream logger() {
@@ -110,13 +109,11 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
                 final ServerConfiguration serverConfiguration,
                 final TrendingConfiguration trendingConfiguration,
                 final LoadTestRun testRun,
-                final boolean skipLogin,
                 final TaskListener listener
         ) {
             this.serverConfiguration = serverConfiguration;
             this.trendingConfiguration = trendingConfiguration;
             this.testRun = testRun;
-            this.skipLogin = skipLogin;
             this.listener = listener;
         }
 
@@ -169,13 +166,15 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
             @NonNull final TaskListener listener
     ) throws InterruptedException, IOException {
         PrintStream logger = listener.getLogger();
-
-        logger.println("StormTestPublisher started for build " + build.getNumber());
-        logger.println("Workspace: " + workspace);
+        LoggerProxy loggerProxy = new LoggerProxy(logger, new LoggerOptions(false, ""));
+        loggerProxy.info("StormTestPublisher started for build " + build.getNumber());
+        loggerProxy.info("Workspace: " + workspace);
 
         FilePath buildResultPath = workspace.child("build_result_" + build.getId());
         if (!buildResultPath.exists()) {
-            logger.println("Build result file not found: " + buildResultPath + ", make sure run LRC build step first.");
+            loggerProxy.error(
+                    "Build result file not found: " + buildResultPath + ", make sure run LRC build step first."
+            );
             build.setResult(Result.FAILURE);
             return;
         }
@@ -184,7 +183,7 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
         JsonObject buildResult = new Gson().fromJson(buildResultPath.readToString(), JsonObject.class);
         Jenkins instance = Jenkins.getInstanceOrNull();
         if (instance == null) {
-            logger.println("Failed to get Jenkins instance");
+            loggerProxy.error("Failed to get Jenkins instance");
             build.setResult(Result.FAILURE);
             return;
         }
@@ -200,13 +199,13 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
                 descriptor.getProxyPort(),
                 descriptor.getProxyUsername(),
                 Secret.fromString(descriptor.getProxyPassword()).getPlainText(),
-                logger
+                loggerProxy
         );
         serverConfiguration.setProxyConfiguration(proxyConfig);
 
         LoadTestRun testRun = new Gson().fromJson(buildResult.get(Constants.TESTRUN).getAsString(), LoadTestRun.class);
         if (testRun == null) {
-            logger.println("Test run not found in build result file. Make sure the test run ended successfully.");
+            loggerProxy.info("Test run not found in build result file. Make sure the test run ended successfully.");
             build.setResult(Result.FAILURE);
             return;
         }
@@ -227,7 +226,6 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
                     serverConfiguration,
                     trendingCfg,
                     testRun,
-                    skipLogin,
                     listener);
             VirtualChannel channel = launcher.getChannel();
             if (channel != null) {
@@ -235,14 +233,14 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
             }
         } catch (IOException e) {
             if (e.getMessage() != null) {
-                logger.println("[ERROR] PublishReport failed. " + e.getMessage());
+                loggerProxy.error("PublishReport failed. " + e.getMessage());
             } else {
-                logger.println("PublishReport failed.");
+                loggerProxy.error("PublishReport failed.");
             }
         }
 
         if (wrapper == null) {
-            logger.println("failed to get trending data.");
+            loggerProxy.error("failed to get trending data.");
             build.setResult(Result.FAILURE);
             return;
         }
@@ -257,7 +255,7 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
         );
 
         if (buildAction == null) {
-            logger.println("failed to save build result into Jenkins.");
+            loggerProxy.error("failed to save build result into Jenkins.");
             build.setResult(Result.FAILURE);
             return;
         }
@@ -278,10 +276,10 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
                     )
             );
             filePath.write(buildAction.getTrendingReportHTML(), "UTF-8");
-            logger.println("trending report html file generated: " + filePath.getRemote());
+            loggerProxy.info("trending report html file generated: " + filePath.getRemote());
             build.setResult(Result.SUCCESS);
-        } catch (Exception ex) {
-            logger.println("failed to write trending report html, " + ex.getMessage());
+        } catch (IOException ex) {
+            loggerProxy.error("failed to write trending report html, " + ex.getMessage());
         }
     }
 

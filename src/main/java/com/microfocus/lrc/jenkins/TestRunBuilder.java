@@ -394,23 +394,6 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
 
         //#endregion
 
-        /**
-         * test connection to the server.
-         *
-         * @param username
-         * @param password
-         * @param url
-         * @param proxyHost
-         * @param proxyPort
-         * @param proxyUsername
-         * @param proxyPassword
-         * @param clientId
-         * @param clientSecret
-         * @param tenantId
-         * @param useOAuth
-         * @param useProxy
-         * @return FormValidation
-         */
         @SuppressWarnings({"checkstyle:ParameterNumber", "checkstyle:HiddenField"})
         public FormValidation doTestConnection(
                 @QueryParameter("username") final String username,
@@ -456,7 +439,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
                             proxyPort,
                             proxyUsername,
                             Secret.fromString(proxyPassword).getPlainText(),
-                            System.out
+                            new LoggerProxy()
                     )
             );
             config.setProxyConfiguration(proxyConfiguration);
@@ -512,17 +495,6 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         this.setSendEmail(sendEmail);
     }
 
-    /**
-     * run the build.
-     *
-     * @param run       a build this is running as a part of
-     * @param workspace a workspace to use for any file operations
-     * @param env       environment variables applicable to this step
-     * @param launcher  a way to start processes
-     * @param listener  a place to send output
-     * @throws InterruptedException
-     * @throws IOException
-     */
     @Override
     public void perform(
             final @NonNull Run<?, ?> run,
@@ -533,6 +505,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
     ) throws InterruptedException, IOException {
         PrintStream logger = listener.getLogger();
         this.loggerProxy = new LoggerProxy(logger, new LoggerOptions(false, ""));
+
         printEnvInfo(run);
 
         TestRunBuilder.DescriptorImpl descriptor = (TestRunBuilder.DescriptorImpl) this.getDescriptor();
@@ -553,7 +526,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
                 descriptor.proxyPort,
                 descriptor.proxyUsername,
                 Secret.fromString(descriptor.proxyPassword).getPlainText(),
-                logger
+                this.loggerProxy
         );
         serverConfiguration.setProxyConfiguration(proxyConfiguration);
 
@@ -769,7 +742,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
             JsonObject resultObj = new Gson().fromJson(result, JsonObject.class);
             String testRunObj = resultObj.get(Constants.TESTRUN).getAsString();
             testRun = new Gson().fromJson(testRunObj, LoadTestRun.class);
-        } catch (Exception ex) {
+        } catch (IOException | RuntimeException ex) {
             this.loggerProxy.error("failed to get run result after interruption: " + ex.getMessage());
         }
         return testRun;

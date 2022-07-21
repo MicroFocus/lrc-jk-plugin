@@ -14,7 +14,6 @@ package com.microfocus.lrc.jenkins
 
 import com.microfocus.lrc.core.entity.ProxyConfiguration
 import jenkins.model.Jenkins
-import java.io.PrintStream
 import java.net.MalformedURLException
 import java.net.Proxy
 import java.net.URL
@@ -29,7 +28,7 @@ class ProxyConfigurationFactory {
             proxyPort: String?,
             proxyUsername: String?,
             proxyPassword: String?,
-            logger: PrintStream
+            loggerProxy: LoggerProxy
         ): ProxyConfiguration? {
             var proxyConfiguration: ProxyConfiguration? = null
             var serverHost = ""
@@ -37,9 +36,9 @@ class ProxyConfigurationFactory {
                 val serverUrlObj = URL(serverUrl)
                 serverHost = serverUrlObj.host
             } catch (e: MalformedURLException) {
-                logger.println("Failed to parse server URL, you may need to check it again.")
+                loggerProxy.info("Failed to parse server URL, you may need to check it again.")
             }
-            logger.println("********** Proxy Settings ***********")
+            loggerProxy.info("********** Proxy Settings ***********")
             //check JVM properties
             try {
                 proxyConfiguration = ProxyConfiguration(
@@ -48,40 +47,23 @@ class ProxyConfigurationFactory {
                     System.getProperty("http.proxyUser"),
                     System.getProperty("http.proxyPassword")
                 )
-                logger.println(
+                loggerProxy.info(
                     "Proxy Setting found in JVM System Property: ${proxyConfiguration.proxy.address()}"
                 )
             } catch (ex: IllegalArgumentException) {
                 //ignore, try next proxy settings
-                logger.println("No proxy setting found in JVM System Property.")
+                loggerProxy.info("No proxy setting found in JVM System Property.")
             }
 
             //check Jenkins Global Settings
-            val jenkinsProxyConfig = Jenkins.getInstanceOrNull()?.proxy
-            if (jenkinsProxyConfig != null) {
-                val pickedProxy: Proxy = jenkinsProxyConfig.createProxy(serverHost)
-                val isNoProxy = pickedProxy == Proxy.NO_PROXY
-                if (isNoProxy) {
-                    logger.println("Server host: $serverUrl match the No Proxy setting.")
-                } else {
-                    try {
-                        proxyConfiguration = ProxyConfiguration(
-                            jenkinsProxyConfig.name,
-                            jenkinsProxyConfig.port,
-                            jenkinsProxyConfig.userName,
-                            jenkinsProxyConfig.secretPassword.plainText
-                        )
-                        logger.println(
-                            "Proxy Setting found in Jenkins Global Setting: ${proxyConfiguration.proxy.address()}"
-                        )
-                    } catch (ex: IllegalArgumentException) {
-                        //ignore, try next proxy settings
-                        logger.println("No proxy setting found in Jenkins Global Setting.")
-                    }
-                }
+            val jenkinsProxy = readProxyFromJenkins(serverHost);
+            if (jenkinsProxy != null) {
+                loggerProxy.info("Proxy Setting found in Jenkins Global Settings: ${jenkinsProxy.proxy.address()}")
+                proxyConfiguration = jenkinsProxy;
             } else {
-                logger.println("No proxy setting found in Jenkins Global Setting.")
+                loggerProxy.info("No proxy setting found in Jenkins Global Settings.")
             }
+
             if (useProxy != null && useProxy) {
                 try {
                     proxyConfiguration = ProxyConfiguration(
@@ -90,22 +72,44 @@ class ProxyConfigurationFactory {
                         proxyUsername,
                         proxyPassword
                     )
-                    logger.println(
+                    loggerProxy.info(
                         "Proxy Setting found in Plugin Setting: ${proxyConfiguration.proxy.address()}"
                     )
                 } catch (ex: IllegalArgumentException) {
-                    logger.println("No proxy setting found in Plugin Setting.")
+                    loggerProxy.info("No proxy setting found in Plugin Setting.")
                 }
             } else {
-                logger.println("No proxy setting found in Plugin Setting.")
+                loggerProxy.info("No proxy setting found in Plugin Setting.")
             }
+
             if (proxyConfiguration == null) {
-                logger.println("Will connect to server directly.")
+                loggerProxy.info("Will connect to server directly.")
             } else {
-                logger.println("Will connect to server via: ${proxyConfiguration.proxy.address()}")
+                loggerProxy.info("Will connect to server via: ${proxyConfiguration.proxy.address()}")
             }
-            logger.println("*************************************")
+
+            loggerProxy.info("*************************************")
             return proxyConfiguration
+        }
+
+        private fun readProxyFromJenkins(serverHost: String): ProxyConfiguration? {
+            val jenkinsProxyConfig = Jenkins.getInstanceOrNull()?.proxy ?: return null
+
+            val pickedProxy: Proxy = jenkinsProxyConfig.createProxy(serverHost);
+            if (pickedProxy.type() == Proxy.Type.DIRECT) {
+                return null
+            }
+
+            return try {
+                ProxyConfiguration(
+                    jenkinsProxyConfig.name,
+                    jenkinsProxyConfig.port,
+                    jenkinsProxyConfig.userName,
+                    jenkinsProxyConfig.secretPassword.plainText
+                );
+            } catch (_: IllegalArgumentException) {
+                null;
+            }
         }
     }
 }
