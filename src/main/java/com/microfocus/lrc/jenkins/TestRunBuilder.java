@@ -508,7 +508,6 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         return this.testId;
     }
 
-    private transient PrintStream logger = System.out;
     private transient LoggerProxy loggerProxy = new LoggerProxy();
 
     @DataBoundConstructor
@@ -541,7 +540,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
             final @NonNull Launcher launcher,
             final @NonNull TaskListener listener
     ) throws InterruptedException, IOException {
-        logger = listener.getLogger();
+        PrintStream logger = listener.getLogger();
         this.loggerProxy = new LoggerProxy(logger, new LoggerOptions(false, ""));
         printEnvInfo(run);
 
@@ -556,7 +555,6 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         }
 
         ServerConfiguration serverConfiguration = createServerConfiguration(descriptor, run, launcher);
-
         ProxyConfiguration proxyConfiguration = ProxyConfigurationFactory.createProxyConfiguration(
                 serverConfiguration.getUrl(),
                 descriptor.useProxy,
@@ -564,7 +562,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
                 descriptor.proxyPort,
                 descriptor.proxyUsername,
                 Secret.fromString(descriptor.proxyPassword).getPlainText(),
-                this.logger
+                logger
         );
         serverConfiguration.setProxyConfiguration(proxyConfiguration);
 
@@ -573,7 +571,6 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         buildResult.addProperty("sendEmail", this.isSendEmail());
         String resultStr = buildResult.toString();
         FilePath resultFile = workspace.child("build_result_" + run.getId());
-
         int testIdVal = Integer.parseInt(this.getTestIdAtRunTime(run, launcher));
         TestRunOptions opt = new TestRunOptions(testIdVal, this.sendEmail);
         Map<String, String> envVarsObj = this.readConfigFromEnvVars(run, launcher);

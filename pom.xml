@@ -13,7 +13,7 @@
     <packaging>hpi</packaging>
     <name>LoadRunner Cloud</name>
     <description>The plugin enables you to run tests in LoadRunner Cloud</description>
-    <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
+    <url>https://github.com/MicroFocus/lrc-jk-plugin</url>
     <licenses>
         <license>
             <name>MIT License</name>
@@ -32,7 +32,7 @@
         <changelist>-SNAPSHOT</changelist>
 
         <!-- Baseline Jenkins version you use to build the plugin. Users must have this version or newer to run. -->
-        <jenkins.version>2.289.2</jenkins.version>
+        <jenkins.version>2.289.1</jenkins.version>
         <java.level>8</java.level>
         <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
         <kotlin.version>1.7.10</kotlin.version>
@@ -208,10 +208,6 @@
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-                    <source>9</source>
-                    <target>9</target>
-                </configuration>
             </plugin>
         </plugins>
     </build>

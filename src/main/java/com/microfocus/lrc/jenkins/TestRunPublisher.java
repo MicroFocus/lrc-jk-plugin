@@ -84,10 +84,12 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
     private static Integer getIntegerSafely(final String str) {
         Integer result = null;
         try {
-            result = Integer.valueOf(str);
-        } finally {
-            return result;
+            result = Integer.parseInt(str);
+        } catch (NumberFormatException e) {
+            // ignore
         }
+
+        return result;
     }
 
     private static class PublishReportCallable implements Callable<TrendingDataWrapper, RuntimeException> {
