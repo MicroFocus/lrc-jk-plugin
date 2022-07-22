@@ -180,14 +180,5 @@ public class TestRunBuilderTest {
         Assert.assertTrue(workspace.child("lrc_report_FAKE_TENANT_ID--1.pdf").exists());
         Assert.assertTrue(workspace.child("lrc_report_FAKE_TENANT_ID--1.csv").exists());
         Assert.assertTrue(workspace.child("lrc_report_trans_FAKE_TENANT_ID--1.csv").exists());
-        FilePath buildResultFile = workspace.child("build_result_" + b.getId());
-
-        Assert.assertTrue(buildResultFile.exists());
-        // assert build result file contains correct data
-        String buildResult = buildResultFile.readToString();
-        JsonObject resultObj = new Gson().fromJson(buildResult, JsonObject.class);
-        LoadTestRun testRun = new Gson().fromJson(resultObj.get(Constants.TESTRUN).getAsString(), LoadTestRun.class);
-        System.out.println(resultObj);
-        Assert.assertEquals(testRun.getId(), -1);
     }
 }

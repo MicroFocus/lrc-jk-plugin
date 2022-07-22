@@ -44,7 +44,6 @@ import org.kohsuke.stapler.QueryParameter;
 
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.HashMap;
 
 public final class TestRunPublisher extends Recorder implements SimpleBuildStep {
 
@@ -98,6 +97,7 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
         private final ServerConfiguration serverConfiguration;
         private final TrendingConfiguration trendingConfiguration;
         private final LoadTestRun testRun;
+        private final TestRunOptions options;
         private final TaskListener listener;
 
         private PrintStream logger() {
@@ -109,18 +109,24 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
                 final ServerConfiguration serverConfiguration,
                 final TrendingConfiguration trendingConfiguration,
                 final LoadTestRun testRun,
+                final TestRunOptions options,
                 final TaskListener listener
         ) {
             this.serverConfiguration = serverConfiguration;
             this.trendingConfiguration = trendingConfiguration;
             this.testRun = testRun;
+            this.options = options;
             this.listener = listener;
         }
 
         @Override
         public TrendingDataWrapper call() throws RuntimeException {
             try {
-                Runner runner = new Runner(serverConfiguration, this.listener.getLogger(), new HashMap<>());
+                Runner runner = new Runner(
+                        serverConfiguration,
+                        this.listener.getLogger(),
+                        options
+                );
                 return runner.fetchTrending(testRun, trendingConfiguration.getBenchmark());
             } catch (Exception e) {
                 logger().println("Error while publishing report: " + e.getMessage());
@@ -170,7 +176,7 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
         loggerProxy.info("StormTestPublisher started for build " + build.getNumber());
         loggerProxy.info("Workspace: " + workspace);
 
-        FilePath buildResultPath = workspace.child("build_result_" + build.getId());
+        FilePath buildResultPath = workspace.child(String.format("lrc_run_result_%s", build.getId()));
         if (!buildResultPath.exists()) {
             loggerProxy.error(
                     "Build result file not found: " + buildResultPath + ", make sure run LRC build step first."
@@ -179,8 +185,22 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
             return;
         }
 
+        TestRunOptions opt;
+        LoadTestRun testRun;
 
-        JsonObject buildResult = new Gson().fromJson(buildResultPath.readToString(), JsonObject.class);
+        try {
+            JsonObject buildResult = new Gson().fromJson(buildResultPath.readToString(), JsonObject.class);
+            opt = new Gson().fromJson(buildResult.get("testOptions").getAsString(), TestRunOptions.class);
+            testRun = new Gson().fromJson(buildResult.get("testRun").getAsString(), LoadTestRun.class);
+        } catch (InterruptedException e) {
+            throw e;
+        } catch (Exception e) {
+            loggerProxy.error("Error while parsing build result file: " + e.getMessage());
+            build.setResult(Result.FAILURE);
+            return;
+        }
+
+
         Jenkins instance = Jenkins.getInstanceOrNull();
         if (instance == null) {
             loggerProxy.error("Failed to get Jenkins instance");
@@ -191,7 +211,7 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
         TestRunBuilder.DescriptorImpl descriptor = instance.getDescriptorByType(
                 TestRunBuilder.DescriptorImpl.class
         );
-        ServerConfiguration serverConfiguration = readServerConfiguration(buildResult, descriptor);
+        ServerConfiguration serverConfiguration = readServerConfiguration(opt, testRun, descriptor);
         ProxyConfiguration proxyConfig = ProxyConfigurationFactory.createProxyConfiguration(
                 serverConfiguration.getUrl(),
                 descriptor.getUseProxy(),
@@ -203,22 +223,9 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
         );
         serverConfiguration.setProxyConfiguration(proxyConfig);
 
-        LoadTestRun testRun = new Gson().fromJson(buildResult.get(Constants.TESTRUN).getAsString(), LoadTestRun.class);
-        if (testRun == null) {
-            loggerProxy.info("Test run not found in build result file. Make sure the test run ended successfully.");
-            build.setResult(Result.FAILURE);
-            return;
-        }
         String uiStatus = testRun.getDetailedStatus();
 
         TrendingConfiguration trendingCfg = this.getTrendingConfig();
-
-        boolean skipLogin = StringUtils.isNotEmpty(
-                EnvVarsUtil.getEnvVar(build, launcher, OptionInEnvVars.SRL_CLI_SKIP_LOGIN.name())
-        );
-        boolean extraContent = StringUtils.isNotEmpty(
-                EnvVarsUtil.getEnvVar(build, launcher, "SRL_INTERNAL_EXTRA_CONTENT")
-        );
 
         TrendingDataWrapper wrapper = null;
         try {
@@ -226,6 +233,7 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
                     serverConfiguration,
                     trendingCfg,
                     testRun,
+                    opt,
                     listener);
             VirtualChannel channel = launcher.getChannel();
             if (channel != null) {
@@ -272,7 +280,7 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
                             build.getParent(),
                             trendingConfig,
                             false,
-                            extraContent
+                            false
                     )
             );
             filePath.write(buildAction.getTrendingReportHTML(), "UTF-8");
@@ -285,19 +293,20 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
 
     @NonNull
     private ServerConfiguration readServerConfiguration(
-            final JsonObject buildResult,
+            final TestRunOptions opt,
+            final LoadTestRun testRun,
             final TestRunBuilder.DescriptorImpl descriptor
     ) {
         JsonObject serverConfigJSON = new JsonObject();
 
-        serverConfigJSON.addProperty(Constants.URL, descriptor.getUrl());
-        serverConfigJSON.addProperty(Constants.USERNAME, descriptor.getUsername());
-        serverConfigJSON.addProperty(Constants.PASSWORD, Secret.fromString(descriptor.getPassword()).getPlainText());
-        serverConfigJSON.addProperty(Constants.TENANTID, descriptor.getTenantId());
-        serverConfigJSON.addProperty(Constants.PROJECTID, buildResult.get(Constants.PROJECTID).getAsInt());
-        serverConfigJSON.addProperty(Constants.SENDEMAIL, buildResult.get(Constants.SENDEMAIL).getAsBoolean());
-        serverConfigJSON.addProperty(Constants.USE_OAUTH, descriptor.getUseOAuth());
-        serverConfigJSON.addProperty(Constants.CLIENT_ID, descriptor.getClientId());
+        serverConfigJSON.addProperty("url", descriptor.getUrl());
+        serverConfigJSON.addProperty("username", descriptor.getUsername());
+        serverConfigJSON.addProperty("password", Secret.fromString(descriptor.getPassword()).getPlainText());
+        serverConfigJSON.addProperty("tenantId", descriptor.getTenantId());
+        serverConfigJSON.addProperty("projectId", testRun.getLoadTest().getProjectId());
+        serverConfigJSON.addProperty("sendEmail", opt.getSendEmail());
+        serverConfigJSON.addProperty("useOAuth", descriptor.getUseOAuth());
+        serverConfigJSON.addProperty("clientId", descriptor.getClientId());
         if (StringUtils.isNotEmpty(descriptor.getClientSecret())) {
             serverConfigJSON.addProperty(
                     Constants.CLIENT_SECRET,
@@ -308,27 +317,23 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
         }
 
         ServerConfiguration serverConfiguration;
-        if (serverConfigJSON.get(Constants.USE_OAUTH).getAsBoolean()) {
-            serverConfiguration = new ServerConfiguration(
-                    serverConfigJSON.get(Constants.URL).getAsString(),
-                    serverConfigJSON.get(Constants.CLIENT_ID).getAsString(),
-                    serverConfigJSON.get(Constants.CLIENT_SECRET).getAsString(),
-                    serverConfigJSON.get(Constants.TENANTID).getAsString(),
-                    serverConfigJSON.get(Constants.PROJECTID).getAsInt(),
-                    serverConfigJSON.get(Constants.SENDEMAIL).getAsBoolean(),
-                    "jenkins-plugin"
-            );
-        } else {
-            serverConfiguration = new ServerConfiguration(
-                    serverConfigJSON.get(Constants.URL).getAsString(),
-                    serverConfigJSON.get(Constants.USERNAME).getAsString(),
-                    serverConfigJSON.get(Constants.PASSWORD).getAsString(),
-                    serverConfigJSON.get(Constants.TENANTID).getAsString(),
-                    serverConfigJSON.get(Constants.PROJECTID).getAsInt(),
-                    serverConfigJSON.get(Constants.SENDEMAIL).getAsBoolean(),
-                    "jenkins-plugin"
-            );
+        String usr = descriptor.getUsername();
+        String pwd = Secret.fromString(descriptor.getPassword()).getPlainText();
+        if (Boolean.TRUE.equals(descriptor.getUseOAuth())) {
+            usr = descriptor.getClientId();
+            pwd = Secret.fromString(descriptor.getClientSecret()).getPlainText();
         }
+
+        serverConfiguration = new ServerConfiguration(
+                descriptor.getUrl(),
+                usr,
+                pwd,
+                descriptor.getTenantId(),
+                testRun.getLoadTest().getProjectId(),
+                opt.getSendEmail(),
+                "jenkins-plugin"
+        );
+
         return serverConfiguration;
     }
 

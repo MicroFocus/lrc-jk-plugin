@@ -31,54 +31,53 @@ enum class RunStatus(val value: String) {
 class Runner(
     private val serverConfiguration: ServerConfiguration,
     @Transient private val logger: PrintStream = System.out,
-    options: Map<String, String> = mapOf()
+    private val testRunOptions: TestRunOptions
 ) : Serializable, Closeable {
 
-    private val isDebugLoggingEnabled = options.getOrDefault(
-        OptionInEnvVars.LRC_DEBUG_LOG.name,
-        "false"
-    ) == "true";
+    companion object {
+        private const val serialVersionUID = 1L
+    }
 
     @Transient
     private val loggerProxy = LoggerProxy(
         this.logger,
-        LoggerOptions(this.isDebugLoggingEnabled, "Runner")
+        LoggerOptions(this.testRunOptions.isDebug, "Runner")
     );
 
     @Transient
     private val apiClient = ApiClientFactory.getClient(
         this.serverConfiguration,
-        LoggerProxy(this.logger, LoggerOptions(this.isDebugLoggingEnabled, "ApiClient"))
+        LoggerProxy(this.logger, LoggerOptions(this.testRunOptions.isDebug, "ApiClient"))
     );
 
     @Transient
     private val loadTestService = LoadTestService(
         this.apiClient,
-        LoggerProxy(this.logger, LoggerOptions(this.isDebugLoggingEnabled, "LoadTestService"))
+        LoggerProxy(this.logger, LoggerOptions(this.testRunOptions.isDebug, "LoadTestService"))
     );
 
     @Transient
     private val loadTestRunService = LoadTestRunService(
         this.apiClient,
-        LoggerProxy(this.logger, LoggerOptions(this.isDebugLoggingEnabled, "LoadTestRunService"))
+        LoggerProxy(this.logger, LoggerOptions(this.testRunOptions.isDebug, "LoadTestRunService"))
     );
 
     @Transient
     private val reportDownloader = ReportDownloader(
         this.apiClient,
-        LoggerProxy(this.logger, LoggerOptions(this.isDebugLoggingEnabled, "ReportDownloader"))
+        LoggerProxy(this.logger, LoggerOptions(this.testRunOptions.isDebug, "ReportDownloader"))
     );
 
     var testRun: LoadTestRun? = null
         private set
 
     @kotlin.jvm.Throws(IOException::class, InterruptedException::class)
-    fun run(options: TestRunOptions): LoadTestRun {
+    fun run(): LoadTestRun {
         this.loggerProxy.info("login success.");
-        this.loggerProxy.info("fetching load test ${options.testId}...");
-        val lt = this.loadTestService.fetch(options.testId);
+        this.loggerProxy.info("fetching load test ${this.testRunOptions.testId}...");
+        val lt = this.loadTestService.fetch(this.testRunOptions.testId);
         this.loggerProxy.info("load test [${lt.name}] is going to start...");
-        val runId = this.loadTestService.startTestRun(lt.id, options.sendEmail);
+        val runId = this.loadTestService.startTestRun(lt.id, this.testRunOptions.sendEmail);
         this.loggerProxy.info("test run [$runId] started.");
         val testRun = LoadTestRun(runId, lt);
         this.testRun = testRun;
@@ -128,7 +127,6 @@ class Runner(
         this.apiClient.close();
     }
 
-    @kotlin.jvm.Throws(IOException::class, InterruptedException::class)
     fun interruptHandler(): String {
         val testRun = this.testRun;
         if (testRun == null) {
@@ -137,28 +135,11 @@ class Runner(
             return TestRunStatus.ABORTED.statusName;
         }
 
-        this.loadTestRunService.fetchStatus(testRun);
-
-        if (testRun.statusEnum == TestRunStatus.INITIALIZING) {
-            this.loggerProxy.info("test run is initializing, abort...")
-            this.loadTestRunService.abort(testRun);
-            this.testRun = testRun;
-            return TestRunStatus.ABORTED.statusName;
-        }
-
-        this.loggerProxy.info("test run is ${testRun.statusEnum.statusName}, stop it and fetch results before abort.")
-        this.loadTestRunService.stop(testRun);
-        if (!testRun.testRunCompletelyEnded()) {
-            this.testRun = testRun;
-            return TestRunStatus.ABORTED.statusName;
-        }
-
-        this.waitingForReportReady(testRun);
-        if (testRun.hasReport) {
-            this.reportDownloader.download(testRun, arrayOf("csv", "pdf", "docx"));
-        }
+        this.loggerProxy.info("aborting test run [${testRun.id}]...");
+        this.loadTestRunService.abort(testRun);
         this.testRun = testRun;
-        return testRun.statusEnum.statusName;
+        return TestRunStatus.ABORTED.statusName;
+
     }
 
     fun fetchTrending(testRun: LoadTestRun, benchmark: Int?): TrendingDataWrapper {

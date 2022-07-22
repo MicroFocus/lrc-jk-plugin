@@ -116,7 +116,7 @@ class ApiClient internal constructor(
             queryParams.forEach { (k, v) -> run { urlBuilder.addQueryParameter(k, v); } }
         }
         val reqBuilder = this.prepareRequestBuilder(urlBuilder.build());
-        reqBuilder.post(payload.toString().toRequestBody(MEDIA_TYPE_JSON.toMediaType()));
+        reqBuilder.post(payload.toString().toRequestBody(MEDIA_TYPE_JSON));
 
         return this.execute(reqBuilder);
     }
@@ -129,7 +129,7 @@ class ApiClient internal constructor(
         }
 
         val reqBuilder = this.prepareRequestBuilder(urlBuilder.build());
-        reqBuilder.put(payload.toString().toRequestBody(MEDIA_TYPE_JSON.toMediaType()));
+        reqBuilder.put(payload.toString().toRequestBody(MEDIA_TYPE_JSON));
 
         return this.execute(reqBuilder);
     }
