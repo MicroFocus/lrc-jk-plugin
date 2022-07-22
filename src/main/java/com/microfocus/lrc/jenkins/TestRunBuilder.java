@@ -278,14 +278,6 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         private String proxyUsername;
         private String proxyPassword;
 
-        public FormValidation doCheckTenant(@QueryParameter final String value) {
-            if (value == null || value.trim().length() == 0) {
-                return FormValidation.error("Please input a Tenant");
-            }
-
-            return FormValidation.ok();
-        }
-
         public FormValidation doCheckProjectID(@QueryParameter final String value) {
             if (value == null || value.trim().length() == 0) {
                 return FormValidation.error("Please input a ProjectID");
@@ -434,7 +426,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
                 );
             }
             ProxyConfiguration proxyConfiguration = (
-                    ProxyConfigurationFactory.createProxyConfiguration(
+                    ConfigurationFactory.createProxyConfiguration(
                             url,
                             Boolean.valueOf(useProxy),
                             proxyHost,
@@ -484,7 +476,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         return this.testId;
     }
 
-    private transient LoggerProxy loggerProxy = new LoggerProxy();
+    private LoggerProxy loggerProxy = new LoggerProxy();
 
     @DataBoundConstructor
     public TestRunBuilder(
@@ -521,7 +513,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         }
 
         ServerConfiguration serverConfiguration = createServerConfiguration(descriptor, run, launcher);
-        ProxyConfiguration proxyConfiguration = ProxyConfigurationFactory.createProxyConfiguration(
+        ProxyConfiguration proxyConfiguration = ConfigurationFactory.createProxyConfiguration(
                 serverConfiguration.getUrl(),
                 descriptor.useProxy,
                 descriptor.proxyHost,
@@ -654,34 +646,26 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
             final DescriptorImpl descriptor,
             final Run<?, ?> run,
             final Launcher launcher) {
-        ServerConfiguration config;
-        if (descriptor.getUseOAuth()) {
-            config = new ServerConfiguration(
-                    descriptor.getUrl(),
-                    descriptor.getClientId(),
-                    Secret.fromString(descriptor.getClientSecret()).getPlainText(),
-                    descriptor.getTenantId(),
-                    Integer.parseInt(this.getProjectIdAtRunTime(run, launcher)),
-                    this.sendEmail,
-                    "jenkins-plugin"
-            );
-        } else {
-            config = new ServerConfiguration(
-                    descriptor.getUrl(),
-                    descriptor.getUsername(),
-                    Secret.fromString(descriptor.getPassword()).getPlainText(),
-                    descriptor.getTenantId(),
-                    Integer.parseInt(this.getProjectIdAtRunTime(run, launcher)),
-                    this.sendEmail,
-                    "jenkins-plugin"
-            );
+        String usr = descriptor.getUsername();
+        String pwd = Secret.fromString(descriptor.getPassword()).getPlainText();
+        if (Boolean.TRUE.equals(descriptor.getUseOAuth())) {
+            usr = descriptor.getClientId();
+            pwd = Secret.fromString(descriptor.getClientSecret()).getPlainText();
         }
-
+        ServerConfiguration config = new ServerConfiguration(
+                descriptor.getUrl(),
+                usr,
+                pwd,
+                descriptor.getTenantId(),
+                Integer.parseInt(this.getProjectIdAtRunTime(run, launcher)),
+                this.sendEmail,
+                "jenkins-plugin"
+        );
         printJobParameters(config);
         return config;
     }
 
-    private transient HashMap<String, Boolean> isLogPrinted;
+    private HashMap<String, Boolean> isLogPrinted;
 
     private void logFieldReadFromParam(
             final String fieldName,

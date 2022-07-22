@@ -149,18 +149,10 @@ class ReportDownloader(
     private fun genXmlFile(testRun: LoadTestRun) {
         val fileName = genFileName("xml", testRun);
         val content = XmlReport.write(
-            testRun.loadTest.id,
-            testRun.id,
-            testRun.loadTest.name,
-            testRun.detailedStatus,
-            testRun.status,
-            testRun.startTime,
-            testRun.endTime,
-            testRun.testRunCompletelyEnded(),
+            testRun,
             "${this.apiClient.getServerConfiguration().url}/run-overview/${testRun.id}/report/?TENANTID=${this.apiClient.getServerConfiguration().tenantId}&projectId=${this.apiClient.getServerConfiguration().projectId}",
             "${this.apiClient.getServerConfiguration().url}/run-overview/${testRun.id}/dashboard/?TENANTID=${this.apiClient.getServerConfiguration().tenantId}&projectId=${this.apiClient.getServerConfiguration().projectId}",
             null,
-            testRun.statusCode,
         );
         testRun.reports[fileName] = content;
     }

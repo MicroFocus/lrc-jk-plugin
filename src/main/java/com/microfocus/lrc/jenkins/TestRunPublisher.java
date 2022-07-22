@@ -58,7 +58,7 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
     private Integer trtAvgThresholdMinorRegression;
     private Integer trtAvgThresholdMajorRegression;
 
-    private transient TrendingConfiguration trendingConfig;
+    private TrendingConfiguration trendingConfig;
 
     private TrendingConfiguration getTrendingConfig() {
         if (this.trendingConfig == null) {
@@ -77,19 +77,9 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
         return this.trendingConfig;
     }
 
+    @Override
     public BuildStepMonitor getRequiredMonitorService() {
         return BuildStepMonitor.NONE;
-    }
-
-    private static Integer getIntegerSafely(final String str) {
-        Integer result = null;
-        try {
-            result = Integer.parseInt(str);
-        } catch (NumberFormatException e) {
-            // ignore
-        }
-
-        return result;
     }
 
     private static class PublishReportCallable implements Callable<TrendingDataWrapper, RuntimeException> {
@@ -136,7 +126,7 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
 
         @Override
         public void checkRoles(final RoleChecker roleChecker) throws SecurityException {
-
+            // noop
         }
     }
 
@@ -212,7 +202,7 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
                 TestRunBuilder.DescriptorImpl.class
         );
         ServerConfiguration serverConfiguration = readServerConfiguration(opt, testRun, descriptor);
-        ProxyConfiguration proxyConfig = ProxyConfigurationFactory.createProxyConfiguration(
+        ProxyConfiguration proxyConfig = ConfigurationFactory.createProxyConfiguration(
                 serverConfiguration.getUrl(),
                 descriptor.getUseProxy(),
                 descriptor.getProxyHost(),
@@ -337,6 +327,12 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
         return serverConfiguration;
     }
 
+    static final int RUN_COUNT_MIN = 5;
+    static final int RUN_COUNT_MAX = 10;
+    static final int PERCENTAGE_MAX = 100;
+    static final int PERCENTAGE_DEFAULT_MIN = 5;
+    static final int PERCENTAGE_DEFAULT_MAX = 10;
+
     @SuppressWarnings({"checkstyle:MissingJavadocMethod", "checkstyle:ParameterNumber"})
     @DataBoundConstructor
     public TestRunPublisher(
@@ -351,7 +347,7 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
     ) {
         this.runsCount = runsCount;
         if (this.runsCount == null) {
-            this.runsCount = 5;
+            this.runsCount = RUN_COUNT_MIN;
         }
 
         this.benchmark = benchmark;
@@ -359,67 +355,82 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
             this.benchmark = 0;
         }
 
-        this.trtAvgThresholdImprovement = trtAvgThresholdImprovement;
         this.trtAvgThresholdMinorRegression = trtAvgThresholdMinorRegression;
         this.trtAvgThresholdMajorRegression = trtAvgThresholdMajorRegression;
         this.trtPercentileThresholdImprovement = trtPercentileThresholdImprovement;
         this.trtPercentileThresholdMinorRegression = trtPercentileThresholdMinorRegression;
         this.trtPercentileThresholdMajorRegression = trtPercentileThresholdMajorRegression;
 
-        if (this.runsCount < 5) {
-            this.runsCount = 5;
+        if (this.runsCount < RUN_COUNT_MIN) {
+            this.runsCount = RUN_COUNT_MIN;
         }
-        if (this.runsCount > 10) {
-            this.runsCount = 10;
-        }
-
-        if (this.trtAvgThresholdImprovement == null
-                || this.trtAvgThresholdImprovement <= 0
-                || this.trtAvgThresholdImprovement >= 100
-        ) {
-            this.trtAvgThresholdImprovement = 5;
+        if (this.runsCount > RUN_COUNT_MAX) {
+            this.runsCount = RUN_COUNT_MAX;
         }
 
-        if (this.trtAvgThresholdMinorRegression == null
-                || this.trtAvgThresholdMinorRegression <= 0
-                || this.trtAvgThresholdMinorRegression >= 99
-        ) {
-            this.trtAvgThresholdMinorRegression = 5;
-        }
+        this.trtAvgThresholdImprovement = setDefaultValue(
+                trtAvgThresholdImprovement,
+                0,
+                PERCENTAGE_MAX,
+                PERCENTAGE_DEFAULT_MIN
+        );
 
-        if ((this.trtAvgThresholdMajorRegression == null)
-                || (this.trtAvgThresholdMajorRegression <= 0)
-                || (this.trtAvgThresholdMajorRegression >= 100)
-        ) {
-            this.trtAvgThresholdMajorRegression = 10;
-        }
+        this.trtAvgThresholdMinorRegression = setDefaultValue(
+                trtAvgThresholdMinorRegression,
+                0,
+                PERCENTAGE_MAX,
+                PERCENTAGE_DEFAULT_MIN
+        );
+
+
+        this.trtAvgThresholdMajorRegression = setDefaultValue(
+                trtAvgThresholdMajorRegression,
+                0,
+                PERCENTAGE_MAX,
+                PERCENTAGE_DEFAULT_MAX
+        );
+
         if (this.trtAvgThresholdMajorRegression <= this.trtAvgThresholdMinorRegression) {
             this.trtAvgThresholdMajorRegression = this.trtAvgThresholdMinorRegression + 1;
         }
 
-        if (this.trtPercentileThresholdImprovement == null
-                || this.trtPercentileThresholdImprovement <= 0
-                || this.trtPercentileThresholdImprovement >= 100
-        ) {
-            this.trtPercentileThresholdImprovement = 5;
-        }
+        this.trtPercentileThresholdImprovement = setDefaultValue(
+                trtPercentileThresholdImprovement,
+                0,
+                PERCENTAGE_MAX,
+                PERCENTAGE_DEFAULT_MIN
+        );
 
-        if (this.trtPercentileThresholdMinorRegression == null
-                || this.trtPercentileThresholdMinorRegression <= 0
-                || this.trtPercentileThresholdMinorRegression >= 99
-        ) {
-            this.trtPercentileThresholdMinorRegression = 5;
-        }
+        this.trtPercentileThresholdMinorRegression = setDefaultValue(
+                trtPercentileThresholdMinorRegression,
+                0,
+                PERCENTAGE_MAX,
+                PERCENTAGE_DEFAULT_MIN
+        );
 
-        if (this.trtPercentileThresholdMajorRegression == null
-                || this.trtPercentileThresholdMajorRegression <= 0
-                || this.trtPercentileThresholdMinorRegression >= 100
-        ) {
-            this.trtPercentileThresholdMajorRegression = 10;
-        }
+        this.trtPercentileThresholdMajorRegression = setDefaultValue(
+                trtPercentileThresholdMajorRegression,
+                0,
+                PERCENTAGE_MAX,
+                PERCENTAGE_DEFAULT_MAX
+        );
+
         if (this.trtPercentileThresholdMajorRegression <= this.trtPercentileThresholdMinorRegression) {
             this.trtPercentileThresholdMajorRegression = this.trtPercentileThresholdMinorRegression + 1;
         }
+    }
+
+    private Integer setDefaultValue(
+            final Integer val,
+            final Integer min,
+            final Integer max,
+            final Integer defaultValue
+    ) {
+        if (val == null || val < min || val > max) {
+            return defaultValue;
+        }
+
+        return val;
     }
 
     //#region accessors
@@ -467,6 +478,17 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
 
         public boolean isApplicable(final Class<? extends AbstractProject> jobType) {
             return true;
+        }
+
+        private static Integer getIntegerSafely(final String str) {
+            Integer result = null;
+            try {
+                result = Integer.parseInt(str);
+            } catch (NumberFormatException e) {
+                // ignore
+            }
+
+            return result;
         }
 
         //#region formValidation

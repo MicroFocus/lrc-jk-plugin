@@ -13,6 +13,7 @@
 package com.microfocus.lrc.core
 
 import com.google.gson.JsonObject
+import com.microfocus.lrc.core.entity.LoadTestRun
 import com.microfocus.lrc.core.entity.TestRunStatus
 import org.w3c.dom.Document
 import org.w3c.dom.Element
@@ -27,26 +28,18 @@ class XmlReport {
     companion object {
         @Throws(Exception::class)
         fun write(
-            testId: Int,
-            testRunId: Int,
-            testName: String,
-            uiStatus: String,
-            statusDesc: String?,
-            beginTime: Int,
-            endTime: Int,
-            isResultAvailable: Boolean,
+            testRun: LoadTestRun,
             reportUrl: String,
             dashboardUrl: String,
             errorObj: JsonObject?,
-            statusCode: Int
         ): ByteArray {
 
             val xml =
                 DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-            val isFailure: Boolean = TestRunStatus.PASSED.statusName != uiStatus;
+            val isFailure: Boolean = TestRunStatus.PASSED.statusName != testRun.detailedStatus;
 
             val testsuite = xml.createElement("testsuite")
-            testsuite.setAttribute("name", testName)
+            testsuite.setAttribute("name", testRun.loadTest.name)
             testsuite.setAttribute("tests", "1")
             testsuite.setAttribute("failures", if (isFailure) "1" else "0")
             xml.appendChild(testsuite)
@@ -62,28 +55,26 @@ class XmlReport {
             properties.appendChild(pStormRunnerLoad)
             val pTestId: Element = generatePropertyElement(
                 "testId",
-                testId.toString(),
+                testRun.loadTest.id.toString(),
                 xml,
                 false
             )
             properties.appendChild(pTestId)
             val pRunId: Element = generatePropertyElement(
                 "runId",
-                testRunId.toString(),
+                testRun.id.toString(),
                 xml,
                 false
             )
             properties.appendChild(pRunId)
-            if (statusDesc != null) {
-                val pStatusDesc: Element = generatePropertyElement(
-                    "statusDescription",
-                    statusDesc,
-                    xml,
-                    true
-                )
-                properties.appendChild(pStatusDesc)
-            }
-            if (isResultAvailable) {
+            val pStatusDesc: Element = generatePropertyElement(
+                "statusDescription",
+                testRun.status,
+                xml,
+                true
+            )
+            properties.appendChild(pStatusDesc)
+            if (testRun.testRunCompletelyEnded()) {
                 val pReport: Element = generatePropertyElement(
                     "reportUrl",
                     reportUrl,
@@ -102,28 +93,28 @@ class XmlReport {
             testsuite.appendChild(properties)
 
             var time = 0.0
-            if (beginTime != -1 && endTime != -1 && endTime > beginTime) {
-                time = (endTime - beginTime) / 1000.0
+            if (testRun.startTime != -1 && testRun.endTime != -1 && testRun.endTime > testRun.startTime) {
+                time = (testRun.endTime - testRun.startTime) / 1000.0
             }
             val testcase = xml.createElement("testcase")
-            testcase.setAttribute("name", testName)
-            testcase.setAttribute("status", uiStatus)
+            testcase.setAttribute("name", testRun.loadTest.name)
+            testcase.setAttribute("status", testRun.detailedStatus)
             testcase.setAttribute("classname", "com.microfocus.lrc.Test")
             testcase.setAttribute("time", time.toString())
             testsuite.appendChild(testcase)
 
             if (isFailure) {
-                var failureContent = "${statusCode} "
+                var failureContent = "${testRun.statusCode} "
                 if (errorObj != null) {
                     failureContent += "$errorObj "
                 }
-                if (!statusDesc.isNullOrBlank() && uiStatus != TestRunStatus.FAILED.statusName) {
-                    failureContent += "$statusDesc"
+                if (testRun.status.isNotBlank() && testRun.detailedStatus != TestRunStatus.FAILED.statusName) {
+                    failureContent += testRun.status
                 }
                 val failureEle = xml.createElement("failure")
-                failureEle.setAttribute("message", "Test run status is $uiStatus")
+                failureEle.setAttribute("message", "Test run status is ${testRun.detailedStatus}")
                 failureEle.textContent = failureContent
-                failureEle.setAttribute("type", uiStatus)
+                failureEle.setAttribute("type", testRun.detailedStatus)
                 testcase.appendChild(failureEle)
             }
 

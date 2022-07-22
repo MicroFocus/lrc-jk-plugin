@@ -18,7 +18,7 @@ import java.net.MalformedURLException
 import java.net.Proxy
 import java.net.URL
 
-class ProxyConfigurationFactory {
+class ConfigurationFactory {
     companion object {
         @JvmStatic
         fun createProxyConfiguration(

@@ -219,11 +219,6 @@ public final class TrendingDataWrapper implements Serializable {
         public int getRunId() {
             return runId;
         }
-
-        private void setRunId(final int runId) {
-            this.runId = runId;
-        }
-
         public double getDuration() {
             return duration;
         }
