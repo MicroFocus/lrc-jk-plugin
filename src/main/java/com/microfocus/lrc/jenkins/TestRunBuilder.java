@@ -476,7 +476,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         return this.testId;
     }
 
-    private LoggerProxy loggerProxy = new LoggerProxy();
+    private transient LoggerProxy loggerProxy = new LoggerProxy();
 
     @DataBoundConstructor
     public TestRunBuilder(
@@ -665,7 +665,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         return config;
     }
 
-    private HashMap<String, Boolean> isLogPrinted;
+    private transient HashMap<String, Boolean> isLogPrinted;
 
     private void logFieldReadFromParam(
             final String fieldName,

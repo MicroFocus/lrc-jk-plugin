@@ -14,7 +14,6 @@ package com.microfocus.lrc.jenkins;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.microfocus.lrc.core.Constants;
 import com.microfocus.lrc.core.entity.*;
 import com.microfocus.lrc.core.service.Runner;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -36,7 +35,6 @@ import hudson.util.FormValidation;
 import hudson.util.Secret;
 import jenkins.model.Jenkins;
 import jenkins.tasks.SimpleBuildStep;
-import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.remoting.RoleChecker;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -287,25 +285,6 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
             final LoadTestRun testRun,
             final TestRunBuilder.DescriptorImpl descriptor
     ) {
-        JsonObject serverConfigJSON = new JsonObject();
-
-        serverConfigJSON.addProperty("url", descriptor.getUrl());
-        serverConfigJSON.addProperty("username", descriptor.getUsername());
-        serverConfigJSON.addProperty("password", Secret.fromString(descriptor.getPassword()).getPlainText());
-        serverConfigJSON.addProperty("tenantId", descriptor.getTenantId());
-        serverConfigJSON.addProperty("projectId", testRun.getLoadTest().getProjectId());
-        serverConfigJSON.addProperty("sendEmail", opt.getSendEmail());
-        serverConfigJSON.addProperty("useOAuth", descriptor.getUseOAuth());
-        serverConfigJSON.addProperty("clientId", descriptor.getClientId());
-        if (StringUtils.isNotEmpty(descriptor.getClientSecret())) {
-            serverConfigJSON.addProperty(
-                    Constants.CLIENT_SECRET,
-                    Secret.fromString(descriptor.getClientSecret()).getPlainText()
-            );
-        } else {
-            serverConfigJSON.addProperty(Constants.CLIENT_SECRET, "");
-        }
-
         ServerConfiguration serverConfiguration;
         String usr = descriptor.getUsername();
         String pwd = Secret.fromString(descriptor.getPassword()).getPlainText();
