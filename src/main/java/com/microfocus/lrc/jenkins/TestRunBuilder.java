@@ -535,7 +535,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         );
 
         RunTestCallable callable = new RunTestCallable(
-                logger,
+                listener,
                 serverConfiguration,
                 opt
         );
@@ -576,6 +576,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         }
 
         // remove reports data to write a smaller json
+        testRun.getReports().clear();
         JsonObject buildResult = new JsonObject();
         buildResult.addProperty("testOptions", new Gson().toJson(opt));
         buildResult.addProperty("testRun", new Gson().toJson(testRun));
@@ -685,36 +686,40 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
 
     private static class RunTestCallable implements Callable<LoadTestRun, Exception> {
 
-        private final transient PrintStream logger;
         private final ServerConfiguration serverConfiguration;
         private final TestRunOptions testRunOptions;
+        private final TaskListener listener;
 
         RunTestCallable(
-                final PrintStream logger,
+                final TaskListener listener,
                 final ServerConfiguration serverConfiguration,
                 final TestRunOptions testRunOptions
         ) {
-            this.logger = logger;
+            this.listener = listener;
             this.serverConfiguration = serverConfiguration;
             this.testRunOptions = testRunOptions;
         }
 
         @Override
         public LoadTestRun call() throws Exception {
+            PrintStream logger = this.listener.getLogger();
             LoggerProxy loggerProxy = new LoggerProxy(
-                    this.logger,
+                    logger,
                     new LoggerOptions(this.testRunOptions.isDebug(), "")
             );
 
             Runner runner = new Runner(
                     this.serverConfiguration,
-                    this.logger,
+                    logger,
                     this.testRunOptions
             );
             try {
                 return runner.run();
             } catch (IOException e) {
                 loggerProxy.error("Failed to run test, " + e.getMessage());
+                if (Thread.interrupted()) {
+                    throw new InterruptedException("jenkins job is interrupted.");
+                }
                 throw e;
             } catch (InterruptedException e) {
                 runner.interruptHandler();
