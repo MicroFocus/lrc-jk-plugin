@@ -43,7 +43,6 @@ class TrendingReport {
             extraContent: Boolean
         ): String? {
             //#region parameter validate
-
             if (project == null) {
                 LoggerProxy.sysLogger.log(Level.SEVERE, "'project' is null, failed to generate trending report.")
                 return null
@@ -60,10 +59,8 @@ class TrendingReport {
 
             //#region get the latest build has trending data
             val latestBuilds: List<Run<*, *>> =
-                this.findValidBuilds(project.lastBuild, 1) { build: Run<*, *>?, _ ->
-                    this.isHavingTrendingData(
-                        build
-                    )
+                this.findValidBuilds(project.lastBuild, 1) { build, _ ->
+                    this.isHavingTrendingData(build)
                 }
             if (latestBuilds.size == 1) {
                 latestBuild = latestBuilds[0]
@@ -90,22 +87,9 @@ class TrendingReport {
 
             //#region check if report has been generated for the latestBuild
             // and if trendingConfig is changed since last generating.
-            if (latestBuildAction.trendingReportHTML != null) {
-                val lastTrendingConfig: TrendingConfiguration = latestBuildAction.trendingConfig
-                if (this.isSameTrendingConfig(lastTrendingConfig, trendingConfig) && !forceUpdate) {
-                    LoggerProxy.sysLogger.log(
-                        Level.INFO,
-                        "cached trending report found and trending config is not changed"
-                    )
-                    return latestBuildAction.trendingReportHTML
-                } else {
-                    LoggerProxy.sysLogger.log(
-                        Level.INFO,
-                        "cached trending report found but trending config is changed, re-generating."
-                    )
-                }
-            } else {
-                LoggerProxy.sysLogger.log(Level.INFO, "cached trending report not found, generating.")
+            val cachedHTML = this.findCachedHTML(latestBuildAction, trendingConfig, forceUpdate)
+            if (cachedHTML != null) {
+                return cachedHTML
             }
             //#endregion
 
@@ -233,7 +217,7 @@ class TrendingReport {
                                 )
                             if ((prevData != null) && (prevData.second != null)) {
                                 generatorLogs.append(
-                                        "\t\t\t\tbenchmark found: testrun#${prevData.first}",
+                                    "\t\t\t\tbenchmark found: testrun#${prevData.first}",
                                 )
                                 benchmarkTrans = prevData.second
                                 benchmarkRunId = prevData.first
@@ -335,6 +319,32 @@ class TrendingReport {
             } catch (e: IOException) {
                 LoggerProxy.sysLogger.log(Level.SEVERE, "failed to generate html, " + e.message)
                 "failed to generate"
+            }
+        }
+
+        private fun findCachedHTML(
+            latestBuildAction: TestRunReportBuildAction,
+            trendingConfig: TrendingConfiguration,
+            forceUpdate: Boolean
+        ): String? {
+            if (latestBuildAction.trendingReportHTML == null) {
+                LoggerProxy.sysLogger.log(Level.INFO, "cached trending report not found, generating.")
+                return null;
+            }
+
+            val lastTrendingConfig: TrendingConfiguration = latestBuildAction.trendingConfig
+            return if (this.isSameTrendingConfig(lastTrendingConfig, trendingConfig) && !forceUpdate) {
+                LoggerProxy.sysLogger.log(
+                    Level.INFO,
+                    "cached trending report found and trending config is not changed"
+                )
+                latestBuildAction.trendingReportHTML
+            } else {
+                LoggerProxy.sysLogger.log(
+                    Level.INFO,
+                    "cached trending report found but trending config is changed, re-generating."
+                )
+                null;
             }
         }
 

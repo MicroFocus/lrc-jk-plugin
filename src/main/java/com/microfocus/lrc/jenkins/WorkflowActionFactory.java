@@ -38,18 +38,20 @@ public final class WorkflowActionFactory extends TransientActionFactory<Job> {
             try {
                 LoggerProxy.getSysLogger().log(
                         Level.FINE,
-                        "*******valid build action found*******\n"
-                                + "build#"
-                                + buildAction.getRun().getId() + "\n"
-                                + "trendingConfig "
-                                + buildAction.getTrendingConfig().toString() + "\n"
-                                + "trendingReport "
-                                + (buildAction.getTrendingReportHTML() == null
-                                ? "NULL"
-                                : buildAction.getTrendingReportHTML().length())
+                        String.format(
+                                "*******valid build action found*******\n"
+                                        + "build#%s\n"
+                                        + "trendingConfig %s\n"
+                                        + "trendingReport %s",
+                                buildAction.getRun().getId(),
+                                buildAction.getTrendingConfig().toString(),
+                                buildAction.getTrendingReportHTML() == null
+                                        ? "NULL"
+                                        : buildAction.getTrendingReportHTML().length()
+                        )
                 );
             } catch (Exception ignored) {
-
+                // ignore
             }
             return Collections.singletonList(new TestRunReportProjectAction(job, buildAction.getTrendingConfig()));
         }

@@ -16,7 +16,6 @@ import com.microfocus.lrc.core.entity.TrendingConfiguration;
 import hudson.model.Action;
 import hudson.model.Job;
 import hudson.model.Run;
-import hudson.util.HttpResponses;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
@@ -78,12 +77,18 @@ public final class TestRunReportProjectAction implements Action {
         if (buildAction == null) {
             LoggerProxy.getSysLogger().log(
                     Level.INFO,
-                    "no valid build found for project#" + this.project.getName() + ", cannot display trending report."
+                    String.format(
+                            "no valid build found for project#%s, cannot display trending report.",
+                            this.project.getName()
+                    )
             );
         } else {
             LoggerProxy.getSysLogger().log(
                     Level.FINE,
-                    "build action found: #" + buildAction.getRun().getNumber()
+                    String.format(
+                            "build action found: #%d",
+                            buildAction.getRun().getNumber()
+                    )
             );
             if (forceUpdate || buildAction.getTrendingReportHTML() == null) {
                 htmlContent = TrendingReport.generateReport(
@@ -103,7 +108,7 @@ public final class TestRunReportProjectAction implements Action {
             htmlContent = "<h1>Failed to generate report.</h1>";
         }
 
-        HttpResponses.html(htmlContent).generateResponse(req, response, this);
+        org.kohsuke.stapler.HttpResponses.literalHtml(htmlContent).generateResponse(req, response, this);
     }
 
     public Job<?, ?> getProject() {

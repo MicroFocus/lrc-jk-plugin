@@ -80,6 +80,16 @@ class ApiClient internal constructor(
         return reqBuilder;
     }
 
+    private fun execute(reqBuilder: Request.Builder): Response {
+        try {
+            return this.getOkhttpClient().newCall(reqBuilder.build()).execute();
+        } catch (ex: UnknownHostException) {
+            throw IOException("Cannot resolve hostname: ${ex.message}, please check your configuration");
+        } catch (ex: SSLHandshakeException) {
+            throw IOException("Cannot access server, please check if you are behind a proxy server");
+        }
+    }
+
     fun get(
         apiPath: String,
         queryParams: Map<String, String>? = null,
@@ -97,14 +107,7 @@ class ApiClient internal constructor(
         }
 
         val reqBuilder = this.prepareRequestBuilder(urlBuilder.build(), contentType).get();
-
-        try {
-            return this.getOkhttpClient().newCall(reqBuilder.build()).execute();
-        } catch (ex: UnknownHostException) {
-            throw IOException("Cannot resolve hostname: ${ex.message}, please check your configuration");
-        } catch (ex: SSLHandshakeException) {
-            throw IOException("Cannot access server, please check if you are behind a proxy server");
-        }
+        return this.execute(reqBuilder);
     }
 
     fun post(apiPath: String, queryParams: Map<String, String>? = null, payload: JsonObject): Response {
@@ -113,16 +116,9 @@ class ApiClient internal constructor(
             queryParams.forEach { (k, v) -> run { urlBuilder.addQueryParameter(k, v); } }
         }
         val reqBuilder = this.prepareRequestBuilder(urlBuilder.build());
-
         reqBuilder.post(payload.toString().toRequestBody(MEDIA_TYPE_JSON));
 
-        try {
-            return this.getOkhttpClient().newCall(reqBuilder.build()).execute();
-        } catch (ex: UnknownHostException) {
-            throw IOException("Cannot resolve hostname: ${ex.message}, please check your configuration");
-        } catch (ex: SSLHandshakeException) {
-            throw IOException("Cannot access server, please check if you are behind a proxy server");
-        }
+        return this.execute(reqBuilder);
     }
 
     fun put(apiPath: String, queryParams: Map<String, String>? = null, payload: JsonObject): Response {
@@ -133,16 +129,9 @@ class ApiClient internal constructor(
         }
 
         val reqBuilder = this.prepareRequestBuilder(urlBuilder.build());
-
         reqBuilder.put(payload.toString().toRequestBody(MEDIA_TYPE_JSON));
 
-        try {
-            return this.getOkhttpClient().newCall(reqBuilder.build()).execute();
-        } catch (ex: UnknownHostException) {
-            throw IOException("Cannot resolve hostname: ${ex.message}, please check your configuration");
-        } catch (ex: SSLHandshakeException) {
-            throw IOException("Cannot access server, please check if you are behind a proxy server");
-        }
+        return this.execute(reqBuilder);
     }
 
     fun login() {

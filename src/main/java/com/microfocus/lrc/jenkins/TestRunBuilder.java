@@ -44,7 +44,9 @@ import org.kohsuke.stapler.StaplerRequest;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public final class TestRunBuilder extends Builder implements SimpleBuildStep {
@@ -276,14 +278,6 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         private String proxyUsername;
         private String proxyPassword;
 
-        public FormValidation doCheckTenant(@QueryParameter final String value) {
-            if (value == null || value.trim().length() == 0) {
-                return FormValidation.error("Please input a Tenant");
-            }
-
-            return FormValidation.ok();
-        }
-
         public FormValidation doCheckProjectID(@QueryParameter final String value) {
             if (value == null || value.trim().length() == 0) {
                 return FormValidation.error("Please input a ProjectID");
@@ -394,23 +388,6 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
 
         //#endregion
 
-        /**
-         * test connection to the server.
-         *
-         * @param username
-         * @param password
-         * @param url
-         * @param proxyHost
-         * @param proxyPort
-         * @param proxyUsername
-         * @param proxyPassword
-         * @param clientId
-         * @param clientSecret
-         * @param tenantId
-         * @param useOAuth
-         * @param useProxy
-         * @return FormValidation
-         */
         @SuppressWarnings({"checkstyle:ParameterNumber", "checkstyle:HiddenField"})
         public FormValidation doTestConnection(
                 @QueryParameter("username") final String username,
@@ -449,14 +426,14 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
                 );
             }
             ProxyConfiguration proxyConfiguration = (
-                    ProxyConfigurationFactory.createProxyConfiguration(
+                    ConfigurationFactory.createProxyConfiguration(
                             url,
                             Boolean.valueOf(useProxy),
                             proxyHost,
                             proxyPort,
                             proxyUsername,
                             Secret.fromString(proxyPassword).getPlainText(),
-                            System.out
+                            new LoggerProxy()
                     )
             );
             config.setProxyConfiguration(proxyConfiguration);
@@ -512,17 +489,6 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         this.setSendEmail(sendEmail);
     }
 
-    /**
-     * run the build.
-     *
-     * @param run       a build this is running as a part of
-     * @param workspace a workspace to use for any file operations
-     * @param env       environment variables applicable to this step
-     * @param launcher  a way to start processes
-     * @param listener  a place to send output
-     * @throws InterruptedException
-     * @throws IOException
-     */
     @Override
     public void perform(
             final @NonNull Run<?, ?> run,
@@ -533,6 +499,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
     ) throws InterruptedException, IOException {
         PrintStream logger = listener.getLogger();
         this.loggerProxy = new LoggerProxy(logger, new LoggerOptions(false, ""));
+
         printEnvInfo(run);
 
         TestRunBuilder.DescriptorImpl descriptor = (TestRunBuilder.DescriptorImpl) this.getDescriptor();
@@ -546,73 +513,45 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         }
 
         ServerConfiguration serverConfiguration = createServerConfiguration(descriptor, run, launcher);
-        ProxyConfiguration proxyConfiguration = ProxyConfigurationFactory.createProxyConfiguration(
+        ProxyConfiguration proxyConfiguration = ConfigurationFactory.createProxyConfiguration(
                 serverConfiguration.getUrl(),
                 descriptor.useProxy,
                 descriptor.proxyHost,
                 descriptor.proxyPort,
                 descriptor.proxyUsername,
                 Secret.fromString(descriptor.proxyPassword).getPlainText(),
-                logger
+                this.loggerProxy
         );
         serverConfiguration.setProxyConfiguration(proxyConfiguration);
 
-        JsonObject buildResult = new JsonObject();
-        buildResult.addProperty(Constants.PROJECTID, this.getProjectIdAtRunTime(run, launcher));
-        buildResult.addProperty(Constants.SENDEMAIL, this.isSendEmail());
-        String resultStr = buildResult.toString();
-        FilePath resultFile = workspace.child("build_result_" + run.getId());
         int testIdVal = Integer.parseInt(this.getTestIdAtRunTime(run, launcher));
-        TestRunOptions opt = new TestRunOptions(testIdVal, this.sendEmail);
         Map<String, String> envVarsObj = this.readConfigFromEnvVars(run, launcher);
+        TestRunOptions opt = new TestRunOptions(
+                testIdVal,
+                this.sendEmail,
+                Boolean.parseBoolean(envVarsObj.get(OptionInEnvVars.SRL_CLI_SKIP_LOGIN.name())),
+                Boolean.parseBoolean(envVarsObj.get(OptionInEnvVars.LRC_SKIP_PDF_REPORT.name())),
+                Boolean.parseBoolean(envVarsObj.get(OptionInEnvVars.LRC_DEBUG_LOG.name()))
+        );
 
         RunTestCallable callable = new RunTestCallable(
-                serverConfiguration,
                 listener,
-                resultStr,
-                resultFile,
-                opt,
-                envVarsObj
+                serverConfiguration,
+                opt
         );
+
         LoadTestRun testRun = null;
-        String interruptionDone = null;
 
         try {
             VirtualChannel channel = launcher.getChannel();
             if (channel != null) {
                 testRun = channel.call(callable);
             }
-        } catch (IOException e) {
-            this.loggerProxy.info("[ERROR] " + e.getMessage());
         } catch (InterruptedException e) {
-            //#region this catch block will only be executed when the job runs on slave
-
-            this.loggerProxy.info("interruption occurred, waiting for execution ending.");
-            interruptionDone = Constants.UNKNOWN;
-            int elapsedWaiting = 0;
-            while (Constants.UNKNOWN.equals(interruptionDone) && elapsedWaiting < 1000 * 60 * 3) {
-                Thread.sleep(10000);
-                elapsedWaiting += 10000;
-                interruptionDone = EnvVars.getRemote(launcher.getChannel()).get(testIdVal + "_INTERRUPTION");
-                this.loggerProxy.info("still waiting for execution ending...");
-            }
-            testRun = checkInterruptionDone(run, testRun, resultFile, interruptionDone);
-            this.loggerProxy.debug(
-                    new StringBuilder()
-                            .append("interruption done: ").append(interruptionDone)
-                            .append(", test run restored: ").append(testRun == null ? "null" : testRun.getId())
-                            .toString()
-            );
-            //#endregion
-        }
-
-        if (
-                interruptionDone == null
-                        && EnvVars.getRemote(launcher.getChannel()).containsKey(testIdVal + "_INTERRUPTION")
-        ) {
-            //which means the InterruptedException is not caught(running on master)
-            interruptionDone = EnvVars.getRemote(launcher.getChannel()).get(testIdVal + "_INTERRUPTION");
-            testRun = checkInterruptionDone(run, testRun, resultFile, interruptionDone);
+            loggerProxy.info("Test run interrupted");
+            throw e;
+        } catch (Exception e) {
+            loggerProxy.error(e.getMessage());
         }
 
         if (testRun == null) {
@@ -621,15 +560,28 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
             return;
         }
 
-        testRun.getReports().forEach((fileName, content) -> {
+        List<String> fileNames = new ArrayList<>();
+        testRun.getReports().forEach((fileName, content) -> fileNames.add(fileName));
+
+        for (String fileName : fileNames) {
+            byte[] content = testRun.getReports().get(fileName);
             FilePath file = workspace.child(fileName);
             try (OutputStream out = file.write()) {
                 out.write(content);
                 this.loggerProxy.info("Report file " + file.getRemote() + " created.");
-            } catch (IOException | InterruptedException e) {
-                this.loggerProxy.error("Error during writing file " + fileName + ", " + e.getMessage());
+            } catch (IOException e) {
+                this.loggerProxy.error("Failed to create report file " + file.getRemote());
+                this.loggerProxy.error(e.getMessage());
             }
-        });
+        }
+
+        // remove reports data to write a smaller json
+        testRun.getReports().clear();
+        JsonObject buildResult = new JsonObject();
+        buildResult.addProperty("testOptions", new Gson().toJson(opt));
+        buildResult.addProperty("testRun", new Gson().toJson(testRun));
+
+        workspace.child(String.format("lrc_run_result_%s", run.getId())).write(buildResult.toString(), "UTF-8");
 
         if (testRun.getStatusEnum().isSuccess()) {
             run.setResult(Result.SUCCESS);
@@ -695,29 +647,21 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
             final DescriptorImpl descriptor,
             final Run<?, ?> run,
             final Launcher launcher) {
-        ServerConfiguration config;
-        if (descriptor.getUseOAuth()) {
-            config = new ServerConfiguration(
-                    descriptor.getUrl(),
-                    descriptor.getClientId(),
-                    Secret.fromString(descriptor.getClientSecret()).getPlainText(),
-                    descriptor.getTenantId(),
-                    Integer.parseInt(this.getProjectIdAtRunTime(run, launcher)),
-                    this.sendEmail,
-                    "jenkins-plugin"
-            );
-        } else {
-            config = new ServerConfiguration(
-                    descriptor.getUrl(),
-                    descriptor.getUsername(),
-                    Secret.fromString(descriptor.getPassword()).getPlainText(),
-                    descriptor.getTenantId(),
-                    Integer.parseInt(this.getProjectIdAtRunTime(run, launcher)),
-                    this.sendEmail,
-                    "jenkins-plugin"
-            );
+        String usr = descriptor.getUsername();
+        String pwd = Secret.fromString(descriptor.getPassword()).getPlainText();
+        if (Boolean.TRUE.equals(descriptor.getUseOAuth())) {
+            usr = descriptor.getClientId();
+            pwd = Secret.fromString(descriptor.getClientSecret()).getPlainText();
         }
-
+        ServerConfiguration config = new ServerConfiguration(
+                descriptor.getUrl(),
+                usr,
+                pwd,
+                descriptor.getTenantId(),
+                Integer.parseInt(this.getProjectIdAtRunTime(run, launcher)),
+                this.sendEmail,
+                "jenkins-plugin"
+        );
         printJobParameters(config);
         return config;
     }
@@ -740,164 +684,50 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         }
     }
 
-    private LoadTestRun checkInterruptionDone(
-            final Run<?, ?> run,
-            final LoadTestRun testRun,
-            final FilePath resultFile,
-            final String interruptionDone
-    ) throws InterruptedException {
-        LoadTestRun restored = testRun;
-        if (Constants.UNKNOWN.equals(interruptionDone)) {
-            this.loggerProxy.error("Jenkins job interruption handler failed, stop waiting.");
-            this.loggerProxy.info(
-                    "you may need to go to the LoadRunner Cloud website "
-                            + "to check if you need to stop the test manually."
-            );
-        } else {
-            restored = restoreTestRunFromFile(resultFile);
-            setJenkinsRunResult(run, interruptionDone);
-        }
-        return restored;
-    }
-
-    private LoadTestRun restoreTestRunFromFile(final FilePath resultFile) throws InterruptedException {
-        LoadTestRun testRun = null;
-        try {
-            String result = resultFile.readToString();
-            this.loggerProxy.info("execution ended gracefully");
-
-            JsonObject resultObj = new Gson().fromJson(result, JsonObject.class);
-            String testRunObj = resultObj.get(Constants.TESTRUN).getAsString();
-            testRun = new Gson().fromJson(testRunObj, LoadTestRun.class);
-        } catch (Exception ex) {
-            this.loggerProxy.error("failed to get run result after interruption: " + ex.getMessage());
-        }
-        return testRun;
-    }
-
-    private void setJenkinsRunResult(final Run<?, ?> run, final String interruptionDone) {
-        if ("ABORTED".equals(interruptionDone)
-                || "STOPPED".equals(interruptionDone)
-        ) {
-            run.setResult(Result.ABORTED);
-        } else {
-            run.setResult(Result.FAILURE);
-        }
-    }
-
-    private static class RunTestCallable implements Callable<LoadTestRun, RuntimeException> {
+    private static class RunTestCallable implements Callable<LoadTestRun, Exception> {
 
         private final ServerConfiguration serverConfiguration;
-        private final TaskListener listener;
-        private final String resultStr;
-        private final FilePath resultFilePath;
-
         private final TestRunOptions testRunOptions;
-        private final Map<String, String> envVarsOptions;
-        private LoadTestRun testRun = null;
-
-        private Runner runner;
-
-        private PrintStream logger() {
-            return this.listener.getLogger();
-        }
+        private final TaskListener listener;
 
         RunTestCallable(
-                final ServerConfiguration serverConfiguration,
                 final TaskListener listener,
-                final String resultStr,
-                final FilePath resultFilePath,
-                final TestRunOptions testRunOptions,
-                final Map<String, String> envVarsOptions
+                final ServerConfiguration serverConfiguration,
+                final TestRunOptions testRunOptions
         ) {
-            this.serverConfiguration = serverConfiguration;
             this.listener = listener;
-            this.resultStr = resultStr;
-            this.resultFilePath = resultFilePath;
+            this.serverConfiguration = serverConfiguration;
             this.testRunOptions = testRunOptions;
-            this.envVarsOptions = envVarsOptions;
         }
 
         @Override
-        public LoadTestRun call() {
-            String interruptionDoneFlagName = this.testRunOptions.getTestId() + "_INTERRUPTION";
-            LoggerProxy loggerProxy = new LoggerProxy(this.logger(), new LoggerOptions(false, ""));
+        public LoadTestRun call() throws Exception {
+            PrintStream logger = this.listener.getLogger();
+            LoggerProxy loggerProxy = new LoggerProxy(
+                    logger,
+                    new LoggerOptions(this.testRunOptions.isDebug(), "")
+            );
+
+            Runner runner = new Runner(
+                    this.serverConfiguration,
+                    logger,
+                    this.testRunOptions
+            );
             try {
-                EnvVars.masterEnvVars.remove(interruptionDoneFlagName);
-                this.runner = new Runner(
-                        serverConfiguration,
-                        listener.getLogger(),
-                        envVarsOptions
-                );
-                testRun = this.runner.getTestRun();
-                testRun = this.runner.run(this.testRunOptions);
-                JsonObject buildResult = new Gson().fromJson(this.resultStr, JsonObject.class);
-                buildResult.addProperty(Constants.TESTRUN, new Gson().toJson(testRun));
-
-                try {
-                    resultFilePath.write(buildResult.toString(), "UTF-8");
-//                    Utils.getSystemLogger().log(Level.INFO, "result file " + resultFilePath.getRemote());
-                } catch (Exception e) {
-                    loggerProxy.error(
-                            "Writing file [" + resultFilePath.getName() + "] failed, " + e.getMessage()
-                    );
+                return runner.run();
+            } catch (IOException e) {
+                loggerProxy.error("Failed to run test, " + e.getMessage());
+                if (Thread.interrupted()) {
+                    throw new InterruptedException("jenkins job is interrupted.");
                 }
-                return testRun;
-            } catch (InterruptedException | IOException ex) {
-                if (ex instanceof IOException && !"thread interrupted".equals(ex.getMessage())) {
-                    loggerProxy.error("error during [call]: " + ex.getMessage());
-                    if (runner != null) {
-                        return testRun;
-                    }
-                    return null;
-                }
-
-                String abortResult = Constants.UNKNOWN;
-                EnvVars.masterEnvVars.put(interruptionDoneFlagName, abortResult);
-                try {
-                    this.listener.getLogger().println("job being interrupted...");
-                    abortResult = runner.interruptHandler();
-                } catch (IOException | InterruptedException e) {
-                    loggerProxy.error("interruption handler failed.");
-                    if (e.getMessage() != null) {
-                        loggerProxy.error("interruption handler exception: " + e.getMessage());
-                    }
-                } finally {
-                    testRun = runner.getTestRun();
-                    if (testRun != null) {
-                        loggerProxy.debug("testRun: " + testRun.getId() + " ready to be written to file");
-                    } else {
-                        loggerProxy.debug("got null testRun from interruptHandler");
-                    }
-                    JsonObject buildResult = new Gson().fromJson(this.resultStr, JsonObject.class);
-                    buildResult.addProperty(Constants.TESTRUN, new Gson().toJson(testRun));
-
-                    try {
-                        resultFilePath.write(buildResult.toString(), "UTF-8");
-//                        Utils.getSystemLogger().log(Level.INFO, "result file " + resultFilePath.getRemote());
-                    } catch (Exception e) {
-                        loggerProxy.error(
-                                "Writing file [" + resultFilePath.getName() + "] failed, " + e.getMessage()
-                        );
-                    }
-                    loggerProxy.info("job interruption handler end.");
-                    loggerProxy.info(
-                            "the final status of LoadRunner Cloud test run is: " + abortResult
-                    );
-                    EnvVars.masterEnvVars.put(interruptionDoneFlagName, abortResult);
-                }
-                return testRun;
-            } catch (Exception ex) {
-                ex.printStackTrace(this.listener.getLogger());
-                return null;
+                throw e;
+            } catch (InterruptedException e) {
+                runner.interruptHandler();
+                throw e;
             } finally {
-                if (runner != null) {
-                    runner.close();
-                }
+                runner.close();
             }
         }
-
-        private static final long serialVersionUID = 1L;
 
         @Override
         public void checkRoles(final RoleChecker roleChecker) throws SecurityException {

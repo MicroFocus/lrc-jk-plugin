@@ -17,7 +17,6 @@ import com.microfocus.lrc.core.entity.TrendingConfiguration;
 import com.microfocus.lrc.core.entity.TrendingDataWrapper;
 import hudson.model.Job;
 import hudson.model.Run;
-import hudson.util.HttpResponses;
 import jenkins.model.RunAction2;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
@@ -71,10 +70,10 @@ public final class TestRunReportBuildAction implements RunAction2 {
                         : "<pre>" + new Gson().toJson(this.trendingConfig) + "</pre>";
 
         jsonStr = jsonStr + "<br>" + trendingConfigStr + "<br>" + this.trendingReportHTML;
-        HttpResponses.html(jsonStr).generateResponse(req, response, this);
+        org.kohsuke.stapler.HttpResponses.literalHtml(jsonStr).generateResponse(req, response, this);
     }
 
-    public Run getRun() {
+    public Run<?, ?> getRun() {
         return run;
     }
 
@@ -104,7 +103,7 @@ public final class TestRunReportBuildAction implements RunAction2 {
         this.trendingReportHTML = trendingReportHTML;
     }
 
-    public static TestRunReportBuildAction getLastBuildActionHasTrendingData(final Job job) {
+    public static TestRunReportBuildAction getLastBuildActionHasTrendingData(final Job<?, ?> job) {
         Run<?, ?> r = (job.getLastBuild());
         while (true) {
             if (r == null) {

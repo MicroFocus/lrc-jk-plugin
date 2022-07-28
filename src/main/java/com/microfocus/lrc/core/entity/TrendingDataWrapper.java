@@ -27,8 +27,9 @@ import java.util.List;
  * Will be persisted by Jenkins as a member field of StormTestReportBuildAction.
  */
 
-//#TODO: add [serialVersionUID](http://www.javapractices.com/topic/TopicAction.do?Id=45)
 public final class TrendingDataWrapper implements Serializable {
+
+    static final long serialVersionUID = 1L;
 
     private TrendingData trendingData;
     private TrendingData benchmark;
@@ -218,11 +219,6 @@ public final class TrendingDataWrapper implements Serializable {
         public int getRunId() {
             return runId;
         }
-
-        private void setRunId(final int runId) {
-            this.runId = runId;
-        }
-
         public double getDuration() {
             return duration;
         }
