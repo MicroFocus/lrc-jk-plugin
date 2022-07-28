@@ -388,7 +388,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
 
         //#endregion
 
-        @SuppressWarnings({"checkstyle:ParameterNumber", "checkstyle:HiddenField"})
+        @SuppressWarnings({"java:S107", "checkstyle:ParameterNumber", "checkstyle:HiddenField"})
         public FormValidation doTestConnection(
                 @QueryParameter("username") final String username,
                 @QueryParameter("password") final String password,
@@ -476,6 +476,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         return this.testId;
     }
 
+    @SuppressWarnings("java:S2065")
     private transient LoggerProxy loggerProxy = new LoggerProxy();
 
     @DataBoundConstructor
@@ -603,7 +604,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
     }
 
     private void printEnvInfo(final Run<?, ?> build) {
-        this.loggerProxy.info("=====================================");
+        this.loggerProxy.info(Constants.SEPARATOR_LINE);
         this.loggerProxy.info("Current environment:");
         VersionNumber ver = jenkins.model.Jenkins.getVersion();
         String verStr = "N/A";
@@ -622,7 +623,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         }
         this.loggerProxy.info("  LoadRunner Cloud plugin version: " + pluginVerStr);
         this.loggerProxy.info("  Currently running on Jenkins node: " + build.getDisplayName());
-        this.loggerProxy.info("=====================================");
+        this.loggerProxy.info(Constants.SEPARATOR_LINE);
     }
 
     private boolean isDescriptorEmpty() {
@@ -640,7 +641,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         display.remove("proxyConfiguration");
         this.loggerProxy.info("start job with parameters: ");
         this.loggerProxy.info(display.toString());
-        this.loggerProxy.info("=====================================");
+        this.loggerProxy.info(Constants.SEPARATOR_LINE);
     }
 
     private ServerConfiguration createServerConfiguration(
@@ -666,6 +667,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         return config;
     }
 
+    @SuppressWarnings("java:S2065")
     private transient HashMap<String, Boolean> isLogPrinted;
 
     private void logFieldReadFromParam(
@@ -701,6 +703,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         }
 
         @Override
+        @SuppressWarnings("java:S2093")
         public LoadTestRun call() throws Exception {
             PrintStream logger = this.listener.getLogger();
             LoggerProxy loggerProxy = new LoggerProxy(

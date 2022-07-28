@@ -25,6 +25,7 @@ import javax.servlet.ServletException;
 import java.io.IOException;
 
 public final class TestRunReportBuildAction implements RunAction2 {
+    @SuppressWarnings("java:S2065")
     private transient Run<?, ?> run;
     private final TrendingDataWrapper trendingDataWrapper;
     private final TrendingConfiguration trendingConfig;
@@ -73,6 +74,7 @@ public final class TestRunReportBuildAction implements RunAction2 {
         org.kohsuke.stapler.HttpResponses.literalHtml(jsonStr).generateResponse(req, response, this);
     }
 
+    @SuppressWarnings("java:S1452")
     public Run<?, ?> getRun() {
         return run;
     }

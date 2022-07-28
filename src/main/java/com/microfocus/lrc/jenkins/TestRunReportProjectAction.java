@@ -111,6 +111,7 @@ public final class TestRunReportProjectAction implements Action {
         org.kohsuke.stapler.HttpResponses.literalHtml(htmlContent).generateResponse(req, response, this);
     }
 
+    @SuppressWarnings("java:S1452")
     public Job<?, ?> getProject() {
         return project;
     }

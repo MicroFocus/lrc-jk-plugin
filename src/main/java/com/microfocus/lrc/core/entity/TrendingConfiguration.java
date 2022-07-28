@@ -70,7 +70,7 @@ public final class TrendingConfiguration implements Serializable {
     }
     //#endregion
 
-    @SuppressWarnings("checkstyle:ParameterNumber")
+    @SuppressWarnings({"checkstyle:ParameterNumber", "java:S107"})
     public TrendingConfiguration(
             final Integer runsCount,
             final Integer benchmark,

@@ -312,7 +312,7 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
     static final int PERCENTAGE_DEFAULT_MIN = 5;
     static final int PERCENTAGE_DEFAULT_MAX = 10;
 
-    @SuppressWarnings({"checkstyle:MissingJavadocMethod", "checkstyle:ParameterNumber"})
+    @SuppressWarnings({"checkstyle:MissingJavadocMethod", "checkstyle:ParameterNumber", "java:S107"})
     @DataBoundConstructor
     public TestRunPublisher(
             final Integer runsCount,

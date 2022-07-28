@@ -20,12 +20,9 @@ public final class Constants {
     public static final String CLIENT_ID = "clientId";
     public static final String CLIENT_SECRET = "clientSecret";
     public static final String TENANTID = "tenantId";
-    public static final String PROJECTID = "projectId";
-    public static final String SENDEMAIL = "sendEmail";
     public static final String APPLICATION_JSON = "application/json";
     public static final String BENCHMARK = "benchmark";
-    public static final String UNKNOWN = "unknown";
-    public static final String TESTRUN = "testRun";
+    public static final String SEPARATOR_LINE = "=====================================";
 
     private Constants() {
         throw new IllegalStateException("Utility class");
