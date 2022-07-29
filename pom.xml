@@ -34,7 +34,7 @@
         <!-- Baseline Jenkins version you use to build the plugin. Users must have this version or newer to run. -->
         <jenkins.version>2.289.1</jenkins.version>
         <java.level>8</java.level>
-        <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
+        <gitHubRepo>jenkinsci/lrc-jk-plugin</gitHubRepo>
         <kotlin.version>1.7.10</kotlin.version>
         <kotlin.compiler.incrementail>true</kotlin.compiler.incrementail>
     </properties>
@@ -211,6 +211,19 @@
             </plugin>
         </plugins>
     </build>
+
+    <developers>
+        <developer>
+            <id>narcotics726</id>
+            <name>Xiao-Yuan Qi</name>
+            <email>xiao-yuan.qi@microfocus.com</email>
+        </developer>
+        <developer>
+            <id>weisun10</id>
+            <name>Wei Sun</name>
+            <email>wei.sun10@microfocus.com</email>
+        </developer>
+    </developers>
 
     <repositories>
         <repository>

@@ -208,7 +208,6 @@ class ReportDownloader(
     }
 
     private fun genTxCsv(testRun: LoadTestRun) {
-        // #TODO: could the tx be cached?
         val txArr = fetchTestRunTx(testRun.id);
         val fileName = "lrc_report_trans_${this.apiClient.getServerConfiguration().tenantId}-${testRun.id}.csv";
         testRun.reports[fileName] = writeCsvBytesArray(txArr);

@@ -35,6 +35,7 @@ import java.util.stream.Collectors
 class TrendingReport {
     companion object {
         @JvmStatic
+        @SuppressWarnings("kotlin:S3776")
         fun generateReport(
             project: Job<*, *>?,
             trendingConfig: TrendingConfiguration?,
