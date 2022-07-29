@@ -37,6 +37,9 @@
         <gitHubRepo>jenkinsci/lrc-jk-plugin</gitHubRepo>
         <kotlin.version>1.7.10</kotlin.version>
         <kotlin.compiler.incrementail>true</kotlin.compiler.incrementail>
+        <spotbugs.effort>Max</spotbugs.effort>
+        <spotbugs.failOnError>false</spotbugs.failOnError>
+        <spotbugs.threshold>Medium</spotbugs.threshold>
     </properties>
 
     <dependencyManagement>
@@ -137,7 +140,28 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <id>validate</id>
+                        <id>validate-checkstyle</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <version>4.7.1.1</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.github.spotbugs</groupId>
+                        <artifactId>spotbugs</artifactId>
+                        <version>4.7.1</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <id>validate-spotbugs</id>
                         <phase>validate</phase>
                         <goals>
                             <goal>check</goal>
