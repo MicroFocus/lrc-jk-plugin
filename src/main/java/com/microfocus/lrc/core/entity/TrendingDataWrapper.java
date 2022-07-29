@@ -289,8 +289,6 @@ public final class TrendingDataWrapper implements Serializable {
                 JsonObject t = transactionsArr.get(i).getAsJsonObject();
                 this.transactions.add(new TransactionData(t));
             }
-
-            //TODO: trending calculation
         }
 
         public TrendingData(final int runId, final String runStatus) {

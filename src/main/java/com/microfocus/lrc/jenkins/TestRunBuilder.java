@@ -250,7 +250,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
 
         private String proxyPort;
 
-        @SuppressWarnings("checkstyle:HiddenField")
+        @SuppressWarnings({"checkstyle:HiddenField", "checkstyle:MagicNumber"})
         public FormValidation doCheckProxyPort(
                 @QueryParameter final String value,
                 @QueryParameter final String useProxy
@@ -268,6 +268,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
             }
 
             int portVal = Integer.parseInt(value);
+
             if (portVal < 0 || portVal > 65535) {
                 return FormValidation.error("Please input a valid port number.");
             }

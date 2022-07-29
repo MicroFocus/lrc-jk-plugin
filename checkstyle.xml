@@ -90,12 +90,6 @@
         <property name="message" value="Line has trailing spaces."/>
     </module>
 
-    <!-- Checks for Headers                                -->
-    <!-- See https://checkstyle.org/config_header.html   -->
-    <!-- <module name="Header"> -->
-    <!--   <property name="headerFile" value="${checkstyle.header.file}"/> -->
-    <!--   <property name="fileExtensions" value="java"/> -->
-    <!-- </module> -->
     <module name="SuppressWarningsFilter" />
     <module name="TreeWalker">
         <module name="SuppressWarningsHolder" />
@@ -201,8 +195,5 @@
             <property name="file" value="${org.checkstyle.sun.suppressionxpathfilter.config}" default="checkstyle-xpath-suppressions.xml" />
             <property name="optional" value="true"/>
         </module>
-
-
     </module>
-
 </module>

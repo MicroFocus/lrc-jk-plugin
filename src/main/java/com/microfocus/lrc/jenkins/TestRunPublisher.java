@@ -471,7 +471,7 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
         }
 
         //#region formValidation
-
+        @SuppressWarnings({"checkstyle:MagicNumber"})
         public FormValidation doCheckRunsCount(final @QueryParameter String value) {
             Integer val = getIntegerSafely(value);
             if (val == null || val < 5 || val > 10) {
@@ -513,6 +513,7 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
             return doCheckTrtPercentileThresholdImprovement(value);
         }
 
+        @SuppressWarnings({"checkstyle:MagicNumber"})
         private FormValidation checkThreshold(final Integer value) {
             if (value == null) {
                 return FormValidation.ok();
