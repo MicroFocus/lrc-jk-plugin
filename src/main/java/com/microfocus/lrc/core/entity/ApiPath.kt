@@ -58,14 +58,3 @@ class ApiTestRunTx(variables: Map<String, String>): BaseApiPath(variables) {
     override val path: String = "${super.path}/test-runs/${this.variables["runId"]}/transactions";
     override val httpMethod: String = "GET";
 }
-
-
-/**
- * !no api
- *
- */
-class ApiDownloadTransactionCSV(variables: Map<String, String>): BaseApiPath(variables) {
-    override val path: String = "";
-    override val httpMethod: String = "GET";
-}
-

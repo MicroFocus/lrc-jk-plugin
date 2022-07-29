@@ -97,6 +97,7 @@ public final class TrendingDataWrapper implements Serializable {
 
 
     public final class TransactionData implements Serializable {
+        static final long serialVersionUID = 1L;
         private String name;
         private String script;
         private double min;
@@ -197,6 +198,7 @@ public final class TrendingDataWrapper implements Serializable {
     }
 
     public final class TrendingData implements Serializable {
+        static final long serialVersionUID = 1L;
         private int initDuration = -1;
         private int runId;
         private int testId;

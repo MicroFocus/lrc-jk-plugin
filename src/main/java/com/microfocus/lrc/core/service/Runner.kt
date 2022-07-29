@@ -21,13 +21,6 @@ import java.io.IOException
 import java.io.PrintStream
 import java.io.Serializable
 
-enum class RunStatus(val value: String) {
-    RUNNING("RUNNING"),
-    STOPPED("STOPPED"),
-    COMPLETED("COMPLETED"),
-    FAILED("FAILED"),
-}
-
 class Runner(
     private val serverConfiguration: ServerConfiguration,
     @Transient private val logger: PrintStream = System.out,

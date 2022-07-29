@@ -16,6 +16,8 @@ import java.net.InetSocketAddress;
 import java.net.Proxy;
 
 public final class ProxyConfiguration implements Serializable {
+
+    static final long serialVersionUID = 1L;
     private static final int MAX_PORT_RANGE = 65525;
 
     private final String host;
@@ -28,14 +30,6 @@ public final class ProxyConfiguration implements Serializable {
 
     // #endregion
 
-    /**
-     * constructor.
-     *
-     * @param host
-     * @param port
-     * @param username
-     * @param password
-     */
     public ProxyConfiguration(final String host, final int port, final String username, final String password) {
         if (host == null || host.length() == 0) {
             throw new IllegalArgumentException("host must not be empty.");
@@ -53,15 +47,6 @@ public final class ProxyConfiguration implements Serializable {
         }
     }
 
-    /**
-     * constructor.
-     *
-     * @param host
-     * @param port
-     * @param username
-     * @param password
-     * @throws IllegalArgumentException
-     */
     public ProxyConfiguration(final String host, final String port, final String username, final String password)
             throws IllegalArgumentException {
         if (host == null || host.length() == 0) {
@@ -86,11 +71,6 @@ public final class ProxyConfiguration implements Serializable {
         }
     }
 
-    /**
-     * get proxy, if null, construct a new one.
-     *
-     * @return proxy
-     */
     public Proxy getProxy() {
         if (this.proxy != null) {
             return this.proxy;
