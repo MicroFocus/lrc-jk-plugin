@@ -494,28 +494,23 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
         }
 
         public FormValidation doCheckTrtPercentileThresholdMinorRegression(final @QueryParameter String value) {
-            Integer val = getIntegerSafely(value);
-            return checkThreshold(val);
+            return doCheckTrtPercentileThresholdImprovement(value);
         }
 
         public FormValidation doCheckTrtPercentileThresholdMajorRegression(final @QueryParameter String value) {
-            Integer val = getIntegerSafely(value);
-            return checkThreshold(val);
+            return doCheckTrtPercentileThresholdImprovement(value);
         }
 
         public FormValidation doCheckTrtAvgThresholdImprovement(final @QueryParameter String value) {
-            Integer val = getIntegerSafely(value);
-            return checkThreshold(val);
+            return doCheckTrtPercentileThresholdImprovement(value);
         }
 
         public FormValidation doCheckTrtAvgThresholdMinorRegression(final @QueryParameter String value) {
-            Integer val = getIntegerSafely(value);
-            return checkThreshold(val);
+            return doCheckTrtPercentileThresholdImprovement(value);
         }
 
         public FormValidation doCheckTrtAvgThresholdMajorRegression(final @QueryParameter String value) {
-            Integer val = getIntegerSafely(value);
-            return checkThreshold(val);
+            return doCheckTrtPercentileThresholdImprovement(value);
         }
 
         private FormValidation checkThreshold(final Integer value) {

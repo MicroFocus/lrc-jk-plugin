@@ -23,6 +23,8 @@ class EnvVarsUtil {
     companion object{
         @JvmStatic
         fun getEnvVar(build: Run<*, *>, launcher: Launcher, key: String): String? {
+            // getAction(Class<T> type) is not deprecated
+            @SuppressWarnings("kotlin:S1874")
             val action = build.getAction(ParametersAction::class.java)
             if (action != null) {
                 val paramValue = action.getParameter(key) as StringParameterValue?

@@ -56,6 +56,7 @@ public final class TestRunReportProjectAction implements Action {
     }
 
 
+    @SuppressWarnings("java:S2629")
     public void doDynamic(final StaplerRequest req, final StaplerResponse response)
             throws IOException, ServletException {
         String htmlContent = null;
@@ -71,7 +72,6 @@ public final class TestRunReportProjectAction implements Action {
                 extraContent = true;
             }
         }
-
         TestRunReportBuildAction buildAction =
                 TestRunReportBuildAction.getLastBuildActionHasTrendingData(this.project);
         if (buildAction == null) {
@@ -118,10 +118,6 @@ public final class TestRunReportProjectAction implements Action {
 
     public void setProject(final Job<?, ?> project) {
         this.project = project;
-    }
-
-    private TrendingConfiguration getTrendingConfig() {
-        return trendingConfig;
     }
 
     private void setTrendingConfig(final TrendingConfiguration trendingConfig) {

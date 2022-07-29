@@ -12,16 +12,17 @@
 
 package com.microfocus.lrc.jenkins;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.model.Action;
 import hudson.model.Job;
 import jenkins.model.TransientActionFactory;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.logging.Level;
 
+@SuppressWarnings("java:S3740")
 @Extension
 public final class WorkflowActionFactory extends TransientActionFactory<Job> {
 
@@ -30,9 +31,10 @@ public final class WorkflowActionFactory extends TransientActionFactory<Job> {
         return Job.class;
     }
 
-    @NotNull
+    @SuppressWarnings("java:S2629")
+    @NonNull
     @Override
-    public Collection<? extends Action> createFor(final Job job) {
+    public Collection<? extends Action> createFor(@NonNull final Job job) {
         TestRunReportBuildAction buildAction = TestRunReportBuildAction.getLastBuildActionHasTrendingData(job);
         if (buildAction != null) {
             try {

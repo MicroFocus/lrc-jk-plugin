@@ -12,7 +12,6 @@
 
 package com.microfocus.lrc.jenkins
 
-import com.google.common.collect.ImmutableMap
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
@@ -71,6 +70,7 @@ class TrendingReport {
                 return null
             }
 
+            @SuppressWarnings("kotlin:S1874")
             val latestBuildAction: TestRunReportBuildAction? =
                 latestBuild.getAction(TestRunReportBuildAction::class.java)
             if (latestBuildAction == null) {
@@ -127,18 +127,19 @@ class TrendingReport {
             LoggerProxy.sysLogger.log(
                 Level.INFO, "benchmark is: run#" + benchmark.runId
             )
-            val DATE_F = SimpleDateFormat("yyyy.MM.dd HH:mm:ss")
+            val dateFormat = SimpleDateFormat("yyyy.MM.dd HH:mm:ss")
 
             //{buildId: number, data: TrendingDataWrapper}[]
 
             val trendingDataWrapperList: List<JsonObject> =
                 latestBuildsHasTrendingDataAndSameTestId.stream().map { b: Run<*, *> ->
                     val tempTrd = JsonObject()
+                    @SuppressWarnings("kotlin:S1874")
                     val trendingDataWrapper: TrendingDataWrapper =
                         b.getAction(TestRunReportBuildAction::class.java).trendingDataWrapper
                     tempTrd.addProperty("data", Gson().toJson(trendingDataWrapper))
                     tempTrd.addProperty("buildId", b.getNumber())
-                    tempTrd.addProperty("buildDate", DATE_F.format(b.time))
+                    tempTrd.addProperty("buildDate", dateFormat.format(b.time))
                     tempTrd
                 }.collect(Collectors.toList())
 
@@ -286,19 +287,16 @@ class TrendingReport {
             val slotContent: Map<String, String>
             val htmlTemplate: String
             try {
-                slotContent = ImmutableMap.of(
-                    "pureCss",
-                    IOUtils.toString(
+                slotContent = mapOf(
+                    "pureCss" to IOUtils.toString(
                         TestRunBuilder::class.java.classLoader
                             .getResourceAsStream("trending_report/pure.min.css"), StandardCharsets.UTF_8
                     ),
-                    "lodashjs",
-                    IOUtils.toString(
+                    "lodashjs" to IOUtils.toString(
                         TestRunBuilder::class.java.classLoader
                             .getResourceAsStream("trending_report/lodash.min.js"), StandardCharsets.UTF_8
                     ),
-                    "momentjs",
-                    IOUtils.toString(
+                    "momentjs" to IOUtils.toString(
                         TestRunBuilder::class.java.classLoader
                             .getResourceAsStream("trending_report/moment.min.js"), StandardCharsets.UTF_8
                     )
@@ -365,6 +363,7 @@ class TrendingReport {
         }
 
         private fun isHavingTrendingData(build: Run<*, *>?): Boolean {
+            @SuppressWarnings("kotlin:S1874")
             val trendingAction: TestRunReportBuildAction? = build?.getAction(TestRunReportBuildAction::class.java)
             val size = trendingAction?.trendingDataWrapper?.trendingData?.transactions?.size ?: 0
             return size > 0
@@ -384,9 +383,11 @@ class TrendingReport {
             if (!this.isHavingTrendingData(build)) {
                 return false
             }
+            @SuppressWarnings("kotlin:S1874")
             val trendingAction = build?.getAction(TestRunReportBuildAction::class.java)
                 ?: return false
 
+            @SuppressWarnings("kotlin:S1874")
             val baseTrendingAction: TestRunReportBuildAction =
                 baseBuild?.getAction(TestRunReportBuildAction::class.java)
                     ?: return false
