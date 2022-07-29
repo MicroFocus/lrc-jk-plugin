@@ -41,9 +41,9 @@ public final class WorkflowActionFactory extends TransientActionFactory<Job> {
                 LoggerProxy.getSysLogger().log(
                         Level.FINE,
                         String.format(
-                                "*******valid build action found*******\n"
-                                        + "build#%s\n"
-                                        + "trendingConfig %s\n"
+                                "*******valid build action found*******%n"
+                                        + "build#%s%n"
+                                        + "trendingConfig %s%n"
                                         + "trendingReport %s",
                                 buildAction.getRun().getId(),
                                 buildAction.getTrendingConfig().toString(),
