@@ -24,13 +24,13 @@ import com.microfocus.lrc.core.entity.OptionInEnvVars;
 import com.microfocus.lrc.core.entity.TestRunStatus;
 import hudson.EnvVars;
 import hudson.FilePath;
-import hudson.model.FreeStyleBuild;
-import hudson.model.FreeStyleProject;
-import hudson.model.Result;
+import hudson.Launcher;
+import hudson.model.*;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.*;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.TestBuilder;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -153,6 +153,15 @@ public class TestRunBuilderTest {
         FreeStyleProject project = jenkins.createFreeStyleProject();
         TestRunBuilder builder = new TestRunBuilder("99", "999", false);
         project.getBuildersList().add(builder);
+        project.getBuildersList().add(new TestBuilder() {
+            @Override
+            public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
+                String runId = EnvVarsUtil.getEnvVar(build, launcher, "LRC_RUN_ID");
+                Assert.assertEquals(runId, "-1");
+                listener.getLogger().println("got LRC_RUN_ID: " + runId);
+                return true;
+            }
+        });
         TestRunBuilder.DescriptorImpl descriptor = jenkins.get(TestRunBuilder.DescriptorImpl.class);
         String baseUrl = mockserver.url("/").toString();
         descriptor.setUrl(baseUrl);

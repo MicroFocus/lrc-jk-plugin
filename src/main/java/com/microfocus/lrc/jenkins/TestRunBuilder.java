@@ -577,6 +577,10 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
             }
         }
 
+        // output vars to jenkins env
+        EnvVarsUtil.putEnvVar(run, "LRC_RUN_ID", String.valueOf(testRun.getId()));
+
+
         // remove reports data to write a smaller json
         testRun.getReports().clear();
         JsonObject buildResult = new JsonObject();

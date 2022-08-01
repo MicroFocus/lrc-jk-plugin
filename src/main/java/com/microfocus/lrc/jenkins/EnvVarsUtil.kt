@@ -41,5 +41,12 @@ class EnvVarsUtil {
                 null
             }
         }
+
+        @JvmStatic
+        fun putEnvVar(build: Run<*, *>, key: String?, value: String?) {
+            val existed = build.getAction(ParametersAction::class.java)
+            val newAction = ParametersAction(StringParameterValue(key, value))
+            build.replaceAction(newAction.merge(existed))
+        }
     }
 }
