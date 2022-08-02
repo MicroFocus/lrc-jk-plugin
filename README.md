@@ -16,10 +16,9 @@ Both of them are also exposed in pipeline jobs as `srlRunTest` and `srlGetTrendi
 
 ### System configuration
 Go to **Manage Jenkins** &rarr; **System Configuration** &rarr; **Configure System** to specify below settings: 
- - **Username and password**  
- - **Client Id and Client Secret**  
-   If you use [API Access keys](https://admhelp.microfocus.com/lrc/en/Latest/Content/Storm/Admin-APIAccess.htm), select the **Use OAuth token**.
- - **Tenant ID**, for example: 652261300
+ - **Client Id** and **Client Secret** (recommended) or **Username** and **Password**  
+   If you use [API Access keys](https://admhelp.microfocus.com/lrc/en/Latest/Content/Storm/Admin-APIAccess.htm), select the **Use OAuth token** checkbox.
+ - **Tenant Id**, for example: 652261300
  - **LoadRunner Cloud URL**, default: "https://loadrunner-cloud.saas.microfocus.com"
  - **Proxy** settings (optional)
 
