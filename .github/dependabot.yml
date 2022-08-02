@@ -5,8 +5,7 @@ updates:
   - package-ecosystem: "maven"
     directory: "/"
     schedule:
-      interval: "weekly"
-    open-pull-request-limit: 0
+      interval: "monthly"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
