@@ -241,13 +241,22 @@
             <id>narcotics726</id>
             <name>Xiao-Yuan Qi</name>
             <email>xiao-yuan.qi@microfocus.com</email>
+            <organization>Micro Focus</organization>
+            <organizationUrl>https://github.com/microfocus</organizationUrl>
         </developer>
         <developer>
             <id>weisun10</id>
             <name>Wei Sun</name>
             <email>wei.sun10@microfocus.com</email>
+            <organization>Micro Focus</organization>
+            <organizationUrl>https://github.com/microfocus</organizationUrl>
         </developer>
     </developers>
+
+    <organization>
+        <name>Micro Focus</name>
+        <url>https://www.microfocus.com</url>
+    </organization>
 
     <repositories>
         <repository>
