@@ -45,7 +45,7 @@ class ReportDownloader(
     fun download(testRun: LoadTestRun, reportTypes: Array<String>) {
         // validate report types
         val validReportTypes = reportTypes.filter {
-            it in arrayOf("docx", "pdf", "csv")
+            it in arrayOf("pdf", "csv")
         };
         if (validReportTypes.isEmpty()) {
             this.loggerProxy.info("Invalid report types: ${reportTypes.joinToString(", ")}");

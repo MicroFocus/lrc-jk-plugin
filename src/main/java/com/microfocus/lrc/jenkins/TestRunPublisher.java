@@ -257,7 +257,7 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
         }
 
         try {
-            String filename = "srl_report_trend_"
+            String filename = "lrc_report_trend_"
                     + serverConfiguration.getTenantId()
                     + "-" + testRun.getId()
                     + "(build_" + build.getId() + ")"

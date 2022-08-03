@@ -103,7 +103,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
             // set all properties from formData
             // validate all properties, throw FormException if invalid
             this.username = formData.getString(Constants.USERNAME).trim();
-            this.password = Secret.fromString(formData.getString(Constants.PASSWORD).trim()).getEncryptedValue();
+            this.password = formData.getString(Constants.PASSWORD).trim();
             this.url = org.apache.commons.lang.StringUtils.stripEnd(formData.getString(Constants.URL).trim(), "/");
             this.useProxy = Boolean.valueOf(formData.getString("useProxy").trim());
             this.proxyHost = formData.getString("proxyHost").trim();
@@ -120,7 +120,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
                 this.proxyUsername = null;
             }
 
-            this.proxyPassword = Secret.fromString(formData.getString("proxyPassword").trim()).getEncryptedValue();
+            this.proxyPassword = formData.getString("proxyPassword").trim();
             this.useOAuth = Boolean.valueOf(formData.getString(Constants.USE_OAUTH).trim());
             this.clientId = formData.getString(Constants.CLIENT_ID).trim();
             this.clientSecret = formData.getString(Constants.CLIENT_SECRET).trim();
@@ -502,7 +502,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         PrintStream logger = listener.getLogger();
         this.loggerProxy = new LoggerProxy(logger, new LoggerOptions(false, ""));
 
-        printEnvInfo(run);
+        printEnvInfo(env);
 
         TestRunBuilder.DescriptorImpl descriptor = (TestRunBuilder.DescriptorImpl) this.getDescriptor();
         if (isDescriptorEmpty()) {
@@ -608,7 +608,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         return map;
     }
 
-    private void printEnvInfo(final Run<?, ?> build) {
+    private void printEnvInfo(final EnvVars env) {
         this.loggerProxy.info(Constants.SEPARATOR_LINE);
         this.loggerProxy.info("Current environment:");
         VersionNumber ver = jenkins.model.Jenkins.getVersion();
@@ -627,7 +627,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
             }
         }
         this.loggerProxy.info("  LoadRunner Cloud plugin version: " + pluginVerStr);
-        this.loggerProxy.info("  Currently running on Jenkins node: " + build.getDisplayName());
+        this.loggerProxy.info("  Currently running on Jenkins node: " + env.get("NODE_NAME"));
         this.loggerProxy.info(Constants.SEPARATOR_LINE);
     }
 
@@ -641,7 +641,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
     }
 
     private void printJobParameters(final ServerConfiguration config) {
-        JSONObject display = JSONObject.fromObject(config);
+        JsonObject display = new Gson().toJsonTree(config).getAsJsonObject();
         display.remove("password");
         display.remove("proxyConfiguration");
         this.loggerProxy.info("start job with parameters: ");

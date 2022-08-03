@@ -15,11 +15,9 @@ package com.microfocus.lrc.jenkins;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlInput;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.microfocus.lrc.MockServerResponseGenerator;
 import com.microfocus.lrc.core.Constants;
-import com.microfocus.lrc.core.entity.LoadTestRun;
 import com.microfocus.lrc.core.entity.OptionInEnvVars;
 import com.microfocus.lrc.core.entity.TestRunStatus;
 import hudson.EnvVars;
@@ -109,7 +107,7 @@ public class TestRunBuilderTest {
         runStatusResObj.addProperty("detailedStatus", "INITIALIZING");
         runStatusResObj.addProperty("hasReport", false);
         responseRunStatus.setBody(runStatusResObj.toString());
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 2; i++) {
             mockserver.enqueue(responseRunStatus);
         }
 
@@ -125,7 +123,7 @@ public class TestRunBuilderTest {
 
         // repeat 3 times for csv, docx and pdf download
         // #TODO: how to handle parallel downloading here
-        for (int i = 0; i < 3; i += 1) {
+        for (int i = 0; i < 2; i += 1) {
             JsonObject genReportResObj = new JsonObject();
             genReportResObj.addProperty("reportId", -999);
             MockResponse responseGenReport = new MockResponse().setBody(genReportResObj.toString());
@@ -185,7 +183,6 @@ public class TestRunBuilderTest {
         FilePath workspace = b.getWorkspace();
         assert workspace != null;
         Assert.assertTrue(workspace.child("lrc_report_FAKE_TENANT_ID--1.xml").exists());
-        Assert.assertTrue(workspace.child("lrc_report_FAKE_TENANT_ID--1.docx").exists());
         Assert.assertTrue(workspace.child("lrc_report_FAKE_TENANT_ID--1.pdf").exists());
         Assert.assertTrue(workspace.child("lrc_report_FAKE_TENANT_ID--1.csv").exists());
         Assert.assertTrue(workspace.child("lrc_report_trans_FAKE_TENANT_ID--1.csv").exists());
