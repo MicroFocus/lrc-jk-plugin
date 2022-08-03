@@ -53,9 +53,9 @@ The plugin generates the following files (if they are available) in workspace fo
 
 | File                                    | Description                                                                                                  |
 |-----------------------------------------|--------------------------------------------------------------------------------------------------------------|
-| **srl_report_TENANTID-RUNID.xml**       | A Junit XML file containing basic information about the test, such as name, status, duration, and so forth.  |
-| **srl_report_TENANTID-RUNID.csv**       | A CSV file containing detailed test run results with metrics such as Vuser count, error count, and so forth. |
-| **srl_report_trans_TENANTID-RUNID.csv** | A CSV file containing detailed statistics on each transaction in the test run.                               |
+| **lrc_report_TENANTID-RUNID.xml**       | A Junit XML file containing basic information about the test, such as name, status, duration, and so forth.  |
+| **lrc_report_TENANTID-RUNID.csv**       | A CSV file containing detailed test run results with metrics such as Vuser count, error count, and so forth. |
+| **lrc_report_trans_TENANTID-RUNID.csv** | A CSV file containing detailed statistics on each transaction in the test run.                               |
 
 > **Note:**
 > If build / job is aborted or cancelled, the plugin will not try to collect artifacts.
