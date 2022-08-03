@@ -39,7 +39,7 @@
         <kotlin.compiler.incrementail>true</kotlin.compiler.incrementail>
         <spotbugs.effort>Max</spotbugs.effort>
         <spotbugs.failOnError>false</spotbugs.failOnError>
-        <spotbugs.threshold>Medium</spotbugs.threshold>
+        <spotbugs.threshold>High</spotbugs.threshold>
     </properties>
 
     <dependencyManagement>
