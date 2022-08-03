@@ -5,7 +5,7 @@
 
 # Introduction
 
-The plugin enables users to run [LoadRunner Cloud test](https://admhelp.microfocus.com/lrc/en/Latest/Content/Storm/c_Getting_started.htm) from Jenkins and collect results. For details, refer to [Use the Jenkins plugin](https://admhelp.microfocus.com/lrc/en/Latest/Content/Storm/t_ci_plugins.htm#mt-item-0) in DOC.
+The plugin enables users to run test in [LoadRunner Cloud](https://admhelp.microfocus.com/lrc/en/Latest/Content/Storm/c_Getting_started.htm) and collect results. For details, refer to [Use the Jenkins plugin](https://admhelp.microfocus.com/lrc/en/Latest/Content/Storm/t_ci_plugins.htm#mt-item-0) in DOC.
 
 # Getting started
 
