@@ -155,7 +155,7 @@ public class TestRunBuilderTest {
             @Override
             public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
                 String runId = EnvVarsUtil.getEnvVar(build, launcher, "LRC_RUN_ID");
-                Assert.assertEquals(runId, "-1");
+                Assert.assertEquals("-1", runId);
                 listener.getLogger().println("got LRC_RUN_ID: " + runId);
                 return true;
             }
