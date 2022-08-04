@@ -87,7 +87,7 @@ public class TestRunBuilderTest {
     }
 
     private void mockResponseNormal() {
-        MockServerResponseGenerator.mockLogin(mockserver);
+        MockServerResponseGenerator.mockLogin();
 
         MockResponse responseGetLoadTest = new MockResponse();
         JsonObject loadTestResObj = new JsonObject();
@@ -141,7 +141,7 @@ public class TestRunBuilderTest {
             mockserver.enqueue(responseReportContent);
         }
 
-        MockServerResponseGenerator.mockTransactions(mockserver);
+        MockServerResponseGenerator.mockTransactions();
     }
 
     @Test

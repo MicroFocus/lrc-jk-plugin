@@ -16,7 +16,6 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.microfocus.lrc.MockServerResponseGenerator
 import com.microfocus.lrc.core.entity.*
-import com.microfocus.lrc.core.Constants
 import hudson.EnvVars
 import hudson.Launcher
 import hudson.model.AbstractBuild
@@ -128,9 +127,9 @@ class TestRunPublisherTest {
 
         });
 
-        MockServerResponseGenerator.mockLogin(mockserver);
-        MockServerResponseGenerator.mockTestRunResults(mockserver);
-        MockServerResponseGenerator.mockTransactions(mockserver);
+        MockServerResponseGenerator.mockLogin();
+        MockServerResponseGenerator.mockTestRunResults();
+        MockServerResponseGenerator.mockTransactions();
 
         val build = jenkins.buildAndAssertSuccess(project);
         val action = build.getAction(TestRunReportBuildAction::class.java);
