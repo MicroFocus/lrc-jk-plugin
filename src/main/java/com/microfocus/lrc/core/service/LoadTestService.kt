@@ -15,6 +15,7 @@ package com.microfocus.lrc.core.service
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.microfocus.lrc.core.ApiClient
+import com.microfocus.lrc.core.Constants
 import com.microfocus.lrc.core.entity.ApiGetLoadTest
 import com.microfocus.lrc.core.entity.ApiStartTestRun
 import com.microfocus.lrc.core.entity.LoadTest
@@ -51,7 +52,11 @@ class LoadTestService(
                 "loadTestId" to "$id"
             )
         ).path;
-        val res = this.client.post(apiPath, mapOf("sendEmail" to sendEmail.toString()), payload = payload);
+        val queryParams = mapOf(
+            "sendEmail" to sendEmail.toString(),
+            "initiator" to Constants.INITIATOR
+        )
+        val res = this.client.post(apiPath, queryParams, payload);
         val bodyString = res.body?.string();
         if (res.code == 200) {
             val resObj = Gson().fromJson(bodyString, JsonObject::class.java);
