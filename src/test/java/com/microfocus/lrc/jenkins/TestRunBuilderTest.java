@@ -121,8 +121,7 @@ public class TestRunBuilderTest {
         MockResponse responseRunStatusHasReport = new MockResponse().setBody(runStatusResObj.toString());
         mockserver.enqueue(responseRunStatusHasReport);
 
-        // repeat 3 times for csv, docx and pdf download
-        // #TODO: how to handle parallel downloading here
+        // repeat 2 times for csv and pdf
         for (int i = 0; i < 2; i += 1) {
             JsonObject genReportResObj = new JsonObject();
             genReportResObj.addProperty("reportId", -999);
