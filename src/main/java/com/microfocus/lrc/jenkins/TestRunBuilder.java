@@ -642,6 +642,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
 
     private void printJobParameters(final ServerConfiguration config) {
         JsonObject display = new Gson().toJsonTree(config).getAsJsonObject();
+        display.remove("initiator");
         display.remove("password");
         display.remove("proxyConfiguration");
         this.loggerProxy.info("start job with parameters: ");
@@ -666,7 +667,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
                 descriptor.getTenantId(),
                 Integer.parseInt(this.getProjectIdAtRunTime(run, launcher)),
                 this.sendEmail,
-                "jenkins-plugin"
+                Constants.INITIATOR
         );
         printJobParameters(config);
         return config;

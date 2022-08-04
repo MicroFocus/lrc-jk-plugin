@@ -23,6 +23,7 @@ public final class Constants {
     public static final String APPLICATION_JSON = "application/json";
     public static final String BENCHMARK = "benchmark";
     public static final String SEPARATOR_LINE = "=====================================";
+    public static final String INITIATOR = "jenkins-plugin-new";
 
     private Constants() {
         throw new IllegalStateException("Utility class");
