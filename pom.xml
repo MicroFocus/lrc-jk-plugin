@@ -162,7 +162,7 @@
                 <executions>
                     <execution>
                         <id>validate-spotbugs</id>
-                        <phase>validate</phase>
+                        <phase>none</phase>  <!-- disable it by default -->
                         <goals>
                             <goal>check</goal>
                         </goals>
