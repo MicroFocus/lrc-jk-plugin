@@ -309,14 +309,14 @@ class TrendingReport {
                 )
             } catch (e: IOException) {
                 LoggerProxy.sysLogger
-                    .log(Level.SEVERE, "failed to load resource files for trending report, " + e.message)
+                    .log(Level.SEVERE, "Failed to load resource files for trending report, " + e.message)
                 return null
             }
 
             return try {
                 HTMLTemplate.generateByPebble(htmlTemplate, data)
             } catch (e: IOException) {
-                LoggerProxy.sysLogger.log(Level.SEVERE, "failed to generate html, " + e.message)
+                LoggerProxy.sysLogger.log(Level.SEVERE, "Failed to generate html, " + e.message)
                 "failed to generate"
             }
         }

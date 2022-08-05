@@ -95,9 +95,9 @@ class LoadTestRunService(
         }
 
         if (testRun.statusEnum.isEnded) {
-            this.loggerProxy.info("test run [${testRun.id}] stopped.");
+            this.loggerProxy.info("Test run #${testRun.id} stopped.");
         } else {
-            this.loggerProxy.info("test run [${testRun.id}] failed to stop.");
+            this.loggerProxy.info("Test run #${testRun.id} failed to stop.");
         }
     }
 }

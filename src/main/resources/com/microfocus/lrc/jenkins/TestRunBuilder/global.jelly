@@ -15,10 +15,10 @@
       so it should be straightforward to find them.
     -->
     <f:section title="LoadRunner Cloud">
-        <f:entry title="Username" field="username" description="Your username login to LoadRunner Cloud, for example: loadrunner.cloud@microfocus.com">
+        <f:entry title="Username" field="username" description="Your username to login LoadRunner Cloud, for example: loadrunner-cloud@microfocus.com">
             <f:textbox />
         </f:entry>
-        <f:entry title="Password" field="password" description="Your password login to LoadRunner Cloud">
+        <f:entry title="Password" field="password" description="Your password to login LoadRunner Cloud">
             <f:password />
         </f:entry>
         <f:entry title="URL" field="url" description="LoadRunner Cloud URL, for example: https://loadrunner-cloud.saas.microfocus.com">
@@ -29,7 +29,7 @@
         </f:entry>
         <f:block>
             <f:optionalBlock checked="${descriptor.useOAuth}" name="useOAuth" field="useOAuth" inline="true" title="Use OAuth token">
-                <f:entry title="Client ID" field="clientId" description="If set, all jobs will use this instead of username and password">
+                <f:entry title="Client ID" field="clientId" description="If it's set, jobs will use client id and secret.">
                     <f:textbox />
                 </f:entry>
                 <f:entry title="Client Secret" field="clientSecret">
@@ -38,8 +38,8 @@
             </f:optionalBlock>
         </f:block>
         <f:block>
-            <f:optionalBlock checked="${descriptor.useProxy}" name="useProxy" field="useProxy" inline="true" title="Use proxy connecting to LoadRunner Cloud server">
-                <f:entry title="Proxy Host" field="proxyHost" description="If set, all other proxy settings will be ignored while connecting to LoadRunner Cloud server.">
+            <f:optionalBlock checked="${descriptor.useProxy}" name="useProxy" field="useProxy" inline="true" title="Connect LoadRunner Cloud via proxy">
+                <f:entry title="Proxy Host" field="proxyHost" description="If it's set, all other proxy settings will be ignored while connecting LoadRunner Cloud.">
                     <f:textbox />
                 </f:entry>
                 <f:entry title="Proxy Port" field="proxyPort" >

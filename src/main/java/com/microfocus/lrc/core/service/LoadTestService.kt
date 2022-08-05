@@ -36,7 +36,7 @@ class LoadTestService(
         val res = this.client.get(apiPath);
         val code = res.code;
         val body = res.body?.string();
-        this.loggerProxy.debug("fetch load test got response: $code, $body");
+        this.loggerProxy.debug("Fetching load test got response: $code, $body");
         val obj = Gson().fromJson(body, JsonObject::class.java);
         val lt = LoadTest(id, this.client.getServerConfiguration().projectId);
         lt.name = obj.get("name").asString;
@@ -62,7 +62,7 @@ class LoadTestService(
             val resObj = Gson().fromJson(bodyString, JsonObject::class.java);
             return resObj.get("runId").asInt;
         } else {
-            throw IOException("failed to start test run, Load Test $id, error: $bodyString");
+            throw IOException("Failed to start test run, load test #$id. error: $bodyString");
         }
     }
 }

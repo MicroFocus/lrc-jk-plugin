@@ -66,20 +66,22 @@ class Runner(
 
     @kotlin.jvm.Throws(IOException::class, InterruptedException::class)
     fun run(): LoadTestRun {
-        this.loggerProxy.info("login success.");
-        this.loggerProxy.info("fetching load test ${this.testRunOptions.testId}...");
+        this.loggerProxy.info("Authentication passed.");
+        this.loggerProxy.info("Fetching load test #${this.testRunOptions.testId} ...");
+
         val lt = this.loadTestService.fetch(this.testRunOptions.testId);
-        this.loggerProxy.info("load test [${lt.name}] is going to start...");
+        this.loggerProxy.info("Staring load test \"${lt.name}\" ...");
+
         val runId = this.loadTestService.startTestRun(lt.id, this.testRunOptions.sendEmail);
-        this.loggerProxy.info("test run [$runId] started.");
+        this.loggerProxy.info("Test run #${runId} started.");
         val testRun = LoadTestRun(runId, lt);
         this.testRun = testRun;
         this.waitingForTestRunToEnd(testRun);
-        this.loggerProxy.info("test run [$runId] ended with [${testRun.statusEnum.statusName}]");
-        // wait for report to be ready
+        this.loggerProxy.info("Test run #${runId} ended with ${testRun.statusEnum.statusName}");
+
         this.waitingForReportReady(testRun);
         if (testRun.hasReport) {
-            this.reportDownloader.download(testRun, arrayOf("csv", "pdf", "docx"));
+            this.reportDownloader.download(testRun, arrayOf("csv", "pdf"));
         }
 
         return testRun;
@@ -108,7 +110,7 @@ class Runner(
         }
 
         if (!testRun.hasReport) {
-            this.loggerProxy.info("test run [${testRun.id}] has no report, skip.");
+            this.loggerProxy.info("Test run #${testRun.id} has no report.");
         }
     }
 
@@ -123,12 +125,12 @@ class Runner(
     fun interruptHandler(): String {
         val testRun = this.testRun;
         if (testRun == null) {
-            this.loggerProxy.info("test run is not started yet, abort...")
-            this.loggerProxy.info("you may want to go to the LoadRunner Cloud website to check if you need to stop the run manually.")
+            this.loggerProxy.info("Test run is not started yet, aborting ...")
+            this.loggerProxy.info("You may want to go to LoadRunner Cloud website to check if you need to stop the run manually.")
             return TestRunStatus.ABORTED.statusName;
         }
 
-        this.loggerProxy.info("aborting test run [${testRun.id}]...");
+        this.loggerProxy.info("Aborting test run #${testRun.id} ...");
         this.loadTestRunService.abort(testRun);
         this.testRun = testRun;
         return TestRunStatus.ABORTED.statusName;

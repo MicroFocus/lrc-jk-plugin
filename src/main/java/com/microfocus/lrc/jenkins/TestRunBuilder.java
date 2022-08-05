@@ -149,7 +149,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
 
         public FormValidation doCheckTenantId(@QueryParameter final String value) {
             if (value == null || value.trim().length() == 0) {
-                return FormValidation.error("Please input a Tenant");
+                return FormValidation.error("Please input a Tenant ID");
             }
 
             return FormValidation.ok();
@@ -204,7 +204,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
             }
 
             if (!ApiClient.isOAuthClientId(value.trim())) {
-                return FormValidation.error("Please input a valid Client Id");
+                return FormValidation.error("Please input a valid Client ID");
             }
 
             return FormValidation.ok();
@@ -507,8 +507,8 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         TestRunBuilder.DescriptorImpl descriptor = (TestRunBuilder.DescriptorImpl) this.getDescriptor();
         if (isDescriptorEmpty()) {
             this.loggerProxy.error(
-                    "failed to read configuration of LoadRunner Cloud Plugin. "
-                            + "Please check it in System Configuration and try again."
+                    "Failed to read configuration of LoadRunner Cloud plugin. "
+                            + "Please check configuration and try again."
             );
             run.setResult(Result.FAILURE);
             return;
@@ -557,7 +557,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         }
 
         if (testRun == null) {
-            this.loggerProxy.info("run test failed, job end.");
+            this.loggerProxy.info("Test run failed.");
             run.setResult(Result.FAILURE);
             return;
         }
@@ -610,7 +610,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
 
     private void printEnvInfo(final EnvVars env) {
         this.loggerProxy.info(Constants.SEPARATOR_LINE);
-        this.loggerProxy.info("Current environment:");
+        this.loggerProxy.info("Environment information:");
         VersionNumber ver = jenkins.model.Jenkins.getVersion();
         String verStr = "N/A";
         if (ver != null) {
@@ -626,8 +626,9 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
                 pluginVerStr = plugin.getVersion();
             }
         }
+
+        this.loggerProxy.info("  Running on Jenkins node: " + env.get("NODE_NAME"));
         this.loggerProxy.info("  LoadRunner Cloud plugin version: " + pluginVerStr);
-        this.loggerProxy.info("  Currently running on Jenkins node: " + env.get("NODE_NAME"));
         this.loggerProxy.info(Constants.SEPARATOR_LINE);
     }
 
@@ -642,10 +643,12 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
 
     private void printJobParameters(final ServerConfiguration config) {
         JsonObject display = new Gson().toJsonTree(config).getAsJsonObject();
+
         display.remove("initiator");
         display.remove("password");
         display.remove("proxyConfiguration");
-        this.loggerProxy.info("start job with parameters: ");
+
+        this.loggerProxy.info("Job started with parameters: ");
         this.loggerProxy.info(display.toString());
         this.loggerProxy.info(Constants.SEPARATOR_LINE);
     }
@@ -727,7 +730,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
             } catch (IOException e) {
                 loggerProxy.error("Failed to run test, " + e.getMessage());
                 if (Thread.interrupted()) {
-                    throw new InterruptedException("jenkins job is interrupted.");
+                    throw new InterruptedException("Jenkins job is interrupted.");
                 }
                 throw e;
             } catch (InterruptedException e) {

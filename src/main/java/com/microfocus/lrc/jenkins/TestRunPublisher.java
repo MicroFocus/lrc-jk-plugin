@@ -162,7 +162,7 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
     ) throws InterruptedException, IOException {
         PrintStream logger = listener.getLogger();
         LoggerProxy loggerProxy = new LoggerProxy(logger, new LoggerOptions(false, ""));
-        loggerProxy.info("StormTestPublisher started for build " + build.getNumber());
+        loggerProxy.info("TestPublisher started for build " + build.getNumber());
         loggerProxy.info("Workspace: " + workspace);
 
         FilePath buildResultPath = workspace.child(String.format("lrc_run_result_%s", build.getId()));
@@ -237,7 +237,7 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
         }
 
         if (wrapper == null) {
-            loggerProxy.error("failed to get trending data.");
+            loggerProxy.error("Failed to get trending data.");
             build.setResult(Result.FAILURE);
             return;
         }
@@ -252,7 +252,7 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
         );
 
         if (buildAction == null) {
-            loggerProxy.error("failed to save build result into Jenkins.");
+            loggerProxy.error("Failed to save build result into Jenkins.");
             build.setResult(Result.FAILURE);
             return;
         }
@@ -273,10 +273,10 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
                     )
             );
             filePath.write(buildAction.getTrendingReportHTML(), "UTF-8");
-            loggerProxy.info("trending report html file generated: " + filePath.getRemote());
+            loggerProxy.info("Trending report file generated: " + filePath.getRemote());
             build.setResult(Result.SUCCESS);
         } catch (IOException ex) {
-            loggerProxy.error("failed to write trending report html, " + ex.getMessage());
+            loggerProxy.error("Failed to write trending report file, " + ex.getMessage());
         }
     }
 

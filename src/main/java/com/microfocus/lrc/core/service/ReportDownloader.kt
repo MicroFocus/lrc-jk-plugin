@@ -69,7 +69,7 @@ class ReportDownloader(
             }
 
             if (reportContent == null) {
-                this.loggerProxy.info("Report is not ready after $retryWaitingTimes retries, giving up.");
+                this.loggerProxy.info("Report #$reportId is not ready after $retryWaitingTimes retries");
                 return;
             }
 
@@ -118,7 +118,7 @@ class ReportDownloader(
 
         val res = this.apiClient.get(apiPath);
         if (res.code != 200) {
-            this.loggerProxy.info("Report is not ready: ${res.code}, ${res.body?.string()}");
+            this.loggerProxy.info("Report #$reportId is not ready: ${res.code}, ${res.body?.string()}");
             return null;
         }
         val contentType = res.header("content-type", null);
@@ -126,15 +126,15 @@ class ReportDownloader(
             val body = res.body?.string();
             val result = Gson().fromJson(body, JsonObject::class.java);
             if (result["message"]?.asString == "In progress") {
-                this.loggerProxy.info("Report $reportId is not ready yet...");
+                this.loggerProxy.info("Report #$reportId is not ready yet...");
                 return null;
             } else {
-                throw Exception("Report $reportId invalid status: $body");
+                throw Exception("Report #$reportId invalid status: $body");
             }
         }
 
         if (contentType?.contains("application/octet-stream") == true) {
-            this.loggerProxy.info("Report $reportId is ready.");
+            this.loggerProxy.info("Report #$reportId is ready.");
 
             return res.body?.bytes();
         }
@@ -166,18 +166,18 @@ class ReportDownloader(
 
         val res = this.apiClient.get(apiPath);
         if (res.code != 200) {
-            val msg = "Failed to fetch test-run results: ${res.code}, ${res.body?.string()}"
+            val msg = "Failed to fetch test run results: ${res.code}, ${res.body?.string()}"
             this.loggerProxy.info(msg);
             throw IOException(msg);
         }
 
         val body = res.body?.string();
-        this.loggerProxy.debug("Fetched test-run results: $body");
+        this.loggerProxy.debug("Fetched test run results: $body");
         try {
             val results = Gson().fromJson(body, TestRunResultsResponse::class.java);
             return results;
         } catch (e: JsonSyntaxException) {
-            this.loggerProxy.info("Failed to parse test-run results: $body");
+            this.loggerProxy.info("Failed to parse test run results: $body");
             throw e;
         }
     }
@@ -191,7 +191,7 @@ class ReportDownloader(
 
         val res = this.apiClient.get(apiPath);
         if (res.code != 200) {
-            val msg = "Failed to fetch test-run transactions: ${res.code}, ${res.body?.string()}"
+            val msg = "Failed to fetch test run transactions: ${res.code}, ${res.body?.string()}"
             this.loggerProxy.info(msg);
             throw IOException(msg);
         }
@@ -202,7 +202,7 @@ class ReportDownloader(
             val results = Gson().fromJson(body, Array<TestRunTransactionsResponse>::class.java);
             return results;
         } catch (e: JsonSyntaxException) {
-            this.loggerProxy.info("Failed to parse test-run transactions: $body");
+            this.loggerProxy.info("Failed to parse test run transactions: $body");
             throw e;
         }
     }
