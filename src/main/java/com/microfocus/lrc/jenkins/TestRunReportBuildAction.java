@@ -40,7 +40,7 @@ public final class TestRunReportBuildAction implements RunAction2 {
     }
 
     public String getUrlName() {
-        return "srl_build_report";
+        return "lrc_build_report";
     }
 
     TestRunReportBuildAction(
