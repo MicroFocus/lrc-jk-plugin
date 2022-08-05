@@ -177,7 +177,7 @@ public class TestRunBuilderTest {
             // print jenkins logs for debugging
             System.out.println(rd.readLine());
         }
-        jenkins.assertLogContains("load test [fake_load_test] is going to start...", b);
+        jenkins.assertLogContains("Staring load test \"fake_load_test\" ...", b);
         // assert workspace has report files
         FilePath workspace = b.getWorkspace();
         assert workspace != null;
