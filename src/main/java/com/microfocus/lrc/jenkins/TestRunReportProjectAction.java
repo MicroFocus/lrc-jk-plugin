@@ -43,7 +43,7 @@ public final class TestRunReportProjectAction implements Action {
     }
 
     public String getDisplayName() {
-        return "LoadRunner Cloud Trend";
+        return "LoadRunner Cloud Trending";
     }
 
     public String getUrlName() {
