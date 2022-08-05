@@ -12,7 +12,7 @@
     <version>${revision}${changelist}</version>
     <packaging>hpi</packaging>
     <name>LoadRunner Cloud</name>
-    <description>The plugin enables you to run tests in LoadRunner Cloud</description>
+    <description>This plugin allows you to run test in LoadRunner Cloud and collect results</description>
     <url>https://github.com/MicroFocus/lrc-jk-plugin</url>
     <licenses>
         <license>

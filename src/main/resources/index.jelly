@@ -3,5 +3,5 @@
 -->
 <?jelly escape-by-default='true'?>
 <div>
-    The plugin enables users to run test in LoadRunner Cloud and collect results.
+    This plugin allows you to run test in LoadRunner Cloud and collect results.
 </div>
