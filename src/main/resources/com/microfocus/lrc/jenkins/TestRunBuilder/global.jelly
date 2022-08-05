@@ -15,13 +15,13 @@
       so it should be straightforward to find them.
     -->
     <f:section title="LoadRunner Cloud">
-        <f:entry title="Username" field="username" description="Your username to login LoadRunner Cloud, for example: loadrunner-cloud@microfocus.com">
+        <f:entry title="Username" field="username">
             <f:textbox />
         </f:entry>
-        <f:entry title="Password" field="password" description="Your password to login LoadRunner Cloud">
+        <f:entry title="Password" field="password">
             <f:password />
         </f:entry>
-        <f:entry title="URL" field="url" description="LoadRunner Cloud URL, for example: https://loadrunner-cloud.saas.microfocus.com">
+        <f:entry title="URL" field="url">
             <f:textbox />
         </f:entry>
         <f:entry title="Tenant ID" field="tenantId">
