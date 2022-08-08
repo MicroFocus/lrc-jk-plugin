@@ -531,7 +531,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         TestRunOptions opt = new TestRunOptions(
                 testIdVal,
                 this.sendEmail,
-                Boolean.parseBoolean(envVarsObj.get(OptionInEnvVars.SRL_CLI_SKIP_LOGIN.name())),
+                Boolean.parseBoolean(envVarsObj.get(OptionInEnvVars.LRC_CLI_SKIP_LOGIN.name())),
                 Boolean.parseBoolean(envVarsObj.get(OptionInEnvVars.LRC_SKIP_PDF_REPORT.name())),
                 Boolean.parseBoolean(envVarsObj.get(OptionInEnvVars.LRC_DEBUG_LOG.name()))
         );
