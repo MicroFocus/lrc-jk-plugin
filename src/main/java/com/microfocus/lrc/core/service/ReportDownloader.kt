@@ -59,7 +59,10 @@ class ReportDownloader(
             // wait for the report to be ready
             var retryWaitingTimes = 0;
             var reportContent: ByteArray? = null;
-            val maxRetry = 3;
+            var maxRetry = 6;
+            if (reportType == "pdf") {
+                maxRetry = 24;  // max 8 minutes for pdf report generation
+            }
             while (retryWaitingTimes < maxRetry && reportContent == null) {
                 reportContent = this.isReportReady(reportId);
                 if (reportContent == null) {

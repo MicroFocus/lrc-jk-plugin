@@ -57,6 +57,13 @@ class LoadTestRunService(
         ).path;
         val res = this.client.get(apiPath);
         val code = res.code;
+        if (code != 200) {
+            if (code == 401) {
+                throw IOException("Unauthorized");
+            }
+
+            throw IOException("Failed to fetch status for run ${testRun.id}: $code");
+        }
         val body = res.body?.string();
         this.loggerProxy.debug("fetch status got $code, $body");
         val obj = Gson().fromJson(body, JsonObject::class.java);

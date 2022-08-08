@@ -92,9 +92,36 @@ class Runner(
         // print status
         // if test run not end, repeat the loop
         val interval = 5000L;
+        var loginRetryTimes = 0;
+        var retryTimes = 0;
         while (!testRun.testRunCompletelyEnded()) {
             Thread.sleep(interval);
-            this.loadTestRunService.fetchStatus(testRun);
+            try {
+                this.loadTestRunService.fetchStatus(testRun);
+            } catch (e: IOException) {
+                if (e.message == "401") {
+                    if (loginRetryTimes < 10) {
+                        this.loggerProxy.error("Authentication failed. Session may time out, try login again.");
+                        try {
+                            this.apiClient.login();
+                        } catch (ee: IOException) {
+                            this.loggerProxy.error("login failed: ${ee.message}");
+                        }
+                        loginRetryTimes += 1;
+                        continue;
+                    } else {
+                        this.loggerProxy.error("login retried 10 times, failed.");
+                    }
+                }
+
+                retryTimes++
+                if (retryTimes >= 10) {
+                    logger.println("retried 10 times, abort")
+                    throw e
+                }
+                this.loggerProxy.error("Failed to fetch test run status: ${e.message}");
+                this.loggerProxy.error("error occurred during test running, retrying ...$retryTimes/10")
+            }
             this.printTestRunStatus(testRun);
         }
     }
