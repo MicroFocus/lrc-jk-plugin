@@ -31,7 +31,6 @@ class XmlReport {
             testRun: LoadTestRun,
             reportUrl: String,
             dashboardUrl: String,
-            errorObj: JsonObject?,
         ): ByteArray {
 
             val xml =
@@ -104,16 +103,8 @@ class XmlReport {
             testsuite.appendChild(testcase)
 
             if (isFailure) {
-                var failureContent = "${testRun.statusCode} "
-                if (errorObj != null) {
-                    failureContent += "$errorObj "
-                }
-                if (testRun.status.isNotBlank() && testRun.detailedStatus != TestRunStatus.FAILED.statusName) {
-                    failureContent += testRun.status
-                }
                 val failureEle = xml.createElement("failure")
                 failureEle.setAttribute("message", "Test run status is ${testRun.detailedStatus}")
-                failureEle.textContent = failureContent
                 failureEle.setAttribute("type", testRun.detailedStatus)
                 testcase.appendChild(failureEle)
             }
