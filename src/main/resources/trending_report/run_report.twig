@@ -114,7 +114,7 @@
     <td><%= buildNo %></td>
     <td><%= avgHits %></td>
     <td><%= avgThroughput %></td>
-    <td><%= errorsPerSec %></td>
+    <td><% print(errorsPerSec.toFixed(3)) %></td>
     <td><% print(tps.toFixed(3)) %></td>
     {% if(extraContent) %}
     <td><%= initDurationStr %></td>

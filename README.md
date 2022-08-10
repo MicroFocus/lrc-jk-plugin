@@ -59,7 +59,8 @@ The plugin generates the following files (if they are available) in workspace fo
 | **lrc_report_TENANTID-RUNID.pdf**       | A PDF file containing report data for the test run.                                                           |
 | **lrc_report_trans_TENANTID-RUNID.csv** | A CSV file containing detailed statistics for each transaction in the test run.                               |
 
-> **Note:**
-> If build / job is aborted or cancelled, the plugin will not try to collect artifacts.
+> **Notes:**  
+> - If build / job is aborted or cancelled, the plugin will not try to collect artifacts.  
+> - If you don't need PDF report, define a boolean or string parameter named as "LRC_SKIP_PDF_REPORT" in job.
 
 If trending report is configured, a menu named as "LoadRunner Cloud Trending" will be displayed in the job page. You can view the trending report by clicking the menu.
