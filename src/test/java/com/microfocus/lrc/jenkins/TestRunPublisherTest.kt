@@ -62,25 +62,25 @@ class TestRunPublisherTest {
             null,
             null,
             null,
-        );
+        )
 
-        val descriptor = jenkins.get(TestRunBuilder.DescriptorImpl::class.java);
-        val baseUrl = TestRunBuilderTest.mockserver.url("/").toString();
-        descriptor.url = baseUrl;
-        descriptor.save();
-        project.publishersList.add(publisher);
-        project = jenkins.configRoundtrip(project);
-        val p = project.publishersList[0] as TestRunPublisher;
-        jenkins.assertEqualDataBoundBeans(publisher, p);
-        val defaultRunsCount = 5;
-        Assert.assertEquals(defaultRunsCount, p.runsCount);
+        val descriptor = jenkins.get(TestRunBuilder.DescriptorImpl::class.java)
+        val baseUrl = TestRunBuilderTest.mockserver.url("/").toString()
+        descriptor.url = baseUrl
+        descriptor.save()
+        project.publishersList.add(publisher)
+        project = jenkins.configRoundtrip(project)
+        val p = project.publishersList[0] as TestRunPublisher
+        jenkins.assertEqualDataBoundBeans(publisher, p)
+        val defaultRunsCount = 5
+        Assert.assertEquals(defaultRunsCount, p.runsCount)
     }
 
     @Test
     fun testPerform() {
-        EnvVars.masterEnvVars[OptionInEnvVars.LRC_DEBUG_LOG.name] = "true";
+        EnvVars.masterEnvVars[OptionInEnvVars.LRC_DEBUG_LOG.name] = "true"
 
-        val project = jenkins.createFreeStyleProject();
+        val project = jenkins.createFreeStyleProject()
         val publisher = TestRunPublisher(
             null,
             null,
@@ -90,50 +90,50 @@ class TestRunPublisherTest {
             null,
             null,
             null,
-        );
+        )
 
-        project.publishersList.add(publisher);
-        val descriptor = jenkins.get(TestRunBuilder.DescriptorImpl::class.java);
-        val baseUrl = TestRunBuilderTest.mockserver.url("/").toString();
-        descriptor.url = baseUrl;
-        descriptor.clientId = "FAKE_CLIENT_ID";
-        descriptor.clientSecret = "FAKE_CLIENT_SECRET";
-        descriptor.tenantId = "FAKE_TENANT_ID";
-        descriptor.useOAuth = true;
+        project.publishersList.add(publisher)
+        val descriptor = jenkins.get(TestRunBuilder.DescriptorImpl::class.java)
+        val baseUrl = TestRunBuilderTest.mockserver.url("/").toString()
+        descriptor.url = baseUrl
+        descriptor.clientId = "FAKE_CLIENT_ID"
+        descriptor.clientSecret = "FAKE_CLIENT_SECRET"
+        descriptor.tenantId = "FAKE_TENANT_ID"
+        descriptor.useOAuth = true
 
-        descriptor.save();
+        descriptor.save()
 
         // create a mock "buildResult" for publisher to consume.
         project.buildersList.add(object : TestBuilder() {
             override fun perform(build: AbstractBuild<*, *>, launcher: Launcher, listener: BuildListener): Boolean {
-                val buildResultObj = JsonObject();
+                val buildResultObj = JsonObject()
 
-                val lt = LoadTest(-1, 99);
-                val testRun = LoadTestRun(-1, lt);
-                testRun.statusEnum = TestRunStatus.PASSED;
+                val lt = LoadTest(-1, 99)
+                val testRun = LoadTestRun(-1, lt)
+                testRun.statusEnum = TestRunStatus.PASSED
 
-                val opt = TestRunOptions(lt.id, false);
+                val opt = TestRunOptions(lt.id, false)
 
-                buildResultObj.addProperty("testRun", Gson().toJson(testRun));
-                buildResultObj.addProperty("testOptions", Gson().toJson(opt));
+                buildResultObj.addProperty("testRun", Gson().toJson(testRun))
+                buildResultObj.addProperty("testOptions", Gson().toJson(opt))
 
                 build.workspace!!.child("lrc_run_result_${build.id}").write(
                     buildResultObj.toString(),
                     Charsets.UTF_8.name()
-                );
+                )
 
-                return true;
+                return true
             }
 
-        });
+        })
 
-        MockServerResponseGenerator.mockLogin();
-        MockServerResponseGenerator.mockTestRunResults();
-        MockServerResponseGenerator.mockTransactions();
+        MockServerResponseGenerator.mockLogin()
+        MockServerResponseGenerator.mockTestRunResults()
+        MockServerResponseGenerator.mockTransactions()
 
-        val build = jenkins.buildAndAssertSuccess(project);
-        val action = build.getAction(TestRunReportBuildAction::class.java);
-        assert(action != null);
-        println(action.trendingDataWrapper.tenantId);
+        val build = jenkins.buildAndAssertSuccess(project)
+        val action = build.getAction(TestRunReportBuildAction::class.java)
+        assert(action != null)
+        println(action.trendingDataWrapper.tenantId)
     }
 }

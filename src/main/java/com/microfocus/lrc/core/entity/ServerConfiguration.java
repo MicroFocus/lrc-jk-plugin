@@ -15,14 +15,14 @@ package com.microfocus.lrc.core.entity;
 import java.io.Serializable;
 
 public final class ServerConfiguration implements Serializable {
-    private String url;
-    private String username;
-    private String password;
-    private String tenantId;
-    private int projectId;
+    private final String url;
+    private final String username;
+    private final String password;
+    private final String tenantId;
+    private final int projectId;
     private ProxyConfiguration proxyConfiguration;
-    private boolean sendEmail;
-    private String initiator;
+    private final boolean sendEmail;
+    private final String initiator;
 
     // #region getter/setter
     public String getUrl() {

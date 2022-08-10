@@ -34,8 +34,8 @@ class XmlReport {
         ): ByteArray {
 
             val xml =
-                DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-            val isFailure: Boolean = TestRunStatus.PASSED.statusName != testRun.detailedStatus;
+                DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument()
+            val isFailure: Boolean = TestRunStatus.PASSED.statusName != testRun.detailedStatus
 
             val testsuite = xml.createElement("testsuite")
             testsuite.setAttribute("name", testRun.loadTest.name)
@@ -116,7 +116,7 @@ class XmlReport {
             val sw = StringWriter()
             trans2Str.transform(source, StreamResult(sw))
 
-            return sw.buffer.toString().toByteArray(StandardCharsets.UTF_8);
+            return sw.buffer.toString().toByteArray(StandardCharsets.UTF_8)
         }
 
         private fun generatePropertyElement(

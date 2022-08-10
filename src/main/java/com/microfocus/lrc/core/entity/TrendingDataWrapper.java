@@ -31,10 +31,10 @@ public final class TrendingDataWrapper implements Serializable {
 
     static final long serialVersionUID = 1L;
 
-    private TrendingData trendingData;
+    private final TrendingData trendingData;
     private TrendingData benchmark;
     private Integer benchmarkId;
-    private String tenantId;
+    private final String tenantId;
 
     public TrendingDataWrapper(
             final JsonObject json,
@@ -200,10 +200,10 @@ public final class TrendingDataWrapper implements Serializable {
     public final class TrendingData implements Serializable {
         static final long serialVersionUID = 1L;
         private int initDuration = -1;
-        private int runId;
+        private final int runId;
         private int testId;
         private String testName;
-        private String status;
+        private final String status;
         private int vusers;
         private double duration;
         private int percentile;

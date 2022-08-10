@@ -122,7 +122,7 @@ class TrendingReport {
                 LoggerProxy.sysLogger.log(
                     Level.INFO, "latest benchmark is null, choose the run itself as benchmark."
                 )
-                latestBenchmark = latestBuildAction.trendingDataWrapper.trendingData!!;
+                latestBenchmark = latestBuildAction.trendingDataWrapper.trendingData!!
             }
             val benchmark: TrendingDataWrapper.TrendingData = latestBenchmark
             LoggerProxy.sysLogger.log(
@@ -144,17 +144,16 @@ class TrendingReport {
                     tempTrd
                 }.collect(Collectors.toList())
 
-            val overviews = JsonArray();
+            val overviews = JsonArray()
             trendingDataWrapperList.stream().map { jsonObject: JsonObject ->
                 getOverviewFromTrendingData(
                     jsonObject
                 )
             }.collect(Collectors.toList()).forEach { overview: JsonObject ->
                 overviews.add(overview)
-            };
+            }
 
-
-            val trts = JsonArray();
+            val trts = JsonArray()
             val transactionsGroup: Map<Pair<String, String>, List<JsonObject>> =
                 trendingDataWrapperList.stream().flatMap { t: JsonObject ->
                     (Gson().fromJson(
@@ -328,7 +327,7 @@ class TrendingReport {
         ): String? {
             if (latestBuildAction.trendingReportHTML == null) {
                 LoggerProxy.sysLogger.log(Level.INFO, "cached trending report not found, generating.")
-                return null;
+                return null
             }
 
             val lastTrendingConfig: TrendingConfiguration = latestBuildAction.trendingConfig
@@ -343,7 +342,7 @@ class TrendingReport {
                     Level.INFO,
                     "cached trending report found but trending config is changed, re-generating."
                 )
-                null;
+                null
             }
         }
 
@@ -473,7 +472,7 @@ class TrendingReport {
             benchmarkTrans: TrendingDataWrapper.TransactionData?,
             trendingConfig: TrendingConfiguration
         ): JsonObject {
-            var benchmarkTx = benchmarkTrans;
+            var benchmarkTx = benchmarkTrans
             val trt = JsonObject()
             if (benchmarkTx == null) {
                 //use itself as benchmark if no match (same script/transaction) benchmark is found.

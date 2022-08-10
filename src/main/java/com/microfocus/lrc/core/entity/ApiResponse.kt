@@ -32,21 +32,21 @@ class TestRunResultsResponse(
     companion object {
         @JvmStatic
         fun rmThroughputUnit(withUnit: String): Double {
-            val split = withUnit.split(" ");
+            val split = withUnit.split(" ")
             if (split.size != 2) {
-                return -1.0;
+                return -1.0
             }
-            val unit = split[1].removeSuffix("/s");
-            val num = split[0].toDouble();
+            val unit = split[1].removeSuffix("/s")
+            val num = split[0].toDouble()
 
-            var result = num;
-            val allUnits = arrayOf("bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB");
-            val i = allUnits.indexOf(unit);
+            var result = num
+            val allUnits = arrayOf("bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
+            val i = allUnits.indexOf(unit)
             if (i != -1) {
-                result = num * (1024.0.pow(i));
+                result = num * (1024.0.pow(i))
             }
 
-            return result;
+            return result
         }
     }
 
@@ -63,7 +63,7 @@ class TestRunResultsResponse(
     }
 
     fun getAvgHitsNum(): Double {
-        return averageHits.removeSuffix(" hits/s").toDouble();
+        return averageHits.removeSuffix(" hits/s").toDouble()
     }
 
     fun getAvgThroughputWithOutUnit(): Double {

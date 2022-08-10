@@ -25,15 +25,15 @@ import java.io.Serializable;
  */
 public final class TrendingConfiguration implements Serializable {
     private final boolean isBenchmarkPrev;
-    private Integer runsCount;
-    private Integer benchmark;
-    private Integer trtPctlTholdImpr;
-    private Integer trtPctlTholdMinorRegr;
-    private Integer trtPctlTholdMajorRegr;
+    private final Integer runsCount;
+    private final Integer benchmark;
+    private final Integer trtPctlTholdImpr;
+    private final Integer trtPctlTholdMinorRegr;
+    private final Integer trtPctlTholdMajorRegr;
 
-    private Integer trtAvgTholdImpr;
-    private Integer trtAvgTholdMinorRegr;
-    private Integer trtAvgTholdMajorRegr;
+    private final Integer trtAvgTholdImpr;
+    private final Integer trtAvgTholdMinorRegr;
+    private final Integer trtAvgTholdMajorRegr;
 
     //#region accessors
     public Integer getRunsCount() {

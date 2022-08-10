@@ -18,5 +18,5 @@ class LoadTest(
     val id: Int,
     val projectId: Int,
 ): Serializable {
-    var name: String = "";
+    var name: String = ""
 }

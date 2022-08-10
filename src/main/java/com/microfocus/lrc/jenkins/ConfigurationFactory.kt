@@ -56,10 +56,10 @@ class ConfigurationFactory {
             }
 
             //check Jenkins Global Settings
-            val jenkinsProxy = readProxyFromJenkins(serverHost);
+            val jenkinsProxy = readProxyFromJenkins(serverHost)
             if (jenkinsProxy != null) {
                 loggerProxy.info("Proxy Setting found in Jenkins Global Settings: ${jenkinsProxy.proxy.address()}")
-                proxyConfiguration = jenkinsProxy;
+                proxyConfiguration = jenkinsProxy
             } else {
                 loggerProxy.info("No proxy setting found in Jenkins Global Settings.")
             }
@@ -95,7 +95,7 @@ class ConfigurationFactory {
         private fun readProxyFromJenkins(serverHost: String): ProxyConfiguration? {
             val jenkinsProxyConfig = Jenkins.getInstanceOrNull()?.proxy ?: return null
 
-            val pickedProxy: Proxy = jenkinsProxyConfig.createProxy(serverHost);
+            val pickedProxy: Proxy = jenkinsProxyConfig.createProxy(serverHost)
             if (pickedProxy.type() == Proxy.Type.DIRECT) {
                 return null
             }
@@ -106,9 +106,9 @@ class ConfigurationFactory {
                     jenkinsProxyConfig.port,
                     jenkinsProxyConfig.userName,
                     jenkinsProxyConfig.secretPassword.plainText
-                );
+                )
             } catch (_: IllegalArgumentException) {
-                null;
+                null
             }
         }
     }

@@ -33,36 +33,36 @@ class LoadTestService(
                 "loadTestId" to "$id"
             )
         ).path
-        val res = this.client.get(apiPath);
-        val code = res.code;
-        val body = res.body?.string();
-        this.loggerProxy.debug("Fetching load test got response: $code, $body");
-        val obj = Gson().fromJson(body, JsonObject::class.java);
-        val lt = LoadTest(id, this.client.getServerConfiguration().projectId);
-        lt.name = obj.get("name").asString;
+        val res = this.client.get(apiPath)
+        val code = res.code
+        val body = res.body?.string()
+        this.loggerProxy.debug("Fetching load test got response: $code, $body")
+        val obj = Gson().fromJson(body, JsonObject::class.java)
+        val lt = LoadTest(id, this.client.getServerConfiguration().projectId)
+        lt.name = obj.get("name").asString
 
-        return lt;
+        return lt
     }
 
     fun startTestRun(id: Int, sendEmail: Boolean): Int {
-        val payload = JsonObject();
+        val payload = JsonObject()
         val apiPath = ApiStartTestRun(
             mapOf(
                 "projectId" to "${this.client.getServerConfiguration().projectId}",
                 "loadTestId" to "$id"
             )
-        ).path;
+        ).path
         val queryParams = mapOf(
             "sendEmail" to sendEmail.toString(),
             "initiator" to Constants.INITIATOR
         )
-        val res = this.client.post(apiPath, queryParams, payload);
-        val bodyString = res.body?.string();
+        val res = this.client.post(apiPath, queryParams, payload)
+        val bodyString = res.body?.string()
         if (res.code == 200) {
-            val resObj = Gson().fromJson(bodyString, JsonObject::class.java);
-            return resObj.get("runId").asInt;
+            val resObj = Gson().fromJson(bodyString, JsonObject::class.java)
+            return resObj.get("runId").asInt
         } else {
-            throw IOException("Failed to start test run, load test #$id. error: $bodyString");
+            throw IOException("Failed to start test run, load test #$id. error: $bodyString")
         }
     }
 }

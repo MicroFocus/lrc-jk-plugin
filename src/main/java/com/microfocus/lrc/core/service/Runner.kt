@@ -35,56 +35,56 @@ class Runner(
     private val loggerProxy = LoggerProxy(
         this.logger,
         LoggerOptions(this.testRunOptions.isDebug, "Runner")
-    );
+    )
 
     @Transient
     private val apiClient = ApiClientFactory.getClient(
         this.serverConfiguration,
         LoggerProxy(this.logger, LoggerOptions(this.testRunOptions.isDebug, "ApiClient"))
-    );
+    )
 
     @Transient
     private val loadTestService = LoadTestService(
         this.apiClient,
         LoggerProxy(this.logger, LoggerOptions(this.testRunOptions.isDebug, "LoadTestService"))
-    );
+    )
 
     @Transient
     private val loadTestRunService = LoadTestRunService(
         this.apiClient,
         LoggerProxy(this.logger, LoggerOptions(this.testRunOptions.isDebug, "LoadTestRunService"))
-    );
+    )
 
     @Transient
     private val reportDownloader = ReportDownloader(
         this.apiClient,
         LoggerProxy(this.logger, LoggerOptions(this.testRunOptions.isDebug, "ReportDownloader"))
-    );
+    )
 
     var testRun: LoadTestRun? = null
         private set
 
     @kotlin.jvm.Throws(IOException::class, InterruptedException::class)
     fun run(): LoadTestRun {
-        this.loggerProxy.info("Authentication passed.");
-        this.loggerProxy.info("Fetching load test #${this.testRunOptions.testId} ...");
+        this.loggerProxy.info("Authentication passed.")
+        this.loggerProxy.info("Fetching load test #${this.testRunOptions.testId} ...")
 
-        val lt = this.loadTestService.fetch(this.testRunOptions.testId);
-        this.loggerProxy.info("Staring load test \"${lt.name}\" ...");
+        val lt = this.loadTestService.fetch(this.testRunOptions.testId)
+        this.loggerProxy.info("Staring load test \"${lt.name}\" ...")
 
-        val runId = this.loadTestService.startTestRun(lt.id, this.testRunOptions.sendEmail);
-        this.loggerProxy.info("Test run #${runId} started.");
-        val testRun = LoadTestRun(runId, lt);
-        this.testRun = testRun;
-        this.waitingForTestRunToEnd(testRun);
-        this.loggerProxy.info("Test run #${runId} ended with ${testRun.statusEnum.statusName}");
+        val runId = this.loadTestService.startTestRun(lt.id, this.testRunOptions.sendEmail)
+        this.loggerProxy.info("Test run #${runId} started.")
+        val testRun = LoadTestRun(runId, lt)
+        this.testRun = testRun
+        this.waitingForTestRunToEnd(testRun)
+        this.loggerProxy.info("Test run #${runId} ended with ${testRun.statusEnum.statusName}")
 
-        this.waitingForReportReady(testRun);
+        this.waitingForReportReady(testRun)
         if (testRun.hasReport) {
-            this.reportDownloader.download(testRun, arrayOf("csv", "pdf"));
+            this.reportDownloader.download(testRun, arrayOf("csv", "pdf"))
         }
 
-        return testRun;
+        return testRun
     }
 
     @SuppressWarnings("kotlin:S3776")
@@ -92,97 +92,96 @@ class Runner(
         // refresh test run status
         // print status
         // if test run not end, repeat the loop
-        val interval = 10000L;
-        val maxRetry = 5;
-        val maxLoginRetry = 3;
+        val interval = 10000L
+        val maxRetry = 5
+        val maxLoginRetry = 3
 
-        var retryTimes = 0;
-        var loginRetryTimes = 0;
+        var retryTimes = 0
+        var loginRetryTimes = 0
 
         while (!testRun.testRunCompletelyEnded()) {
-            Thread.sleep(interval);
+            Thread.sleep(interval)
             try {
-                this.loadTestRunService.fetchStatus(testRun);
-                retryTimes = 0;
-                loginRetryTimes = 0;
+                this.loadTestRunService.fetchStatus(testRun)
+                retryTimes = 0
+                loginRetryTimes = 0
             } catch (e: IOException) {
                 if (e.message == "401") {
                     if (loginRetryTimes < maxLoginRetry) {
-                        this.loggerProxy.error("Authentication failed, retrying ......");
-                        loginRetryTimes += 1;
+                        this.loggerProxy.error("Authentication failed, retrying ......")
+                        loginRetryTimes += 1
 
                         try {
-                            this.apiClient.login();
+                            this.apiClient.login()
                         } catch (ee: IOException) {
-                            this.loggerProxy.error("Login failed: ${ee.message}");
+                            this.loggerProxy.error("Login failed: ${ee.message}")
                         }
-   ;
-                        continue;
+                        continue
                     } else {
-                        this.loggerProxy.error("Login retried $maxLoginRetry times, failed.");
-                        throw e;
+                        this.loggerProxy.error("Login retried $maxLoginRetry times, failed.")
+                        throw e
                     }
                 }
 
                 retryTimes++
                 if (retryTimes >= maxRetry) {
-                    logger.println("Retried $maxRetry times, abort");
-                    throw e;
+                    logger.println("Retried $maxRetry times, abort")
+                    throw e
                 }
-                this.loggerProxy.error("Failed to fetch test run status: ${e.message}");
-                this.loggerProxy.error("Error occurred during test running, retrying ...${retryTimes}/${maxRetry}");
+                this.loggerProxy.error("Failed to fetch test run status: ${e.message}")
+                this.loggerProxy.error("Error occurred during test running, retrying ...${retryTimes}/${maxRetry}")
             }
-            this.printTestRunStatus(testRun);
+            this.printTestRunStatus(testRun)
         }
     }
 
     private fun waitingForReportReady(testRun: LoadTestRun) {
-        val interval = 5000L;
-        val maxRetry = 10;
-        var retryTimes = 0;
+        val interval = 5000L
+        val maxRetry = 10
+        var retryTimes = 0
         while (!testRun.hasReport && retryTimes < maxRetry) {
-            Thread.sleep(interval);
-            this.loadTestRunService.fetchStatus(testRun);
-            retryTimes += 1;
+            Thread.sleep(interval)
+            this.loadTestRunService.fetchStatus(testRun)
+            retryTimes += 1
         }
 
         if (!testRun.hasReport) {
-            this.loggerProxy.info("Test run #${testRun.id} has no report.");
+            this.loggerProxy.info("Test run #${testRun.id} has no report.")
         }
     }
 
     private fun printTestRunStatus(testRun: LoadTestRun) {
-        this.loggerProxy.info("${testRun.statusEnum.statusName} - ${testRun.status}");
+        this.loggerProxy.info("${testRun.statusEnum.statusName} - ${testRun.status}")
     }
 
     override fun close() {
-        this.apiClient.close();
+        this.apiClient.close()
     }
 
     fun interruptHandler(): String {
-        val testRun = this.testRun;
+        val testRun = this.testRun
         if (testRun == null) {
             this.loggerProxy.info("Test run is not started yet, aborting ...")
             this.loggerProxy.info("You may want to go to LoadRunner Cloud website to check if you need to stop the run manually.")
-            return TestRunStatus.ABORTED.statusName;
+            return TestRunStatus.ABORTED.statusName
         }
 
-        this.loggerProxy.info("Aborting test run #${testRun.id} ...");
-        this.loadTestRunService.abort(testRun);
-        this.testRun = testRun;
-        return TestRunStatus.ABORTED.statusName;
+        this.loggerProxy.info("Aborting test run #${testRun.id} ...")
+        this.loadTestRunService.abort(testRun)
+        this.testRun = testRun
+        return TestRunStatus.ABORTED.statusName
 
     }
 
     fun fetchTrending(testRun: LoadTestRun, benchmark: Int?): TrendingDataWrapper {
-        var benchmarkTrending: TrendingDataWrapper? = null;
+        var benchmarkTrending: TrendingDataWrapper? = null
         if (benchmark != null) {
-            val benchmarkRun = this.loadTestRunService.fetch(benchmark.toString());
+            val benchmarkRun = this.loadTestRunService.fetch(benchmark.toString())
             if (benchmarkRun != null) {
-                benchmarkTrending = this.reportDownloader.fetchTrending(benchmarkRun, null);
+                benchmarkTrending = this.reportDownloader.fetchTrending(benchmarkRun, null)
             }
         }
 
-        return this.reportDownloader.fetchTrending(testRun, benchmarkTrending);
+        return this.reportDownloader.fetchTrending(testRun, benchmarkTrending)
     }
 }
