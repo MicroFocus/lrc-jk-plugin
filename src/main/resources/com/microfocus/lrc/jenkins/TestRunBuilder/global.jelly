@@ -1,3 +1,15 @@
+<!--
+ * © Copyright 2022 Micro Focus or one of its affiliates.
+ * Licensed under the MIT License (the "License");
+ * you may not use this file except in compliance with the License.
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+-->
+
 <?jelly escape-by-default='true'?>
 <j:jelly
         xmlns:j="jelly:core"
@@ -22,7 +34,7 @@
             <f:password />
         </f:entry>
         <f:entry title="URL" field="url">
-            <f:textbox />
+            <f:textbox value="https://loadrunner-cloud.saas.microfocus.com" />
         </f:entry>
         <f:entry title="Tenant ID" field="tenantId">
             <f:textbox />
