@@ -1,4 +1,3 @@
-[![CodeQL](https://github.com/MicroFocus/lrc-jk-plugin/actions/workflows/codeql.yml/badge.svg)](https://github.com/MicroFocus/lrc-jk-plugin/actions/workflows/codeql.yml)
 [![Build](https://github.com/MicroFocus/lrc-jk-plugin/actions/workflows/build.yml/badge.svg)](https://github.com/MicroFocus/lrc-jk-plugin/actions/workflows/build.yml)
 [![Test](https://github.com/MicroFocus/lrc-jk-plugin/actions/workflows/test.yml/badge.svg)](https://github.com/MicroFocus/lrc-jk-plugin/actions/workflows/test.yml)
 
@@ -60,7 +59,7 @@ The plugin generates the following files (if they are available) in workspace fo
 | **lrc_report_trans_TENANTID-RUNID.csv** | A CSV file containing detailed statistics for each transaction in the test run.                               |
 
 > **Notes:**  
-> - If build / job is aborted or cancelled, the plugin will not try to collect artifacts.  
+> - If build / job is aborted or cancelled, the plugin will not try to collect results.  
 > - If you don't need PDF report, define a boolean or string parameter named as "LRC_SKIP_PDF_REPORT" in job.
 
 If trending report is configured, a menu named as "LoadRunner Cloud Trending" will be displayed in the job page. You can view the trending report by clicking the menu.
