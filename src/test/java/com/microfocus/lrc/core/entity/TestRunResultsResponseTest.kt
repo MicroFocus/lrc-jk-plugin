@@ -18,7 +18,7 @@ import kotlin.math.pow
 class TestRunResultsResponseTest {
     @Test
     fun rmThoughputUnit() {
-        var withoutUnit = 123456789.toDouble();
+        val withoutUnit = 123456789.toDouble();
         var withUnit = "$withoutUnit bytes/s";
         var rmThroughputUnit = TestRunResultsResponse.rmThroughputUnit(withUnit);
         assert(rmThroughputUnit == withoutUnit);
