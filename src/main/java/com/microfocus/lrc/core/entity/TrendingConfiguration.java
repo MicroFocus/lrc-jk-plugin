@@ -56,7 +56,6 @@ public final class TrendingConfiguration implements Serializable {
         return trtPctlTholdMajorRegr;
     }
 
-
     public Integer getTrtAvgTholdImpr() {
         return trtAvgTholdImpr;
     }

@@ -87,15 +87,18 @@ class Runner(
         return testRun;
     }
 
+    @SuppressWarnings("kotlin:S3776")
     private fun waitingForTestRunToEnd(testRun: LoadTestRun) {
         // refresh test run status
         // print status
         // if test run not end, repeat the loop
-        val interval = 5000L;
-        var loginRetryTimes = 0;
-        val maxLoginRetry = 3;
-        var retryTimes = 0;
+        val interval = 10000L;
         val maxRetry = 5;
+        val maxLoginRetry = 3;
+
+        var retryTimes = 0;
+        var loginRetryTimes = 0;
+
         while (!testRun.testRunCompletelyEnded()) {
             Thread.sleep(interval);
             try {
@@ -105,26 +108,29 @@ class Runner(
             } catch (e: IOException) {
                 if (e.message == "401") {
                     if (loginRetryTimes < maxLoginRetry) {
-                        this.loggerProxy.error("Authentication failed. Session may time out, try login again.");
+                        this.loggerProxy.error("Authentication failed, retrying ......");
+                        loginRetryTimes += 1;
+
                         try {
                             this.apiClient.login();
                         } catch (ee: IOException) {
-                            this.loggerProxy.error("login failed: ${ee.message}");
+                            this.loggerProxy.error("Login failed: ${ee.message}");
                         }
-                        loginRetryTimes += 1;
+   ;
                         continue;
                     } else {
-                        this.loggerProxy.error("login retried $maxLoginRetry times, failed.");
+                        this.loggerProxy.error("Login retried $maxLoginRetry times, failed.");
+                        throw e;
                     }
                 }
 
                 retryTimes++
                 if (retryTimes >= maxRetry) {
-                    logger.println("retried $maxRetry times, abort")
-                    throw e
+                    logger.println("Retried $maxRetry times, abort");
+                    throw e;
                 }
                 this.loggerProxy.error("Failed to fetch test run status: ${e.message}");
-                this.loggerProxy.error("error occurred during test running, retrying ...$retryTimes/10")
+                this.loggerProxy.error("Error occurred during test running, retrying ...${retryTimes}/${maxRetry}");
             }
             this.printTestRunStatus(testRun);
         }
