@@ -65,7 +65,7 @@ class LoadTestRunService(
             throw IOException("Failed to fetch status for run ${testRun.id}: $code")
         }
         val body = res.body?.string()
-        this.loggerProxy.debug("fetch status got $code, $body")
+        this.loggerProxy.debug("Fetching test run status got $code, $body")
         val obj = Gson().fromJson(body, JsonObject::class.java)
         testRun.update(obj)
     }
@@ -80,18 +80,18 @@ class LoadTestRunService(
         val res = this.client.put(apiPath, mapOf("action" to "STOP"), JsonObject())
         val code = res.code
         val body = res.body?.string()
-        this.loggerProxy.debug("abort got $code, $body")
+        this.loggerProxy.debug("Aborting test run got $code, $body")
         if (code != 200) {
-            this.loggerProxy.info("abort failed: $code, $body")
-            throw IOException("abort test run [${testRun.id}] failed")
+            this.loggerProxy.info("Aborting test run failed: $code, $body")
+            throw IOException("Aborting test run [${testRun.id}] failed")
         }
 
-        this.loggerProxy.info("aborting test run successfully.")
+        this.loggerProxy.info("Aborting test run successfully.")
     }
 
     fun stop(testRun: LoadTestRun) {
         this.abort(testRun)
-        this.loggerProxy.info("waiting for test run [${testRun.id}] to stop...")
+        this.loggerProxy.info("Waiting for test run [${testRun.id}] to stop...")
 
         val maxRetry = 5
         var retryTimes = 0
