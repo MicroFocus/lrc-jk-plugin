@@ -404,6 +404,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
                 @QueryParameter("useOAuth") final String useOAuth,
                 @QueryParameter("useProxy") final String useProxy
         ) {
+            Jenkins.get().checkPermission(Jenkins.ADMINISTER);
             ServerConfiguration config;
             if (Boolean.parseBoolean(useOAuth)) {
                 config = new ServerConfiguration(
