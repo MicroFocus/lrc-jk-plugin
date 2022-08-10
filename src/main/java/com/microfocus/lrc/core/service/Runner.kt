@@ -102,7 +102,7 @@ class Runner(
         while (!testRun.testRunCompletelyEnded()) {
             Thread.sleep(interval)
             try {
-                this.loadTestRunService.fetchStatus(testRun)
+                this.loadTestRunService.fetch(testRun)
                 retryTimes = 0
                 loginRetryTimes = 0
             } catch (e: IOException) {

@@ -35,12 +35,12 @@ class LoadTestRun(
         }
 
     fun testRunCompletelyEnded(): Boolean {
-        return this.statusEnum.isEnded
+        return this.statusEnum.isEnded && this.isTerminated
     }
 
     fun update(json: JsonObject) {
         this.status = json.get("status")?.asString ?: "NA"
-        this.detailedStatus = json.get("detailedStatus")?.asString ?: "NA"
+        this.detailedStatus = json.get("uiStatus")?.asString ?: (json.get("detailedStatus")?.asString ?: "NA")
         this.isTerminated = json.get("isTerminated")?.asBoolean ?: false
         this.hasReport = json.get("hasReport")?.asBoolean ?: false
         try {

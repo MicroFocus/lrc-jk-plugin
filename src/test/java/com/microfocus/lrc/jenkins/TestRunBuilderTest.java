@@ -104,16 +104,16 @@ public class TestRunBuilderTest {
         MockResponse responseRunStatus = new MockResponse();
         JsonObject runStatusResObj = new JsonObject();
         runStatusResObj.addProperty("status", "INIT");
-        runStatusResObj.addProperty("detailedStatus", "INITIALIZING");
-        runStatusResObj.addProperty("hasReport", false);
+        runStatusResObj.addProperty("uiStatus", "INITIALIZING");
+        runStatusResObj.addProperty("isTerminated", false);
         responseRunStatus.setBody(runStatusResObj.toString());
         for (int i = 0; i < 2; i++) {
             mockserver.enqueue(responseRunStatus);
         }
 
         runStatusResObj.addProperty("status", TestRunStatus.PASSED.getStatusName());
-        runStatusResObj.addProperty("hasReport", false);
-        runStatusResObj.addProperty("detailedStatus", TestRunStatus.PASSED.getStatusName());
+        runStatusResObj.addProperty("uiStatus", TestRunStatus.PASSED.getStatusName());
+        runStatusResObj.addProperty("isTerminated", true);
         MockResponse responseRunStatusDone = new MockResponse().setBody(runStatusResObj.toString());
         mockserver.enqueue(responseRunStatusDone);
 

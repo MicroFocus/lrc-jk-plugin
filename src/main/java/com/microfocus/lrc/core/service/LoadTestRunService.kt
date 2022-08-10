@@ -36,14 +36,28 @@ class LoadTestRunService(
                 runId.toInt(),
                 lt
             )
-            testRun.status = jsonObj.get("status").asString
-            testRun.detailedStatus = jsonObj.get("uiStatus").asString
-            testRun.isTerminated = jsonObj.get("isTerminated").asBoolean
+
+            testRun.update(jsonObj)
 
             return testRun
         } else {
             loggerProxy.error("Failed to fetch run $runId: ${response.code}")
             return null
+        }
+    }
+
+    fun fetch(testRun: LoadTestRun) {
+        val apiPath = ApiGetTestRun(
+            mapOf("runId" to testRun.id.toString())
+        ).path
+        val response = client.get(apiPath)
+        if (response.isSuccessful) {
+            val json = response.body?.string()
+            val jsonObj = Gson().fromJson(json, JsonObject::class.java)
+
+            testRun.update(jsonObj)
+        } else {
+            throw IOException("Failed to fetch run ${testRun.id}: ${response.code}")
         }
     }
 
