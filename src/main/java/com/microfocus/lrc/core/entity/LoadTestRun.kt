@@ -25,8 +25,8 @@ class LoadTestRun(
     var status: String = "NA"
     var isTerminated: Boolean = false
     val reports: MutableMap<String, ByteArray> = mutableMapOf()
-    var startTime: Int = -1
-    var endTime: Int = -1
+    var startTime: Long = -1
+    var endTime: Long = -1
 
     var statusEnum: TestRunStatus = TestRunStatus.NA
         set(value) {
@@ -43,6 +43,13 @@ class LoadTestRun(
         this.detailedStatus = json.get("uiStatus")?.asString ?: (json.get("detailedStatus")?.asString ?: "NA")
         this.isTerminated = json.get("isTerminated")?.asBoolean ?: false
         this.hasReport = json.get("hasReport")?.asBoolean ?: false
+        if (json.has("startTime")) {
+            this.startTime = json.get("startTime").asString.toLong()
+        }
+        if (json.has("endTime")) {
+            this.endTime = json.get("endTime").asString.toLong()
+        }
+
         try {
             this.statusEnum = TestRunStatus.valueOf(this.detailedStatus)
         } catch (e: IllegalArgumentException) {

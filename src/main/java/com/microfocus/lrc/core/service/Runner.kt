@@ -77,7 +77,7 @@ class Runner(
         val testRun = LoadTestRun(runId, lt)
         this.testRun = testRun
         this.waitingForTestRunToEnd(testRun)
-        this.loggerProxy.info("Test run #${runId} ended with ${testRun.statusEnum.statusName}")
+        this.loggerProxy.info("Test run #${runId} ended with ${testRun.statusEnum.statusName} status.")
 
         this.waitingForReportReady(testRun)
         if (testRun.hasReport) {

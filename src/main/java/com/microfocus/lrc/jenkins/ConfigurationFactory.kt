@@ -38,7 +38,7 @@ class ConfigurationFactory {
             } catch (e: MalformedURLException) {
                 loggerProxy.info("Failed to parse server URL, you may need to check it again.")
             }
-            loggerProxy.info("********** Proxy Settings ***********")
+            loggerProxy.info("********** Proxy settings ***********")
             //check JVM properties
             try {
                 proxyConfiguration = ProxyConfiguration(
@@ -48,20 +48,20 @@ class ConfigurationFactory {
                     System.getProperty("http.proxyPassword")
                 )
                 loggerProxy.info(
-                    "Proxy Setting found in JVM System Property: ${proxyConfiguration.proxy.address()}"
+                    "Proxy setting found in JVM system property: ${proxyConfiguration.proxy.address()}"
                 )
             } catch (ex: IllegalArgumentException) {
                 //ignore, try next proxy settings
-                loggerProxy.info("No proxy setting found in JVM System Property.")
+                loggerProxy.info("No proxy setting found in JVM system property.")
             }
 
-            //check Jenkins Global Settings
+            //check Jenkins global settings
             val jenkinsProxy = readProxyFromJenkins(serverHost)
             if (jenkinsProxy != null) {
-                loggerProxy.info("Proxy Setting found in Jenkins Global Settings: ${jenkinsProxy.proxy.address()}")
+                loggerProxy.info("Proxy setting found in Jenkins global settings: ${jenkinsProxy.proxy.address()}")
                 proxyConfiguration = jenkinsProxy
             } else {
-                loggerProxy.info("No proxy setting found in Jenkins Global Settings.")
+                loggerProxy.info("No proxy setting found in Jenkins global settings.")
             }
 
             if (useProxy != null && useProxy) {
@@ -73,13 +73,13 @@ class ConfigurationFactory {
                         proxyPassword
                     )
                     loggerProxy.info(
-                        "Proxy Setting found in Plugin Setting: ${proxyConfiguration.proxy.address()}"
+                        "Proxy setting found in plugin setting: ${proxyConfiguration.proxy.address()}"
                     )
                 } catch (ex: IllegalArgumentException) {
-                    loggerProxy.info("No proxy setting found in Plugin Setting.")
+                    loggerProxy.info("No proxy setting found in plugin setting.")
                 }
             } else {
-                loggerProxy.info("No proxy setting found in Plugin Setting.")
+                loggerProxy.info("No proxy setting found in plugin setting.")
             }
 
             if (proxyConfiguration == null) {

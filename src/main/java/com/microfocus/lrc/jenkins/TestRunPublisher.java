@@ -162,7 +162,7 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
     ) throws InterruptedException, IOException {
         PrintStream logger = listener.getLogger();
         LoggerProxy loggerProxy = new LoggerProxy(logger, new LoggerOptions(false, ""));
-        loggerProxy.info("TestPublisher started for build " + build.getNumber());
+        loggerProxy.info("TestPublisher started for build #" + build.getNumber());
         loggerProxy.info("Workspace: " + workspace);
 
         FilePath buildResultPath = workspace.child(String.format("lrc_run_result_%s", build.getId()));

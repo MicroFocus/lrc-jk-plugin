@@ -53,7 +53,7 @@ class TrendingReport {
                 return null
             }
             //#endregion
-            LoggerProxy.sysLogger.log(Level.INFO, "trending report generating start for project#" + project.name)
+            LoggerProxy.sysLogger.log(Level.INFO, "Trending report generation starts for project \"${project.name}\"")
 
             var latestBuild: Run<*, *>? = null
 
@@ -67,7 +67,7 @@ class TrendingReport {
             }
 
             if (latestBuild == null) {
-                LoggerProxy.sysLogger.log(Level.INFO, "no valid build found, failed to generate trending report.")
+                LoggerProxy.sysLogger.log(Level.INFO, "No valid build found, failed to generate trending report.")
                 return null
             }
 
@@ -77,12 +77,12 @@ class TrendingReport {
             if (latestBuildAction == null) {
                 LoggerProxy.sysLogger.log(
                     Level.SEVERE,
-                    "no buildAction attached on the latest build, failed to generate trending report."
+                    "No buildAction attached on the latest build, failed to generate trending report."
                 )
                 return null
             }
 
-            LoggerProxy.sysLogger.log(Level.FINE, "latest valid build found: build#" + latestBuild.getNumber())
+            LoggerProxy.sysLogger.log(Level.FINE, "Latest valid build found: build#" + latestBuild.getNumber())
             //#endregion
             val generatorLogs = StringBuilder()
 
@@ -120,13 +120,13 @@ class TrendingReport {
             var latestBenchmark: TrendingDataWrapper.TrendingData? = latestBuildAction.trendingDataWrapper.benchmark
             if (latestBenchmark == null) {
                 LoggerProxy.sysLogger.log(
-                    Level.INFO, "latest benchmark is null, choose the run itself as benchmark."
+                    Level.INFO, "Latest benchmark is null, choose the run itself as benchmark."
                 )
                 latestBenchmark = latestBuildAction.trendingDataWrapper.trendingData!!
             }
             val benchmark: TrendingDataWrapper.TrendingData = latestBenchmark
             LoggerProxy.sysLogger.log(
-                Level.INFO, "benchmark is: run#" + benchmark.runId
+                Level.INFO, "Benchmark is: run #${benchmark.runId}"
             )
             val dateFormat = SimpleDateFormat("yyyy.MM.dd HH:mm:ss")
 
@@ -326,7 +326,7 @@ class TrendingReport {
             forceUpdate: Boolean
         ): String? {
             if (latestBuildAction.trendingReportHTML == null) {
-                LoggerProxy.sysLogger.log(Level.INFO, "cached trending report not found, generating.")
+                LoggerProxy.sysLogger.log(Level.INFO, "Cached trending report not found, generating.")
                 return null
             }
 
@@ -334,13 +334,13 @@ class TrendingReport {
             return if (this.isSameTrendingConfig(lastTrendingConfig, trendingConfig) && !forceUpdate) {
                 LoggerProxy.sysLogger.log(
                     Level.INFO,
-                    "cached trending report found and trending config is not changed"
+                    "Cached trending report found and trending config is not changed"
                 )
                 latestBuildAction.trendingReportHTML
             } else {
                 LoggerProxy.sysLogger.log(
                     Level.INFO,
-                    "cached trending report found but trending config is changed, re-generating."
+                    "Cached trending report found but trending config is changed, re-generating."
                 )
                 null
             }

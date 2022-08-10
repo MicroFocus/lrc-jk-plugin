@@ -12,7 +12,6 @@
 
 package com.microfocus.lrc.core
 
-import com.google.gson.JsonObject
 import com.microfocus.lrc.core.entity.LoadTestRun
 import com.microfocus.lrc.core.entity.TestRunStatus
 import org.w3c.dom.Document
@@ -92,14 +91,14 @@ class XmlReport {
             testsuite.appendChild(properties)
 
             var time = 0.0
-            if (testRun.startTime != -1 && testRun.endTime != -1 && testRun.endTime > testRun.startTime) {
+            if (testRun.startTime != -1L && testRun.endTime != -1L && testRun.endTime > testRun.startTime) {
                 time = (testRun.endTime - testRun.startTime) / 1000.0
             }
             val testcase = xml.createElement("testcase")
             testcase.setAttribute("name", testRun.loadTest.name)
             testcase.setAttribute("status", testRun.detailedStatus)
             testcase.setAttribute("classname", "com.microfocus.lrc.Test")
-            testcase.setAttribute("time", time.toString())
+            testcase.setAttribute("time", String.format("%.2f", time))
             testsuite.appendChild(testcase)
 
             if (isFailure) {
