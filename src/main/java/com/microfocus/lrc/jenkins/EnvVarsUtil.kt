@@ -14,6 +14,7 @@ package com.microfocus.lrc.jenkins
 
 import hudson.EnvVars
 import hudson.Launcher
+import hudson.model.BooleanParameterValue
 import hudson.model.ParametersAction
 import hudson.model.Run
 import hudson.model.StringParameterValue
@@ -26,15 +27,21 @@ class EnvVarsUtil {
             // getAction(Class<T> type) is not deprecated
             @SuppressWarnings("kotlin:S1874")
             val action = build.getAction(ParametersAction::class.java)
-            if (action != null) {
-                val paramValue = action.getParameter(key) as StringParameterValue?
-                return if (paramValue?.getValue() != null) {
-                    paramValue.getValue().toString()
-                } else ""
-            }
 
-            //or try the system env var
             return try {
+                if (action != null) {
+                    val param = action.getParameter(/* name = */ key)
+                    var paramValue = ""
+                    if (param is StringParameterValue) {
+                        paramValue = param.getValue().toString().lowercase()
+                    } else if (param is BooleanParameterValue) {
+                        paramValue = param.getValue().toString()
+                    }
+
+                    return paramValue
+                 }
+
+                //or try the system env var
                 EnvVars.getRemote(launcher.channel)[key]
             } catch (e: Exception) {
                 LoggerProxy.sysLogger.log(Level.WARNING, "Failed to get env, " + e.message)

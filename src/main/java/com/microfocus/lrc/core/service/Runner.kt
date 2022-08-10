@@ -58,7 +58,8 @@ class Runner(
     @Transient
     private val reportDownloader = ReportDownloader(
         this.apiClient,
-        LoggerProxy(this.logger, LoggerOptions(this.testRunOptions.isDebug, "ReportDownloader"))
+        LoggerProxy(this.logger, LoggerOptions(this.testRunOptions.isDebug, "ReportDownloader")),
+        this.testRunOptions
     )
 
     var testRun: LoadTestRun? = null

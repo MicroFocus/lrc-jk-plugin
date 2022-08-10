@@ -26,6 +26,7 @@ import java.io.IOException
 class ReportDownloader(
     private val apiClient: ApiClient,
     private val loggerProxy: LoggerProxy,
+    private val testRunOptions: TestRunOptions
 ) {
     companion object {
         @JvmStatic
@@ -43,18 +44,22 @@ class ReportDownloader(
     }
 
     fun download(testRun: LoadTestRun, reportTypes: Array<String>) {
-        // validate report types
-        val validReportTypes = reportTypes.filter {
-            it in arrayOf("pdf", "csv")
+        var validReportTypes = arrayOf("csv", "pdf")
+        if (this.testRunOptions.skipPdfReport) {
+            validReportTypes = arrayOf("csv")
         }
-        if (validReportTypes.isEmpty()) {
+        // validate report types
+        val filteredReportTypes = reportTypes.filter {
+            it in validReportTypes
+        }
+        if (filteredReportTypes.isEmpty()) {
             this.loggerProxy.info("Invalid report types: ${reportTypes.joinToString(", ")}")
             this.loggerProxy.info("Skip downloading reports")
             return
         }
 
         // request reports generating
-        validReportTypes.map { reportType ->
+        filteredReportTypes.map { reportType ->
             val reportId = this.requestReportId(testRun.id, reportType)
             // wait for the report to be ready
             var retryWaitingTimes = 0
