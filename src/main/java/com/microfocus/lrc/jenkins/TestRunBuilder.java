@@ -602,7 +602,8 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         Map<String, String> map = new HashMap<>();
         for (OptionInEnvVars key : OptionInEnvVars.values()) {
             String value = EnvVarsUtil.getEnvVar(run, launcher, key.name());
-            if (StringUtils.isNotBlank(value) && !value.equals("0") && !value.equals("false") && !value.equals("no")) {
+            if (StringUtils.isNotBlank(value) && !value.equals("0")
+                    && !value.equalsIgnoreCase("false") && !value.equalsIgnoreCase("no")) {
                 this.loggerProxy.info("Read " + key.name() + " from parameters / env variables: " + value);
                 map.put(key.name(), "true");
             }

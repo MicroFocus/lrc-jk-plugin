@@ -34,7 +34,7 @@ class EnvVarsUtil {
                     val param = action.getParameter(/* name = */ key)
                     var paramValue = ""
                     if (param is StringParameterValue) {
-                        paramValue = param.getValue().toString().lowercase()
+                        paramValue = param.getValue().toString()
                     } else if (param is BooleanParameterValue) {
                         paramValue = param.getValue().toString()
                     }
