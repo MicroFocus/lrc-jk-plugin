@@ -85,7 +85,7 @@ class Runner(
         if (testRun.hasReport) {
             this.reportDownloader.download(testRun, arrayOf("csv", "pdf"))
         } else {
-            this.loggerProxy.info("Test run #${testRun.id} has no report.")
+            this.loggerProxy.info("Test run #${testRun.id} doesn\'t have run results.")
             this.reportDownloader.genXmlFile(testRun)
         }
 
