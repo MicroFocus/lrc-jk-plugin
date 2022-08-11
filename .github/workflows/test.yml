@@ -4,6 +4,7 @@
 name: Test
 
 on:
+  workflow_dispatch:
   schedule:
     # run at 08:00 on every day
     - cron: '0 8 * * *'
