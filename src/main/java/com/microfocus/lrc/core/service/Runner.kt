@@ -13,6 +13,7 @@
 package com.microfocus.lrc.core.service
 
 import com.microfocus.lrc.core.ApiClientFactory
+import com.microfocus.lrc.core.Constants
 import com.microfocus.lrc.core.entity.*
 import com.microfocus.lrc.jenkins.LoggerOptions
 import com.microfocus.lrc.jenkins.LoggerProxy
@@ -93,15 +94,14 @@ class Runner(
         // refresh test run status
         // print status
         // if test run not end, repeat the loop
-        val interval = 10000L
-        val maxRetry = 5
-        val maxLoginRetry = 3
+        val maxRetry = Constants.TEST_RUN_END_MAXRETRY
+        val maxLoginRetry = Constants.TEST_RUN_END_LOGIN_MAXRETRY
 
         var retryTimes = 0
         var loginRetryTimes = 0
 
         while (!testRun.testRunCompletelyEnded()) {
-            Thread.sleep(interval)
+            Thread.sleep(Constants.TEST_RUN_END_POLLING_INTERVAL)
             try {
                 this.loadTestRunService.fetch(testRun)
                 retryTimes = 0
@@ -137,11 +137,9 @@ class Runner(
     }
 
     private fun waitingForReportReady(testRun: LoadTestRun) {
-        val interval = 5000L
-        val maxRetry = 10
         var retryTimes = 0
-        while (!testRun.hasReport && retryTimes < maxRetry) {
-            Thread.sleep(interval)
+        while (!testRun.hasReport && retryTimes < Constants.REPORT_READY_POLLING_MAXRETRY) {
+            Thread.sleep(Constants.REPORT_READY_POLLING_INTERVAL)
             this.loadTestRunService.fetchStatus(testRun)
             retryTimes += 1
         }

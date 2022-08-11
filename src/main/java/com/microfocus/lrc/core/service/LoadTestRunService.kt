@@ -15,6 +15,7 @@ package com.microfocus.lrc.core.service
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.microfocus.lrc.core.ApiClient
+import com.microfocus.lrc.core.Constants
 import com.microfocus.lrc.core.entity.*
 import com.microfocus.lrc.jenkins.LoggerProxy
 import java.io.IOException
@@ -107,10 +108,9 @@ class LoadTestRunService(
         this.abort(testRun)
         this.loggerProxy.info("Waiting for test run [${testRun.id}] to stop...")
 
-        val maxRetry = 5
         var retryTimes = 0
-        while (retryTimes < maxRetry && !testRun.statusEnum.isEnded) {
-            Thread.sleep(10000)
+        while (retryTimes < Constants.STOP_RUN_POLLING_MAXRETRY && !testRun.statusEnum.isEnded) {
+            Thread.sleep(Constants.STOP_RUN_POLLING_INTERVAL)
             this.fetchStatus(testRun)
             retryTimes += 1
         }

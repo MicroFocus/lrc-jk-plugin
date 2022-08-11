@@ -71,7 +71,7 @@ class ReportDownloader(
             while (retryWaitingTimes < maxRetry && reportContent == null) {
                 reportContent = this.isReportReady(reportId)
                 if (reportContent == null) {
-                    Thread.sleep(5000)
+                    Thread.sleep(Constants.REPORT_DOWNLOAD_POLLING_INTERVAL)
                     retryWaitingTimes += 1
                 }
             }

@@ -25,6 +25,18 @@ public final class Constants {
     public static final String SEPARATOR_LINE = "=====================================";
     public static final String INITIATOR = "jenkins-plugin-new";
 
+    public static final long REPORT_READY_POLLING_INTERVAL = 6000;
+    public static final long REPORT_READY_POLLING_MAXRETRY = 10;
+
+    public static final long STOP_RUN_POLLING_INTERVAL = 10000;
+    public static final long STOP_RUN_POLLING_MAXRETRY = 6;
+
+    public static final long REPORT_DOWNLOAD_POLLING_INTERVAL = 5000;
+
+    public static final long TEST_RUN_END_POLLING_INTERVAL = 10000;
+    public static final long TEST_RUN_END_LOGIN_MAXRETRY = 3;
+    public static final long TEST_RUN_END_MAXRETRY = 5;
+
     private Constants() {
         throw new IllegalStateException("Utility class");
     }
