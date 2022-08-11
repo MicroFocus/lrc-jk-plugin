@@ -729,7 +729,6 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
             try {
                 return runner.run();
             } catch (IOException e) {
-                loggerProxy.error("Failed to run test, " + e.getMessage());
                 if (Thread.interrupted()) {
                     throw new InterruptedException("Jenkins job is interrupted.");
                 }
