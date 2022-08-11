@@ -717,11 +717,6 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         @SuppressWarnings("java:S2093")
         public LoadTestRun call() throws Exception {
             PrintStream logger = this.listener.getLogger();
-            LoggerProxy loggerProxy = new LoggerProxy(
-                    logger,
-                    new LoggerOptions(this.testRunOptions.isDebug(), "")
-            );
-
             Runner runner = new Runner(
                     this.serverConfiguration,
                     logger,

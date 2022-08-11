@@ -154,7 +154,7 @@ class ReportDownloader(
         return "lrc_report_${this.apiClient.getServerConfiguration().tenantId}-${testRun.id}.${reportType}"
     }
 
-    private fun genXmlFile(testRun: LoadTestRun) {
+    fun genXmlFile(testRun: LoadTestRun) {
         val fileName = genFileName("xml", testRun)
         val content = XmlReport.write(
             testRun,
