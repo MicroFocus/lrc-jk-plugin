@@ -32,6 +32,7 @@ import org.jvnet.hudson.test.TestBuilder;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.concurrent.Future;
 
 public class TestRunBuilderTest {
     public static MockWebServer mockserver = new MockWebServer();
@@ -156,6 +157,7 @@ public class TestRunBuilderTest {
                 String runId = EnvVarsUtil.getEnvVar(build, launcher, "LRC_RUN_ID");
                 Assert.assertEquals("-1", runId);
                 listener.getLogger().println("got LRC_RUN_ID: " + runId);
+                Assert.assertEquals("BAR", EnvVarsUtil.getEnvVar(build, launcher, "FOO"));
                 return true;
             }
         });
@@ -170,8 +172,15 @@ public class TestRunBuilderTest {
         descriptor.save();
 
         this.mockResponseNormal();
+        ParametersAction a = new ParametersAction(
+                new StringParameterValue("LRC_RUN_ID", ""),
+                new StringParameterValue("FOO", "BAR")
+        );
+        Future<FreeStyleBuild> f = project.scheduleBuild2(0, a);
+        assert f != null;
+        FreeStyleBuild b = f.get();
 
-        FreeStyleBuild b = jenkins.buildAndAssertStatus(Result.SUCCESS, project);
+        jenkins.assertBuildStatusSuccess(b);
         BufferedReader rd = new BufferedReader(b.getLogReader());
         while (rd.ready()) {
             // print jenkins logs for debugging

@@ -14,6 +14,7 @@ package com.microfocus.lrc.jenkins
 
 import hudson.EnvVars
 import hudson.Launcher
+import hudson.model.ParameterValue
 import hudson.model.BooleanParameterValue
 import hudson.model.ParametersAction
 import hudson.model.Run
@@ -51,9 +52,14 @@ class EnvVarsUtil {
 
         @JvmStatic
         fun putEnvVar(build: Run<*, *>, key: String?, value: String?) {
+            val paramList: MutableList<ParameterValue> = mutableListOf(StringParameterValue(key, value))
+            val pAction = ParametersAction(paramList, arrayListOf("LRC_RUN_ID"))
             val existed = build.getAction(ParametersAction::class.java)
-            val newAction = ParametersAction(StringParameterValue(key, value))
-            build.replaceAction(newAction.merge(existed))
+            if (existed != null) {
+                build.addOrReplaceAction(existed.merge(pAction))
+            } else {
+                build.addOrReplaceAction(pAction)
+            }
         }
     }
 }
