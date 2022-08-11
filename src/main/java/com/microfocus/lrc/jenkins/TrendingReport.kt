@@ -428,6 +428,9 @@ class TrendingReport {
                 "tps",
                 (trendingData.totalTxPassed + trendingData.totalTxFailed).toDouble() / trendingData.duration
             )
+            overview.addProperty("totalTxPassed", trendingData.totalTxPassed)
+            overview.addProperty("totalTxFailed", trendingData.totalTxFailed)
+
             overview.addProperty("status", trendingData.status)
             val startTime = jsonObject.get("buildDate").asString
             overview.addProperty("date", startTime)
