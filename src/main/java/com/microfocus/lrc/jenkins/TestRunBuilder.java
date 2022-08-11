@@ -581,14 +581,15 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         // output vars to jenkins env
         EnvVarsUtil.putEnvVar(run, "LRC_RUN_ID", String.valueOf(testRun.getId()));
 
+        if (testRun.getHasReport()) {
+            // remove reports data to write a smaller json
+            testRun.getReports().clear();
+            JsonObject buildResult = new JsonObject();
+            buildResult.addProperty("testOptions", new Gson().toJson(opt));
+            buildResult.addProperty("testRun", new Gson().toJson(testRun));
 
-        // remove reports data to write a smaller json
-        testRun.getReports().clear();
-        JsonObject buildResult = new JsonObject();
-        buildResult.addProperty("testOptions", new Gson().toJson(opt));
-        buildResult.addProperty("testRun", new Gson().toJson(testRun));
-
-        workspace.child(String.format("lrc_run_result_%s", run.getId())).write(buildResult.toString(), "UTF-8");
+            workspace.child(String.format("lrc_run_result_%s", run.getId())).write(buildResult.toString(), "UTF-8");
+        }
 
         if (testRun.getStatusEnum().isSuccess()) {
             run.setResult(Result.SUCCESS);

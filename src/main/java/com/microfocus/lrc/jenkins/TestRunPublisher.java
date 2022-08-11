@@ -189,7 +189,6 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
             return;
         }
 
-
         Jenkins instance = Jenkins.getInstanceOrNull();
         if (instance == null) {
             loggerProxy.error("Failed to get Jenkins instance");

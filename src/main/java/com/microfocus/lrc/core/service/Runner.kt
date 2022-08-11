@@ -81,9 +81,11 @@ class Runner(
         this.waitingForTestRunToEnd(testRun)
         this.loggerProxy.info("Test run #${runId} ended with ${testRun.statusEnum.statusName} status.")
 
-        this.waitingForReportReady(testRun)
+        this.loadTestRunService.fetchStatus(testRun)
         if (testRun.hasReport) {
             this.reportDownloader.download(testRun, arrayOf("csv", "pdf"))
+        } else {
+            this.loggerProxy.info("Test run #${testRun.id} has no report.")
         }
 
         return testRun
@@ -136,19 +138,6 @@ class Runner(
         }
     }
 
-    private fun waitingForReportReady(testRun: LoadTestRun) {
-        var retryTimes = 0
-        while (!testRun.hasReport && retryTimes < Constants.REPORT_READY_POLLING_MAXRETRY) {
-            Thread.sleep(Constants.REPORT_READY_POLLING_INTERVAL)
-            this.loadTestRunService.fetchStatus(testRun)
-            retryTimes += 1
-        }
-
-        if (!testRun.hasReport) {
-            this.loggerProxy.info("Test run #${testRun.id} has no report.")
-        }
-    }
-
     private fun printTestRunStatus(testRun: LoadTestRun) {
         this.loggerProxy.info("${testRun.statusEnum.statusName} - ${testRun.status}")
     }
@@ -168,8 +157,8 @@ class Runner(
         this.loggerProxy.info("Aborting test run #${testRun.id} ...")
         this.loadTestRunService.abort(testRun)
         this.testRun = testRun
-        return TestRunStatus.ABORTED.statusName
 
+        return TestRunStatus.ABORTED.statusName
     }
 
     fun fetchTrending(testRun: LoadTestRun, benchmark: Int?): TrendingDataWrapper {

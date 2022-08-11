@@ -41,8 +41,13 @@ class LoadTestRun(
     fun update(json: JsonObject) {
         this.status = json.get("status")?.asString ?: "NA"
         this.detailedStatus = json.get("uiStatus")?.asString ?: (json.get("detailedStatus")?.asString ?: "NA")
-        this.isTerminated = json.get("isTerminated")?.asBoolean ?: false
-        this.hasReport = json.get("hasReport")?.asBoolean ?: false
+
+        if (json.has("isTerminated")) {
+            this.isTerminated = json.get("isTerminated").asBoolean
+        }
+        if (json.has("hasReport")) {
+            this.hasReport = json.get("hasReport").asBoolean
+        }
         if (json.has("startTime")) {
             this.startTime = json.get("startTime").asString.toLong()
         }
