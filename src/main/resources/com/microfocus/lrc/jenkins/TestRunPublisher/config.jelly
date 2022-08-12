@@ -28,24 +28,24 @@
     </f:section>
     <f:section title="Thresholds: TRT [Avg]">
         <f:entry title="Improvement" field="trtAvgThresholdImprovement" description="">
-            <f:textbox/>
+            <f:textbox value="5" />
         </f:entry>
         <f:entry title="Minor Regression" field="trtAvgThresholdMinorRegression" description="">
-            <f:textbox/>
+            <f:textbox value="5" />
         </f:entry>
         <f:entry title="Major Regression" field="trtAvgThresholdMajorRegression" description="">
-            <f:textbox/>
+            <f:textbox value="10" />
         </f:entry>
     </f:section>
     <f:section title="Thresholds: TRT [Percentile]">
         <f:entry title="Improvement" field="trtPercentileThresholdImprovement" description="">
-            <f:textbox/>
+            <f:textbox value="5" />
         </f:entry>
         <f:entry title="Minor Regression" field="trtPercentileThresholdMinorRegression" description="">
-            <f:textbox/>
+            <f:textbox value="5" />
         </f:entry>
         <f:entry title="Major Regression" field="trtPercentileThresholdMajorRegression" description="">
-            <f:textbox/>
+            <f:textbox value="10" />
         </f:entry>
     </f:section>
 </j:jelly>
