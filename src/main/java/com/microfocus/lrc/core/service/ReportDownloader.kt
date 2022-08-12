@@ -181,8 +181,7 @@ class ReportDownloader(
         val body = res.body?.string()
         this.loggerProxy.debug("Fetched test run results: $body")
         try {
-            val results = Gson().fromJson(body, TestRunResultsResponse::class.java)
-            return results
+            return Gson().fromJson(body, TestRunResultsResponse::class.java)
         } catch (e: JsonSyntaxException) {
             this.loggerProxy.info("Failed to parse test run results: $body")
             throw e
@@ -206,8 +205,7 @@ class ReportDownloader(
         val body = res.body?.string()
         this.loggerProxy.debug("Fetched transactions results: $body")
         try {
-            val results = Gson().fromJson(body, Array<TestRunTransactionsResponse>::class.java)
-            return results
+            return Gson().fromJson(body, Array<TestRunTransactionsResponse>::class.java)
         } catch (e: JsonSyntaxException) {
             this.loggerProxy.info("Failed to parse test run transactions: $body")
             throw e
@@ -223,14 +221,12 @@ class ReportDownloader(
     fun fetchTrending(testRun: LoadTestRun, benchmark: TrendingDataWrapper?): TrendingDataWrapper {
         val results = this.fetchTestRunResults(testRun.id)
         val txArr = this.fetchTestRunTx(testRun.id)
-        val trendingDataWrapper = TrendingDataWrapper(
+        return TrendingDataWrapper(
             testRun,
             results,
             txArr,
             this.apiClient.getServerConfiguration().tenantId,
             benchmark
         )
-
-        return trendingDataWrapper
     }
 }

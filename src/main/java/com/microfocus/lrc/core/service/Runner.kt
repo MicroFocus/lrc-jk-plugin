@@ -68,7 +68,6 @@ class Runner(
 
     @kotlin.jvm.Throws(IOException::class, InterruptedException::class)
     fun run(): LoadTestRun {
-        this.loggerProxy.info("Authentication passed.")
         this.loggerProxy.info("Fetching load test #${this.testRunOptions.testId} ...")
 
         val lt = this.loadTestService.fetch(this.testRunOptions.testId)
@@ -112,7 +111,7 @@ class Runner(
             } catch (e: IOException) {
                 if (e.message == "401") {
                     if (loginRetryTimes < maxLoginRetry) {
-                        this.loggerProxy.error("Authentication failed, retrying ......")
+                        this.loggerProxy.error("Authentication failed, retrying ...")
                         loginRetryTimes += 1
 
                         try {
