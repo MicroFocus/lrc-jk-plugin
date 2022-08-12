@@ -10,7 +10,7 @@ The plugin allows you to run test in [LoadRunner Cloud](https://admhelp.microfoc
 # Getting started
 
 The plugin provides a build step **LoadRunner Cloud** to run test, and a post-build action **Generate LoadRunner Cloud Trending** to generate trending reports.
-Both of them are also exposed in pipeline jobs as `srlRunTest` and `srlGetTrendingReport`.
+Both of them are also exposed in pipeline job as `srlRunTest` and `srlGetTrendingReport`.
 
 ## Usage
 
@@ -60,6 +60,9 @@ The plugin generates the following files (if they are available) in workspace fo
 
 > **Notes:**  
 > - If build / job is aborted or cancelled, the plugin will not try to collect results.  
-> - If you don't need PDF report, define a boolean or string parameter named as "LRC_SKIP_PDF_REPORT" in job.
+> - If you don't need PDF report, define a boolean or string parameter (LRC_SKIP_PDF_REPORT: true) in job.
 
-If trending report is configured, a menu named as "LoadRunner Cloud Trending" will be displayed in the job page. You can view the trending report by clicking the menu.
+### Trending
+If post-build action **Generate LoadRunner Cloud Trending** is configured, a menu named as "LoadRunner Cloud Trending" will be displayed. You can view the trending report by clicking the menu.
+> **Notes:**
+> - If you start multiple LoadRunner Cloud test runs in one Jenkins build, only last test run will be processed by **Generate LoadRunner Cloud Trending**.
