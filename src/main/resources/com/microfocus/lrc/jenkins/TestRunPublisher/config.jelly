@@ -20,10 +20,10 @@
   -->
     <f:section title="Common">
         <f:entry title="Number of Runs" field="runsCount" description="The number of last successful runs initiated by Jenkins which will be included in the Trending Report, range from 5 to 10.">
-            <f:textbox/>
+            <f:textbox value="5" />
         </f:entry>
         <f:entry title="Benchmark" field="benchmark" description="Leave it blank or 0 to compare to previous run, or fill in a run id as a benchmark.">
-            <f:textbox/>
+            <f:textbox value="0" />
         </f:entry>
     </f:section>
     <f:section title="Thresholds: TRT [Avg]">

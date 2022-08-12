@@ -106,6 +106,8 @@ public final class TrendingDataWrapper implements Serializable {
         private double nintieth;
         private double breakers;
         private double thresholds;
+        private int passed;
+        private int failed;
 
         //#region accessors
         public String getName() {
@@ -171,6 +173,22 @@ public final class TrendingDataWrapper implements Serializable {
         public void setThresholds(final double thresholds) {
             this.thresholds = thresholds;
         }
+
+        public double getPassed() {
+            return passed;
+        }
+
+        public void setPassed(final int passed) {
+            this.passed = passed;
+        }
+
+        public double getFailed() {
+            return failed;
+        }
+
+        public void setFailed(final int failed) {
+            this.failed = failed;
+        }
         //#endregion
 
         public TransactionData(final JsonObject json) {
@@ -183,6 +201,8 @@ public final class TrendingDataWrapper implements Serializable {
             this.nintieth = obj.optDouble("nintieth", 0);
             this.breakers = obj.optDouble("breakers", 0);
             this.thresholds = obj.optDouble("thresholds", 0);
+            this.passed = obj.optInt("passed", 0);
+            this.failed = obj.optInt("failed", 0);
         }
 
         public TransactionData(final TestRunTransactionsResponse tx) {
@@ -194,6 +214,8 @@ public final class TrendingDataWrapper implements Serializable {
             this.nintieth = tx.getPercentileTRT();
             this.breakers = tx.getBreakers();
             this.thresholds = tx.getSlaThreshold();
+            this.passed = tx.getPassed();
+            this.failed = tx.getFailed();
         }
     }
 

@@ -55,9 +55,9 @@
                 <th nowrap>Run#</th>
                 <th nowrap>Build#</th>
                 <th nowrap>Hits per sec</th>
-                <th nowrap>Avg Throughput (bytes/s)</th>
+                <th nowrap>Avg Throughput</th>
                 <th nowrap>Errors per sec</th>
-                <th nowrap>TRX per sec</th>
+                <th nowrap>TPS</th>
                 <th nowrap>Passed TRX</th>
                 <th nowrap>Failed TRX</th>
                 {% if(extraContent) %}
@@ -237,9 +237,11 @@
             '<% if (ninetieth === 0 && ninetiethTrend !== 0) { print("< 0.001") } else { print(ninetieth) } %> <% if (ninetiethTrend !== 0) {print("(" + ninetiethTrend + "%)")} %>' +
             '<% if (ninetiethTrend > 0) { print("&#8593;") } else if (ninetiethTrend < 0) { print("&#8595;") } %>' +
             '<span><%= ninetiethTrendCalc %></span>' +
-            '</td>');
+            '</td>' +
+            '<td><%= passed %></td>' +
+            '<td><%= failed %></td>');
         var trtHeadTmlpStr = '<th>Transaction & Script</th>';
-        var trtRunHeadTmpl =_.template('<th nowrap colspan="2" id="<%= runId %>">Run#<%= runId %> (Build#<%= buildNo %>)</th>');
+        var trtRunHeadTmpl =_.template('<th nowrap colspan="4" id="<%= runId %>">Run#<%= runId %> (Build#<%= buildNo %>)</th>');
         var trtSecondHeadTmplStr = '<th></th>';
 
         var runsFromTrt = [];
@@ -259,7 +261,7 @@
 
         _.each(runsFromTrt, function (transactionItem) {
             trtHeadTmlpStr += trtRunHeadTmpl(transactionItem);
-            trtSecondHeadTmplStr += '<td> Avg </td><td>'+ transactionItem.percentile +'th% </td>';
+            trtSecondHeadTmplStr += '<td> Avg </td><td>'+ transactionItem.percentile +'th% </td><td> Passed </td><td> Failed </td>';
         });
 
         var trtHeadRow = document.createElement('tr');
@@ -290,7 +292,7 @@
                if (correspondRun) {
                    row += trtRowEachRunTmpl(correspondRun);
                } else {
-                   row += '<td>N/A</td><td>N/A</td>'
+                   row += '<td>N/A</td><td>N/A</td><td>N/A</td><td>N/A</td>';
                }
            });
            var rowDOM = document.createElement('tr');

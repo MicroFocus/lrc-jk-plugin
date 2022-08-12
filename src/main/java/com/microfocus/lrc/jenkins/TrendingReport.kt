@@ -542,6 +542,10 @@ class TrendingReport {
                 ninetiethTrend < trendingConfig.trtPctlTholdMajorRegr && ninetiethTrend > trendingConfig.trtPctlTholdMinorRegr
             )
             trt.addProperty("is90thMajorRegr", ninetiethTrend > trendingConfig.trtPctlTholdMajorRegr)
+
+            trt.addProperty("passed", transaction.passed)
+            trt.addProperty("failed", transaction.failed)
+
             return trt
         }
 
