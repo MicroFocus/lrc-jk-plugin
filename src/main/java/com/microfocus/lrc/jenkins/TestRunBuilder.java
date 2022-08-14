@@ -30,7 +30,7 @@ import hudson.tasks.Builder;
 import hudson.util.FormValidation;
 import hudson.util.Secret;
 import hudson.util.VersionNumber;
-import io.jenkins.cli.shaded.org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import jenkins.model.Jenkins;
 import jenkins.tasks.SimpleBuildStep;
 import net.sf.json.JSONObject;
@@ -98,33 +98,61 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
             return "Run test in LoadRunner Cloud";
         }
 
+        private String getStringConfig(final JSONObject data, final String key) {
+            try {
+                String val = data.getString(key);
+                if (StringUtils.isNotEmpty(val)) {
+                    return val.trim();
+                }
+
+                return "";
+            } catch (Exception e) {
+                return "";
+            }
+        }
+
+        private Boolean getBooleanConfig(final JSONObject data, final String key) {
+            try {
+                return Boolean.valueOf(this.getStringConfig(data, key));
+            } catch (Exception e) {
+                return Boolean.FALSE;
+            }
+        }
+
         @Override
         public boolean configure(final StaplerRequest req, final JSONObject formData) throws FormException {
             // set all properties from formData
             // validate all properties, throw FormException if invalid
-            this.username = formData.getString(Constants.USERNAME).trim();
-            this.password = formData.getString(Constants.PASSWORD).trim();
-            this.url = org.apache.commons.lang.StringUtils.stripEnd(formData.getString(Constants.URL).trim(), "/");
-            this.useProxy = Boolean.valueOf(formData.getString("useProxy").trim());
-            this.proxyHost = formData.getString("proxyHost").trim();
+            this.username = this.getStringConfig(formData, Constants.USERNAME);
+            this.password = this.getStringConfig(formData, Constants.PASSWORD);
 
-            this.proxyPort = formData.getString("proxyPort").trim();
+            this.url = StringUtils.stripEnd(this.getStringConfig(formData, Constants.URL), "/");
+
+            this.useProxy = this.getBooleanConfig(formData, "useProxy");
+            this.proxyHost = this.getStringConfig(formData, "proxyHost");
+            this.proxyPort =  this.getStringConfig(formData, "proxyPort");
             if (this.proxyPort.length() == 0) {
                 this.proxyPort = "80";
             }
 
-            this.proxyUsername = formData.getString("proxyUsername");
-            if (this.proxyUsername != null && this.proxyUsername.trim().length() != 0) {
-                this.proxyUsername = this.proxyUsername.trim();
-            } else {
+            this.proxyUsername = this.getStringConfig(formData, "proxyUsername");
+            if (StringUtils.isBlank(this.proxyUsername)) {
                 this.proxyUsername = null;
             }
 
-            this.proxyPassword = formData.getString("proxyPassword").trim();
-            this.useOAuth = Boolean.valueOf(formData.getString(Constants.USE_OAUTH).trim());
-            this.clientId = formData.getString(Constants.CLIENT_ID).trim();
-            this.clientSecret = formData.getString(Constants.CLIENT_SECRET).trim();
-            this.tenantId = formData.getString(Constants.TENANTID).trim();
+            this.proxyPassword = this.getStringConfig(formData, "proxyPassword");
+            if (StringUtils.isBlank(this.proxyPassword)) {
+                this.proxyPassword = null;
+            }
+
+            this.useOAuth = this.getBooleanConfig(formData, Constants.USE_OAUTH);
+            this.clientId = this.getStringConfig(formData, Constants.CLIENT_ID);
+            this.clientSecret = this.getStringConfig(formData, Constants.CLIENT_SECRET);
+            if (StringUtils.isBlank(this.clientSecret)) {
+                this.clientSecret = null;
+            }
+
+            this.tenantId = this.getStringConfig(formData, Constants.TENANTID);
 
             save();
             return super.configure(req, formData);
