@@ -16,8 +16,8 @@ Both of them are also exposed in pipeline job as `srlRunTest` and `srlGetTrendin
 
 ### System configuration
 Go to **Manage Jenkins** &rarr; **System Configuration** &rarr; **Configure System** to specify below settings: 
- - **Client Id** and **Client Secret** (recommended) or **Username** and **Password**  
-   If you use [API Access keys](https://admhelp.microfocus.com/lrc/en/Latest/Content/Storm/Admin-APIAccess.htm), select the **Use OAuth token** checkbox.
+ - **Username** and **Password**  
+ - If you use [API Access keys](https://admhelp.microfocus.com/lrc/en/Latest/Content/Storm/Admin-APIAccess.htm), select the **Use OAuth token** checkbox, then input **Client Id** and **Client Secret**.
  - **Tenant Id**, for example: 652261300
  - **LoadRunner Cloud URL**, default: "https://loadrunner-cloud.saas.microfocus.com"
  - **Proxy** settings (optional)
@@ -60,7 +60,7 @@ The plugin generates the following files (if they are available) in workspace fo
 
 > **Notes:**  
 > - If build / job is aborted or cancelled, the plugin will not try to collect results.  
-> - If you don't need PDF report, define a boolean or string parameter (LRC_SKIP_PDF_REPORT: true) in job.
+> - If you don't need PDF report, define a boolean or string parameter (LRC_SKIP_PDF_REPORT: true) in job to skip it.
 
 ### Trending
 If post-build action **Generate LoadRunner Cloud Trending** is configured, a menu named as "LoadRunner Cloud Trending" will be displayed. You can view the trending report by clicking the menu.
