@@ -79,7 +79,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
     }
     //#endregion
 
-    @Symbol("srlRunTest")
+    @Symbol("lrcRunTest")
     @Extension
     public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
 

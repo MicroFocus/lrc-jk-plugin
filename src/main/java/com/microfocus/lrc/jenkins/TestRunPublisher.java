@@ -447,7 +447,7 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
 
     //#endregion
 
-    @Symbol("srlGetTrendingReport")
+    @Symbol("lrcGenTrendingReport")
     @Extension
     public static final class DescriptorImpl extends BuildStepDescriptor<Publisher> {
         @Override

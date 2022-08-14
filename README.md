@@ -10,7 +10,7 @@ The plugin allows you to run test in [LoadRunner Cloud](https://admhelp.microfoc
 # Getting started
 
 The plugin provides a build step **LoadRunner Cloud** to run test, and a post-build action **Generate LoadRunner Cloud Trending** to generate trending reports.
-Both of them are also exposed in pipeline job as `srlRunTest` and `srlGetTrendingReport`.
+Both of them are also exposed in pipeline job as `lrcRunTest` and `lrcGenTrendingReport`.
 
 ## Usage
 
@@ -39,8 +39,8 @@ pipeline {
     stages {
         stage('lrc') {    
             steps {
-                srlRunTest projectId:'45', testId: "2398", sendEmail: true
-                srlGetTrendingReport benchmark: 0, runsCount: 5, trtAvgThresholdImprovement: 5,trtAvgThresholdMajorRegression: 10, trtAvgThresholdMinorRegression: 5, trtPercentileThresholdImprovement: 5, trtPercentileThresholdMajorRegression: 10, trtPercentileThresholdMinorRegression: 5
+                lrcRunTest projectId:'45', testId: "2398", sendEmail: true
+                lrcGenTrendingReport benchmark: 0, runsCount: 5, trtAvgThresholdImprovement: 5,trtAvgThresholdMajorRegression: 10, trtAvgThresholdMinorRegression: 5, trtPercentileThresholdImprovement: 5, trtPercentileThresholdMajorRegression: 10, trtPercentileThresholdMinorRegression: 5
             }
         }
     }
