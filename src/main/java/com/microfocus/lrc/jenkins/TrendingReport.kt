@@ -281,7 +281,13 @@ class TrendingReport {
             data.get("data").asJsonObject.add("trt", trts)
             data.addProperty("testId", latestBuildAction.trendingDataWrapper.trendingData.testId)
             data.addProperty("testName", latestBuildAction.trendingDataWrapper.trendingData.testName)
-            data.addProperty(Constants.BENCHMARK, latestBuildAction.trendingDataWrapper.benchmarkId)
+
+            if (latestBuildAction.trendingDataWrapper.benchmarkId == null) {
+                data.addProperty(Constants.BENCHMARK, 0)
+            } else {
+                data.addProperty(Constants.BENCHMARK, latestBuildAction.trendingDataWrapper.benchmarkId)
+            }
+
             data.addProperty("generatorLogs", generatorLogs.toString())
             data.addProperty("extraContent", extraContent)
             val slotContent: Map<String, String>
