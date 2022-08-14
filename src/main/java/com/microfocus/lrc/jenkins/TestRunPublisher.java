@@ -14,7 +14,6 @@ package com.microfocus.lrc.jenkins;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.microfocus.lrc.core.Constants;
 import com.microfocus.lrc.core.entity.*;
 import com.microfocus.lrc.core.service.Runner;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -299,8 +298,7 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
                 pwd,
                 descriptor.getTenantId(),
                 testRun.getLoadTest().getProjectId(),
-                opt.getSendEmail(),
-                Constants.INITIATOR
+                opt.getSendEmail()
         );
 
         return serverConfiguration;

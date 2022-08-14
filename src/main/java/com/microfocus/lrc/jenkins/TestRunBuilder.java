@@ -441,8 +441,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
                         Secret.fromString(clientSecret).getPlainText(),
                         tenantId,
                         0,
-                        false,
-                        ""
+                        false
                 );
             } else {
                 config = new ServerConfiguration(
@@ -451,8 +450,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
                         Secret.fromString(password).getPlainText(),
                         tenantId,
                         0,
-                        false,
-                        ""
+                        false
                 );
             }
             ProxyConfiguration proxyConfiguration = (
@@ -675,7 +673,6 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
     private void printJobParameters(final ServerConfiguration config) {
         JsonObject display = new Gson().toJsonTree(config).getAsJsonObject();
 
-        display.remove("initiator");
         display.remove("password");
         display.remove("proxyConfiguration");
 
@@ -700,8 +697,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
                 pwd,
                 descriptor.getTenantId(),
                 Integer.parseInt(this.getProjectIdAtRunTime(run, launcher)),
-                this.sendEmail,
-                Constants.INITIATOR
+                this.sendEmail
         );
         printJobParameters(config);
         return config;

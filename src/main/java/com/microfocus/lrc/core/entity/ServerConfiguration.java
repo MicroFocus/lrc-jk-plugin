@@ -22,7 +22,6 @@ public final class ServerConfiguration implements Serializable {
     private final int projectId;
     private ProxyConfiguration proxyConfiguration;
     private final boolean sendEmail;
-    private final String initiator;
 
     // #region getter/setter
     public String getUrl() {
@@ -52,10 +51,6 @@ public final class ServerConfiguration implements Serializable {
     public boolean isSendEmail() {
         return sendEmail;
     }
-
-    public String getInitiator() {
-        return initiator;
-    }
     // #endregion
 
     /**
@@ -66,17 +61,15 @@ public final class ServerConfiguration implements Serializable {
      * @param tenantId
      * @param projectId
      * @param sendEmail
-     * @param initiator
      */
     public ServerConfiguration(final String url, final String username, final String password, final String tenantId,
-            final int projectId, final boolean sendEmail, final String initiator) {
+            final int projectId, final boolean sendEmail) {
         this.url = url;
         this.username = username;
         this.password = password;
         this.tenantId = tenantId;
         this.projectId = projectId;
         this.sendEmail = sendEmail;
-        this.initiator = initiator;
     }
 
     public void setProxyConfiguration(final ProxyConfiguration proxyConfiguration) {
