@@ -9,7 +9,7 @@ The plugin allows you to run test in [LoadRunner Cloud](https://admhelp.microfoc
 
 # Getting started
 
-The plugin provides a build step **LoadRunner Cloud** to run test, and a post-build action **Generate LoadRunner Cloud Trending** to generate trending reports.
+The plugin provides a build step **Run test in LoadRunner Cloud** to run tests, and a post-build action **Generate LoadRunner Cloud trending report** to generate trending reports.
 Both of them are also exposed in pipeline job as `lrcRunTest` and `lrcGenTrendingReport`.
 
 ## Usage
@@ -24,11 +24,11 @@ Go to **Manage Jenkins** &rarr; **System Configuration** &rarr; **Configure Syst
 
 ### Job configuration
 - **Freestyle**  
-   In a freestyle project, select "LoadRunner Cloud" in **Add build step**, then input **Test ID** and **Project ID**.  
+   In a freestyle project, select "Run test in LoadRunner Cloud" in **Add build step**, then input **Test ID** and **Project ID**.  
    > **Tip:**
    To build a more flexible job, you can use string parameters (LRC_TEST_ID, LRC_PROJECT_ID) to override the **Test ID** and **Project ID**.  
 
-   If you need trending report, select "Generate LoadRunner Cloud Trending" in **Add post-build action**.
+   If you need trending report, select "Generate LoadRunner Cloud trending report" in **Add post-build action**.
 - **Pipeline**  
    Below is an example on how to run a test and generate trending report in pipeline:
 
@@ -39,7 +39,7 @@ pipeline {
     stages {
         stage('lrc') {    
             steps {
-                lrcRunTest projectId:'45', testId: "2398", sendEmail: true
+                lrcRunTest testId: "2398", projectId:'45', sendEmail: false
                 lrcGenTrendingReport benchmark: 0, runsCount: 5, trtAvgThresholdImprovement: 5,trtAvgThresholdMajorRegression: 10, trtAvgThresholdMinorRegression: 5, trtPercentileThresholdImprovement: 5, trtPercentileThresholdMajorRegression: 10, trtPercentileThresholdMinorRegression: 5
             }
         }
@@ -63,9 +63,9 @@ The plugin generates the following files (if they are available) in workspace fo
 > - If you don't need PDF report, define a boolean or string parameter (LRC_SKIP_PDF_REPORT: true) in job to skip it.
 
 ### Trending
-If post-build action **Generate LoadRunner Cloud Trending** is configured, a menu named as "LoadRunner Cloud Trending" will be displayed. You can view the trending report by clicking the menu.
+If post-build action **Generate LoadRunner Cloud trending report** is configured, a menu named as "LoadRunner Cloud Trending" will be displayed. You can view the trending report by clicking the menu.
 > **Notes:**
-> - If you start multiple LoadRunner Cloud test runs in one Jenkins build, only last test run will be processed by **Generate LoadRunner Cloud Trending**.
+> - If you start multiple LoadRunner Cloud test runs in one Jenkins build, only last test run will be processed by **Generate LoadRunner Cloud trending report**.
 
 ## Releases
 See [GitHub Releases](https://github.com/MicroFocus/lrc-jk-plugin/releases)

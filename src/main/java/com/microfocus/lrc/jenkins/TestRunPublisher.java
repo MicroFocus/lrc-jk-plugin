@@ -452,7 +452,7 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
     public static final class DescriptorImpl extends BuildStepDescriptor<Publisher> {
         @Override
         public String getDisplayName() {
-            return "Generate LoadRunner Cloud Trending";
+            return "Generate LoadRunner Cloud trending report";
         }
 
         public boolean isApplicable(final Class<? extends AbstractProject> jobType) {

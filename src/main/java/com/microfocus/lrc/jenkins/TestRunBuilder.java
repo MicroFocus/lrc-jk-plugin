@@ -95,7 +95,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         @NonNull
         @Override
         public String getDisplayName() {
-            return "LoadRunner Cloud";
+            return "Run test in LoadRunner Cloud";
         }
 
         @Override
