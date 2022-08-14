@@ -34,7 +34,7 @@
             <f:password />
         </f:entry>
         <f:entry title="URL" field="url">
-            <f:textbox value="https://loadrunner-cloud.saas.microfocus.com" />
+            <f:textbox default="https://loadrunner-cloud.saas.microfocus.com" />
         </f:entry>
         <f:entry title="Tenant ID" field="tenantId">
             <f:textbox />
