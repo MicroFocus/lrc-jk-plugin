@@ -624,7 +624,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         Jenkins instance = Jenkins.getInstanceOrNull();
         String pluginVerStr = "N/A";
         if (instance != null) {
-            PluginWrapper plugin = instance.pluginManager.getPlugin("loadrunner_cloud");
+            PluginWrapper plugin = instance.pluginManager.getPlugin("loadrunner-cloud");
             if (plugin != null) {
                 pluginVerStr = plugin.getVersion();
             }

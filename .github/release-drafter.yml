@@ -1,2 +1,2 @@
 _extends: .github
-tag-template: loadrunner_cloud-$NEXT_MINOR_VERSION
+tag-template: loadrunner-cloud-$NEXT_MINOR_VERSION

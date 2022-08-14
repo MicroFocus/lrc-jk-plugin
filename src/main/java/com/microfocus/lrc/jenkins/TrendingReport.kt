@@ -265,7 +265,7 @@ class TrendingReport {
             }
 
             val data = JsonObject()
-            data.addProperty("baseURL", Jenkins.getInstanceOrNull()?.rootUrl + "plugin/jenkinsStormPlugin/")
+            data.addProperty("baseURL", Jenkins.getInstanceOrNull()?.rootUrl + "plugin/loadrunner-cloud/")
 
             data.addProperty("trtAvgTholdImpr", trendingConfig.trtAvgTholdImpr)
             data.addProperty("trtAvgTholdMinorRegr", trendingConfig.trtAvgTholdMinorRegr)
