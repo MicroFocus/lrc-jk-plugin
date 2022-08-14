@@ -66,3 +66,6 @@ The plugin generates the following files (if they are available) in workspace fo
 If post-build action **Generate LoadRunner Cloud Trending** is configured, a menu named as "LoadRunner Cloud Trending" will be displayed. You can view the trending report by clicking the menu.
 > **Notes:**
 > - If you start multiple LoadRunner Cloud test runs in one Jenkins build, only last test run will be processed by **Generate LoadRunner Cloud Trending**.
+
+## Releases
+See [GitHub Releases](https://github.com/MicroFocus/lrc-jk-plugin/releases)
