@@ -97,7 +97,7 @@ class TestRunPublisherTest {
         val baseUrl = TestRunBuilderTest.mockserver.url("/").toString()
         descriptor.url = baseUrl
         descriptor.clientId = "FAKE_CLIENT_ID"
-        descriptor.clientSecret = "FAKE_CLIENT_SECRET"
+        descriptor.setClientSecret("FAKE_CLIENT_SECRET")
         descriptor.tenantId = "FAKE_TENANT_ID"
         descriptor.useOAuth = true
 

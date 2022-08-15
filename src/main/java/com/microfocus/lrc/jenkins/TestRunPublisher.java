@@ -32,7 +32,6 @@ import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
 import hudson.tasks.Recorder;
 import hudson.util.FormValidation;
-import hudson.util.Secret;
 import jenkins.model.Jenkins;
 import jenkins.tasks.SimpleBuildStep;
 import org.jenkinsci.Symbol;
@@ -205,7 +204,7 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
                 descriptor.getProxyHost(),
                 descriptor.getProxyPort(),
                 descriptor.getProxyUsername(),
-                Secret.fromString(descriptor.getProxyPassword()).getPlainText(),
+                (descriptor.getProxyPassword() != null) ? descriptor.getProxyPassword().getPlainText() : "",
                 loggerProxy
         );
         serverConfiguration.setProxyConfiguration(proxyConfig);
@@ -286,10 +285,10 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
     ) {
         ServerConfiguration serverConfiguration;
         String usr = descriptor.getUsername();
-        String pwd = Secret.fromString(descriptor.getPassword()).getPlainText();
+        String pwd = (descriptor.getPassword() != null) ? descriptor.getPassword().getPlainText() : "";
         if (Boolean.TRUE.equals(descriptor.getUseOAuth())) {
             usr = descriptor.getClientId();
-            pwd = Secret.fromString(descriptor.getClientSecret()).getPlainText();
+            pwd = (descriptor.getClientSecret() != null) ? descriptor.getClientSecret().getPlainText() : "";
         }
 
         serverConfiguration = new ServerConfiguration(

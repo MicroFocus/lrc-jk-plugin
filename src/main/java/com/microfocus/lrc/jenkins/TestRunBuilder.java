@@ -44,10 +44,7 @@ import org.kohsuke.stapler.StaplerRequest;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public final class TestRunBuilder extends Builder implements SimpleBuildStep {
 
@@ -111,6 +108,15 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
             }
         }
 
+        private Secret getPasswordConfig(final JSONObject data, final String key) {
+            String val = this.getStringConfig(data, key);
+            if (StringUtils.isBlank(val)) {
+                return null;
+            } else {
+                return Secret.fromString(val);
+            }
+        }
+
         private Boolean getBooleanConfig(final JSONObject data, final String key) {
             try {
                 return Boolean.valueOf(this.getStringConfig(data, key));
@@ -124,10 +130,8 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
             // set all properties from formData
             // validate all properties, throw FormException if invalid
             this.username = this.getStringConfig(formData, Constants.USERNAME);
-            this.password = this.getStringConfig(formData, Constants.PASSWORD);
-
+            this.password = this.getPasswordConfig(formData, Constants.PASSWORD);
             this.url = StringUtils.stripEnd(this.getStringConfig(formData, Constants.URL), "/");
-
             this.useProxy = this.getBooleanConfig(formData, "useProxy");
             this.proxyHost = this.getStringConfig(formData, "proxyHost");
             this.proxyPort =  this.getStringConfig(formData, "proxyPort");
@@ -140,18 +144,10 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
                 this.proxyUsername = null;
             }
 
-            this.proxyPassword = this.getStringConfig(formData, "proxyPassword");
-            if (StringUtils.isBlank(this.proxyPassword)) {
-                this.proxyPassword = null;
-            }
-
+            this.proxyPassword = this.getPasswordConfig(formData, "proxyPassword");
             this.useOAuth = this.getBooleanConfig(formData, Constants.USE_OAUTH);
             this.clientId = this.getStringConfig(formData, Constants.CLIENT_ID);
-            this.clientSecret = this.getStringConfig(formData, Constants.CLIENT_SECRET);
-            if (StringUtils.isBlank(this.clientSecret)) {
-                this.clientSecret = null;
-            }
-
+            this.clientSecret = this.getPasswordConfig(formData, Constants.CLIENT_SECRET);
             this.tenantId = this.getStringConfig(formData, Constants.TENANTID);
 
             save();
@@ -201,7 +197,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
             return FormValidation.ok();
         }
 
-        private String password;
+        private Secret password;
 
         @SuppressWarnings("checkstyle:HiddenField")
         public FormValidation doCheckPassword(
@@ -238,7 +234,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
             return FormValidation.ok();
         }
 
-        private String clientSecret;
+        private Secret clientSecret;
 
         @SuppressWarnings("checkstyle:HiddenField")
         public FormValidation doCheckClientSecret(
@@ -305,7 +301,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         }
 
         private String proxyUsername;
-        private String proxyPassword;
+        private Secret proxyPassword;
 
         public FormValidation doCheckProjectID(@QueryParameter final String value) {
             if (value == null || value.trim().length() == 0) {
@@ -343,12 +339,16 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
             this.clientId = clientId;
         }
 
-        public String getClientSecret() {
+        public Secret getClientSecret() {
             return clientSecret;
         }
 
-        public void setClientSecret(final String clientSecret) {
+        public void setClientSecret(final Secret clientSecret) {
             this.clientSecret = clientSecret;
+        }
+
+        public void setClientSecret(final String clientSecret) {
+            this.clientSecret = Secret.fromString(clientSecret);
         }
 
         public Boolean getUseProxy() {
@@ -383,11 +383,11 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
             this.proxyUsername = proxyUsername;
         }
 
-        public String getProxyPassword() {
+        public Secret getProxyPassword() {
             return proxyPassword;
         }
 
-        public void setProxyPassword(final String proxyPassword) {
+        public void setProxyPassword(final Secret proxyPassword) {
             this.proxyPassword = proxyPassword;
         }
 
@@ -399,11 +399,11 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
             this.username = username;
         }
 
-        public String getPassword() {
+        public Secret getPassword() {
             return password;
         }
 
-        public void setPassword(final String password) {
+        public void setPassword(final Secret password) {
             this.password = password;
         }
 
@@ -420,14 +420,14 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         @SuppressWarnings({"java:S107", "checkstyle:ParameterNumber", "checkstyle:HiddenField"})
         public FormValidation doTestConnection(
                 @QueryParameter("username") final String username,
-                @QueryParameter("password") final String password,
+                @QueryParameter("password") final Secret password,
                 @QueryParameter("url") final String url,
                 @QueryParameter("proxyHost") final String proxyHost,
                 @QueryParameter("proxyPort") final String proxyPort,
                 @QueryParameter("proxyUsername") final String proxyUsername,
-                @QueryParameter("proxyPassword") final String proxyPassword,
+                @QueryParameter("proxyPassword") final Secret proxyPassword,
                 @QueryParameter("clientId") final String clientId,
-                @QueryParameter("clientSecret") final String clientSecret,
+                @QueryParameter("clientSecret") final Secret clientSecret,
                 @QueryParameter("tenantId") final String tenantId,
                 @QueryParameter("useOAuth") final String useOAuth,
                 @QueryParameter("useProxy") final String useProxy
@@ -438,7 +438,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
                 config = new ServerConfiguration(
                         url,
                         clientId,
-                        Secret.fromString(clientSecret).getPlainText(),
+                        (clientSecret != null) ? clientSecret.getPlainText() : "",
                         tenantId,
                         0,
                         false
@@ -447,7 +447,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
                 config = new ServerConfiguration(
                         url,
                         username,
-                        Secret.fromString(password).getPlainText(),
+                        (password != null) ? password.getPlainText() : "",
                         tenantId,
                         0,
                         false
@@ -460,7 +460,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
                             proxyHost,
                             proxyPort,
                             proxyUsername,
-                            Secret.fromString(proxyPassword).getPlainText(),
+                            (proxyPassword != null) ? proxyPassword.getPlainText() : "",
                             new LoggerProxy()
                     )
             );
@@ -548,7 +548,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
                 descriptor.proxyHost,
                 descriptor.proxyPort,
                 descriptor.proxyUsername,
-                Secret.fromString(descriptor.proxyPassword).getPlainText(),
+                (descriptor.proxyPassword != null) ? descriptor.proxyPassword.getPlainText() : "",
                 this.loggerProxy
         );
         serverConfiguration.setProxyConfiguration(proxyConfiguration);
@@ -686,10 +686,10 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
             final Run<?, ?> run,
             final Launcher launcher) {
         String usr = descriptor.getUsername();
-        String pwd = Secret.fromString(descriptor.getPassword()).getPlainText();
+        String pwd = (descriptor.getPassword() != null) ? descriptor.getPassword() .getPlainText() : "";
         if (Boolean.TRUE.equals(descriptor.getUseOAuth())) {
             usr = descriptor.getClientId();
-            pwd = Secret.fromString(descriptor.getClientSecret()).getPlainText();
+            pwd = (descriptor.getClientSecret() != null) ? descriptor.getClientSecret().getPlainText() : "";
         }
         ServerConfiguration config = new ServerConfiguration(
                 descriptor.getUrl(),
