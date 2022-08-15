@@ -45,15 +45,15 @@ import java.io.PrintStream;
 
 public final class TestRunPublisher extends Recorder implements SimpleBuildStep {
 
-    private Integer runsCount;
-    private Integer benchmark;
+    private final Integer runsCount;
+    private final Integer benchmark;
 
-    private Integer trtPercentileThresholdImprovement;
-    private Integer trtPercentileThresholdMinorRegression;
+    private final Integer trtPercentileThresholdImprovement;
+    private final Integer trtPercentileThresholdMinorRegression;
     private Integer trtPercentileThresholdMajorRegression;
 
-    private Integer trtAvgThresholdImprovement;
-    private Integer trtAvgThresholdMinorRegression;
+    private final Integer trtAvgThresholdImprovement;
+    private final Integer trtAvgThresholdMinorRegression;
     private Integer trtAvgThresholdMajorRegression;
 
     private TrendingConfiguration trendingConfig;
@@ -322,28 +322,8 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
             final Integer trtPercentileThresholdMinorRegression,
             final Integer trtPercentileThresholdMajorRegression
     ) {
-        this.runsCount = runsCount;
-        if (this.runsCount == null) {
-            this.runsCount = RUN_COUNT_MIN;
-        }
-
-        this.benchmark = benchmark;
-        if (this.benchmark == null) {
-            this.benchmark = 0;
-        }
-
-        this.trtAvgThresholdMinorRegression = trtAvgThresholdMinorRegression;
-        this.trtAvgThresholdMajorRegression = trtAvgThresholdMajorRegression;
-        this.trtPercentileThresholdImprovement = trtPercentileThresholdImprovement;
-        this.trtPercentileThresholdMinorRegression = trtPercentileThresholdMinorRegression;
-        this.trtPercentileThresholdMajorRegression = trtPercentileThresholdMajorRegression;
-
-        if (this.runsCount < RUN_COUNT_MIN) {
-            this.runsCount = RUN_COUNT_MIN;
-        }
-        if (this.runsCount > RUN_COUNT_MAX) {
-            this.runsCount = RUN_COUNT_MAX;
-        }
+        this.benchmark = (benchmark == null) ? 0 : benchmark;
+        this.runsCount = this.checkRunsCount(runsCount, RUN_COUNT_MIN, RUN_COUNT_MAX);
 
         this.trtAvgThresholdImprovement = setDefaultValue(
                 trtAvgThresholdImprovement,
@@ -405,6 +385,22 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
     ) {
         if (val == null || val < min || val > max) {
             return defaultValue;
+        }
+
+        return val;
+    }
+
+    private Integer checkRunsCount(
+            final Integer val,
+            final Integer min,
+            final Integer max
+    ) {
+        if (val == null) {
+            return min;
+        } else if (val < min) {
+            return min;
+        } else if (val > max) {
+            return max;
         }
 
         return val;
