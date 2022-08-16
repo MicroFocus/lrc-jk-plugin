@@ -75,7 +75,7 @@ public final class TrendingDataWrapper implements Serializable {
         this.trendingData = new TrendingData(testRun, results, tx);
         if (benchmark != null) {
             this.benchmark = benchmark.getTrendingData();
-            this.benchmarkId = benchmark.getBenchmarkId();
+            this.benchmarkId = benchmark.getTrendingData().runId;
         }
     }
 
