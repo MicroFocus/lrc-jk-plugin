@@ -22,6 +22,23 @@ Go to **Manage Jenkins** &rarr; **System Configuration** &rarr; **Configure Syst
  - **LoadRunner Cloud URL**, default: "https://loadrunner-cloud.saas.microfocus.com"
  - **Proxy** settings (optional)
 
+JCasC configuration:  
+```yaml
+lrcRunTest:
+    tenantId: "<TENANT ID>"
+    username: "<USERNAME>"
+    password: "<PASSWORD>"
+    url: "https://loadrunner-cloud.saas.microfocus.com"
+    useOAuth: false   
+    clientId: "<CLIENT ID>"
+    clientSecret: "<CLIENT SECRET>"
+    useProxy: false
+    proxyHost: "<PROXY HOST>"
+    proxyPort: "<PROXY PORT>"
+    proxyUsername: "<PROXY USERNAME>"
+    proxyPassword: "<PROXY PASSWORD>"
+```
+
 ### Job configuration
 - **Freestyle**  
    In a freestyle project, select "Run test in LoadRunner Cloud" in **Add build step**, then input **Test ID** and **Project ID**.  
