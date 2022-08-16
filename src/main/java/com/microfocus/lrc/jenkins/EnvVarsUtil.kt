@@ -45,7 +45,7 @@ class EnvVarsUtil {
                 //or try the system env var
                 EnvVars.getRemote(launcher.channel)[key]
             } catch (e: Exception) {
-                LoggerProxy.sysLogger.log(Level.WARNING, "Failed to get env, " + e.message)
+                LoggerProxy.sysLogger.log(Level.WARNING, "Failed to get parameters / env variables, " + e.message)
                 null
             }
         }

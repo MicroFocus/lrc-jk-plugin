@@ -467,9 +467,9 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
             config.setProxyConfiguration(proxyConfiguration);
             try (ApiClient c = ApiClientFactory.getClient(config, new LoggerProxy())) {
                 c.login();
-                return FormValidation.ok("Ping connection successfully!");
+                return FormValidation.ok("Test connection succeeded!");
             } catch (Exception e) {
-                return FormValidation.error("Ping connection failed, error: " + e.getMessage());
+                return FormValidation.error("Test connection failed, error: " + e.getMessage());
             }
         }
     }

@@ -326,14 +326,14 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
 
         this.trtAvgThresholdImprovement = setDefaultValue(
                 trtAvgThresholdImprovement,
-                0,
+                1,
                 PERCENTAGE_MAX,
                 PERCENTAGE_DEFAULT_MIN
         );
 
         this.trtAvgThresholdMinorRegression = setDefaultValue(
                 trtAvgThresholdMinorRegression,
-                0,
+                1,
                 PERCENTAGE_MAX,
                 PERCENTAGE_DEFAULT_MIN
         );
@@ -341,7 +341,7 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
 
         this.trtAvgThresholdMajorRegression = setDefaultValue(
                 trtAvgThresholdMajorRegression,
-                0,
+                1,
                 PERCENTAGE_MAX,
                 PERCENTAGE_DEFAULT_MAX
         );
@@ -352,21 +352,21 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
 
         this.trtPercentileThresholdImprovement = setDefaultValue(
                 trtPercentileThresholdImprovement,
-                0,
+                1,
                 PERCENTAGE_MAX,
                 PERCENTAGE_DEFAULT_MIN
         );
 
         this.trtPercentileThresholdMinorRegression = setDefaultValue(
                 trtPercentileThresholdMinorRegression,
-                0,
+                1,
                 PERCENTAGE_MAX,
                 PERCENTAGE_DEFAULT_MIN
         );
 
         this.trtPercentileThresholdMajorRegression = setDefaultValue(
                 trtPercentileThresholdMajorRegression,
-                0,
+                1,
                 PERCENTAGE_MAX,
                 PERCENTAGE_DEFAULT_MAX
         );
@@ -468,7 +468,7 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
         public FormValidation doCheckRunsCount(final @QueryParameter String value) {
             Integer val = getIntegerSafely(value);
             if (val == null || val < 5 || val > 10) {
-                return FormValidation.error("Please input a valid number range from 5 to 10.");
+                return FormValidation.error("Please input an integer from 5 to 10.");
             }
             return FormValidation.ok();
         }
@@ -476,7 +476,7 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
         public FormValidation doCheckBenchmark(final @QueryParameter String value) {
             Integer val = getIntegerSafely(value);
             if (val != null && val < 0) {
-                return FormValidation.error("Please input a valid RunId or leave it blank or 0.");
+                return FormValidation.error("Please input a valid run id or leave it blank or 0.");
             }
             return FormValidation.ok();
         }
@@ -512,8 +512,8 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
                 return FormValidation.ok();
             }
 
-            if (value <= 0 || value >= 100) {
-                return FormValidation.error("Threshold should be between 0 to 100.");
+            if (value < 1 || value > 100) {
+                return FormValidation.error("Threshold value should be an integer from 1 to 100.");
             }
 
             return FormValidation.ok();
