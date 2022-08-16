@@ -27,11 +27,11 @@ public class ConfigurationAsCodeTest {
     @ConfiguredWithCode("configuration-as-code.yml")
     public void should_support_configuration_as_code() throws Exception {
         TestRunBuilder.DescriptorImpl descriptor = new TestRunBuilder.DescriptorImpl();
-        assertNotNull("TestRunBuilder.DescriptorImpl can not be found", descriptor);
+
         assertEquals("user name", "lrc@microfocus.com", descriptor.getUsername());
         assertNotNull(descriptor.getPassword());
-        assertEquals("tenant id", "336275312", descriptor.getTenantId());
 
+        assertEquals("tenant id", "336275312", descriptor.getTenantId());
         assertEquals("url", "https://loadrunner-cloud.saas.microfocus.com", descriptor.getUrl());
 
         assertTrue("useOAuth", descriptor.getUseOAuth());
