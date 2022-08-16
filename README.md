@@ -22,14 +22,15 @@ Go to **Manage Jenkins** &rarr; **System Configuration** &rarr; **Configure Syst
  - **LoadRunner Cloud URL**, default: "https://loadrunner-cloud.saas.microfocus.com"
  - **Proxy** settings (optional)
 
-JCasC configuration:  
+[JCasC](https://github.com/jenkinsci/configuration-as-code-plugin) configuration:  
 ```yaml
-lrcRunTest:
+unclassified:
+  lrcRunTest:
     tenantId: "<TENANT ID>"
     username: "<USERNAME>"
     password: "<PASSWORD>"
     url: "https://loadrunner-cloud.saas.microfocus.com"
-    useOAuth: false   
+    useOAuth: false
     clientId: "<CLIENT ID>"
     clientSecret: "<CLIENT SECRET>"
     useProxy: false
