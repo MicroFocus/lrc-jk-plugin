@@ -197,8 +197,6 @@ class ApiClient internal constructor(
             }
         }
 
-
-
         c = builder
             .connectTimeout(60, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS)
