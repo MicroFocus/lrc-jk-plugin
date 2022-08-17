@@ -46,14 +46,15 @@ unclassified:
 ```
 
 ### Job configuration
-1. **Freestyle**  
-  - In a freestyle project, select **Run test in LoadRunner Cloud** in **Add build step**, then input **Test ID** and **Project ID**.  
-  > **Tip:** To build a more flexible job, you can use string parameters (LRC_TEST_ID, LRC_PROJECT_ID) to override the **Test ID** and **Project ID**.  
+
+#### Freestyle
+In a freestyle project, select **Run test in LoadRunner Cloud** in **Add build step**, then input **Test ID** and **Project ID**.  
+> **Tip:** To build a more flexible job, you can use string parameters (LRC_TEST_ID, LRC_PROJECT_ID) to override the **Test ID** and **Project ID**.  
      
 ![Job configuration](/images/job_config.png "Run test in LoadRunner Cloud")
 
-2. **Pipeline**  
-  Below is an example on how to run a test and generate trending report in pipeline:
+#### Pipeline
+Below is an example on how to run a test and generate trending report in pipeline:
 
 ```groovy
 pipeline {
@@ -103,18 +104,17 @@ If you need trending report, select **Generate LoadRunner Cloud trending report*
 | Minor Regression                 | The percentage increase in percentile transaction response time considered to be a minor regression in performance.                                                                                                                                                                                                 |
 | Major Regression                 | The percentage increase in percentile transaction response time considered to be a major regression in performance.                                                                                                                                                                                                 |
 
-> **Notes:** If you start multiple LoadRunner Cloud test runs in one Jenkins build, only the last test run will be processed by Generate LoadRunner Cloud trending report.
-
-A menu named as "**LoadRunner Cloud Trending**" will be displayed. You can view the trending report by clicking the menu.
+You can view the trending report by clicking the "**LoadRunner Cloud Trending**" menu. It shows the trends for the last 5-10 runs of the load test configured in the job. 
 
 ![Trending menu](/images/trending_menu.png "LoadRunner Cloud Trending menu")
+> **Notes:** If you start multiple LoadRunner Cloud test runs in one Jenkins build, only the last test run will be processed by Generate LoadRunner Cloud trending report.
 
 ## Releases
 See [GitHub Releases](https://github.com/MicroFocus/lrc-jk-plugin/releases)
 
 ## Notes
 - The plugin requires Jenkins version **2.289.3** or above.
+- Keep your password or secret safe.
 - It's recommended to use the latest Jenkins [**LTS**](https://get.jenkins.io/war-stable/) release.
 - It's recommended to update the plugin to the latest version.
   > **Tip**: **Manage Jenkins** &rarr; **Manage Plugins**, on the **Updates** tab, click **Check now** to check for the most recent plugin updates.
-- Keep your password or secret safe.
