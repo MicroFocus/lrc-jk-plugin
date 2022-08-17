@@ -12,7 +12,7 @@ Both of them are also exposed in pipeline job as `lrcRunTest` and `lrcGenTrendin
 ## Getting started
 
 ### System configuration
-- Go to **Manage Jenkins** &rarr; **System Configuration** &rarr; **Configure System** to specify below settings: 
+- Go to **Manage Jenkins** &rarr; **System Configuration** &rarr; **Configure System** to locate "LoadRunner Cloud" section, then specify below settings: 
   - **Username** and **Password**  
   - If you use [API Access keys](https://admhelp.microfocus.com/lrc/en/Latest/Content/Storm/Admin-APIAccess.htm), select the **Use OAuth token** checkbox, then input **Client Id** and **Client Secret**.
   - **URL**, default: "https://loadrunner-cloud.saas.microfocus.com"
@@ -22,7 +22,7 @@ Both of them are also exposed in pipeline job as `lrcRunTest` and `lrcGenTrendin
     - Proxy Port	    - The proxy server port number.
     - Proxy Username	- The username to log into the proxy server.
     - Proxy Password	- The password to log into the proxy server.
-    > Above proxy settings are only effective for connections between Jenkins and LoadRunner Cloud.
+    > **Notes**: above proxy settings are only effective for connections between Jenkins and LoadRunner Cloud.
 
 - Sample configuration for 
 [Jenkins configuration as Code](https://github.com/jenkinsci/configuration-as-code-plugin):  
@@ -45,10 +45,10 @@ unclassified:
 
 ### Job configuration
 1. **Freestyle**  
-   - In a freestyle project, select "Run test in LoadRunner Cloud" in **Add build step**, then input **Test ID** and **Project ID**.  
+   - In a freestyle project, select "**Run test in LoadRunner Cloud**" in **Add build step**, then input **Test ID** and **Project ID**.  
      > **Tip:** To build a more flexible job, you can use string parameters (LRC_TEST_ID, LRC_PROJECT_ID) to override the **Test ID** and **Project ID**.  
 
-   - If you need trending report, select "Generate LoadRunner Cloud trending report" in **Add post-build action**.    
+   - If you need trending report, select "**Generate LoadRunner Cloud trending report**" in **Add post-build action**.    
 
 | Item                             | Description                                                                                                                                                                                                                                                                                                         |
 |----------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -84,21 +84,22 @@ pipeline {
 
 The plugin generates the following files (if they are available) in workspace folder after the build is completed.
 
-| File                                    | Description                                                                                                   |
-|-----------------------------------------|---------------------------------------------------------------------------------------------------------------|
-| **lrc_report_TENANTID-RUNID.xml**       | A JUnit XML file containing basic information about test run, such as name, status, duration, and so forth.   |
-| **lrc_report_TENANTID-RUNID.csv**       | A CSV file containing detailed test run results with metrics, such as Vuser count, error count, and so forth. |
-| **lrc_report_TENANTID-RUNID.pdf**       | A PDF file containing report data for the test run.                                                           |
-| **lrc_report_trans_TENANTID-RUNID.csv** | A CSV file containing detailed statistics for each transaction in the test run.                               |
+| File                         | Description                                                                                                   |
+|------------------------------|---------------------------------------------------------------------------------------------------------------|
+| **lrc_report_XXX.xml**       | A JUnit XML file containing basic information about test run, such as name, status, duration, and so forth.   |
+| **lrc_report_XXX.csv**       | A CSV file containing detailed test run results with metrics, such as Vuser count, error count, and so forth. |
+| **lrc_report_XXX.pdf**       | A PDF file containing report data for the test run.                                                           |
+| **lrc_report_trans_XXX.csv** | A CSV file containing detailed statistics for each transaction in the test run.                               |
 
 > **Notes:**  
-> - If build / job is aborted or cancelled, the plugin will not try to collect results.  
-> - If you don't need PDF report, define a boolean or string parameter (LRC_SKIP_PDF_REPORT: true) in job to skip it.
+> - Above "XXX" means ${tenantId}-${runId}. For example: 652261300-123.
+> - If a Jenkins job that includes a running test is aborted, the plugin will attempt to stop the corresponding test run in LoadRunner Cloud. **It does not collect results**. The attempt may fail in the event of network problems, or if Jenkins aborts the job before the plugin can stop the test run.
+> - If PDF report is not needed, define a boolean or string parameter (LRC_SKIP_PDF_REPORT: true) to skip it.
+> - The test run id is exposed in environment variable: **LRC_RUN_ID**.
 
 ### Trending
-If post-build action **Generate LoadRunner Cloud trending report** is configured, a menu named as "LoadRunner Cloud Trending" will be displayed. You can view the trending report by clicking the menu.
-> **Notes:**
-> - If you start multiple LoadRunner Cloud test runs in one Jenkins build, only the last test run will be processed by **Generate LoadRunner Cloud trending report**.
+If post-build action **Generate LoadRunner Cloud trending report** is configured, a menu named as "**LoadRunner Cloud Trending**" will be displayed. You can view the trending report by clicking the menu.
+> **Notes:** If you start multiple LoadRunner Cloud test runs in one Jenkins build, only the last test run will be processed by Generate LoadRunner Cloud trending report.
 
 ## Releases
 See [GitHub Releases](https://github.com/MicroFocus/lrc-jk-plugin/releases)
