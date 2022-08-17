@@ -51,22 +51,6 @@ unclassified:
   > **Tip:** To build a more flexible job, you can use string parameters (LRC_TEST_ID, LRC_PROJECT_ID) to override the **Test ID** and **Project ID**.  
      
 ![Job configuration](/images/job_config.png "Run test in LoadRunner Cloud")
-  - If you need trending report, select **Generate LoadRunner Cloud trending report** in **Add post-build action**.    
-
-| Item                             | Description                                                                                                                                                                                                                                                                                                         |
-|----------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Number of Runs**               | The number of last successful runs to include in the report. The valid range is 5-10.                                                                                                                                                                                                                               |
-| **Benchmark**                    | Enter a specific test run ID to use as a benchmark, or leave blank to compare a run to the previous run.<br/>**Note**: If you change the benchmark run ID, only those load tests that run after the change are compared to the new benchmark. Load tests that ran before the change show their original comparison. |
-| **Thresholds: TRT (Avg)**        | <Enter a positive integer between from 1 to 100>                                                                                                                                                                                                                                                                    |
-| Improvement                      | The percentage decrease in average transaction response time considered to be an improvement in performance.                                                                                                                                                                                                        |
-| Minor Regression                 | The percentage increase in average transaction response time considered to be a minor regression in performance.                                                                                                                                                                                                    |
-| Major Regression                 | The percentage increase in average transaction response time considered to be a major regression in performance.                                                                                                                                                                                                    |
-| **Thresholds: TRT (Percentile)** | <Enter a positive integer between from 1 to 100>                                                                                                                                                                                                                                                                    |
-| Improvement                      | The percentage decrease in percentile transaction response time considered to be an improvement in performance.                                                                                                                                                                                                     |
-| Minor Regression                 | The percentage increase in percentile transaction response time considered to be a minor regression in performance.                                                                                                                                                                                                 |
-| Major Regression                 | The percentage increase in percentile transaction response time considered to be a major regression in performance.                                                                                                                                                                                                 |
-
-![Trending configuration](/images/trending_config.png "Generate LoadRunner Cloud trending report")
 
 2. **Pipeline**  
   Below is an example on how to run a test and generate trending report in pipeline:
@@ -103,8 +87,25 @@ The plugin generates the following files (if they are available) in workspace fo
 > - The test run id is exposed in environment variable: **LRC_RUN_ID**.
 
 ### Trending
-If post-build action **Generate LoadRunner Cloud trending report** is configured, a menu named as "**LoadRunner Cloud Trending**" will be displayed. You can view the trending report by clicking the menu.
+If you need trending report, select **Generate LoadRunner Cloud trending report** in **Add post-build action**.
+![Trending configuration](/images/trending_config.png "Generate LoadRunner Cloud trending report")
+
+| Item                             | Description                                                                                                                                                                                                                                                                                                         |
+|----------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Number of Runs**               | The number of last successful runs to include in the report. The valid range is 5-10.                                                                                                                                                                                                                               |
+| **Benchmark**                    | Enter a specific test run ID to use as a benchmark, or leave blank to compare a run to the previous run.<br/>**Note**: If you change the benchmark run ID, only those load tests that run after the change are compared to the new benchmark. Load tests that ran before the change show their original comparison. |
+| **Thresholds: TRT (Avg)**        | <Enter a positive integer between from 1 to 100>                                                                                                                                                                                                                                                                    |
+| Improvement                      | The percentage decrease in average transaction response time considered to be an improvement in performance.                                                                                                                                                                                                        |
+| Minor Regression                 | The percentage increase in average transaction response time considered to be a minor regression in performance.                                                                                                                                                                                                    |
+| Major Regression                 | The percentage increase in average transaction response time considered to be a major regression in performance.                                                                                                                                                                                                    |
+| **Thresholds: TRT (Percentile)** | <Enter a positive integer between from 1 to 100>                                                                                                                                                                                                                                                                    |
+| Improvement                      | The percentage decrease in percentile transaction response time considered to be an improvement in performance.                                                                                                                                                                                                     |
+| Minor Regression                 | The percentage increase in percentile transaction response time considered to be a minor regression in performance.                                                                                                                                                                                                 |
+| Major Regression                 | The percentage increase in percentile transaction response time considered to be a major regression in performance.                                                                                                                                                                                                 |
+
 > **Notes:** If you start multiple LoadRunner Cloud test runs in one Jenkins build, only the last test run will be processed by Generate LoadRunner Cloud trending report.
+
+A menu named as "**LoadRunner Cloud Trending**" will be displayed. You can view the trending report by clicking the menu.
 
 ![Trending menu](/images/trending_menu.png "LoadRunner Cloud Trending menu")
 
