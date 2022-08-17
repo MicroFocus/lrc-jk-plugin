@@ -24,7 +24,7 @@ Both of them are also exposed in pipeline job as `lrcRunTest` and `lrcGenTrendin
     - Proxy Password	- The password to log into the proxy server.
     > **Notes**: above proxy settings are only effective for connections between Jenkins and LoadRunner Cloud.  
 
-  ![System configuration](/images/system_config.png "LoadRunner Cloud")
+![System configuration](/images/system_config.png "LoadRunner Cloud")
 
 - Sample configuration for 
 [Jenkins configuration as Code](https://github.com/jenkinsci/configuration-as-code-plugin):  
@@ -47,11 +47,11 @@ unclassified:
 
 ### Job configuration
 1. **Freestyle**  
-   - In a freestyle project, select **Run test in LoadRunner Cloud** in **Add build step**, then input **Test ID** and **Project ID**.  
-     > **Tip:** To build a more flexible job, you can use string parameters (LRC_TEST_ID, LRC_PROJECT_ID) to override the **Test ID** and **Project ID**.  
+  - In a freestyle project, select **Run test in LoadRunner Cloud** in **Add build step**, then input **Test ID** and **Project ID**.  
+  > **Tip:** To build a more flexible job, you can use string parameters (LRC_TEST_ID, LRC_PROJECT_ID) to override the **Test ID** and **Project ID**.  
      
-     ![Job configuration](/images/job_config.png "Run test in LoadRunner Cloud")
-   - If you need trending report, select **Generate LoadRunner Cloud trending report** in **Add post-build action**.    
+![Job configuration](/images/job_config.png "Run test in LoadRunner Cloud")
+  - If you need trending report, select **Generate LoadRunner Cloud trending report** in **Add post-build action**.    
 
 | Item                             | Description                                                                                                                                                                                                                                                                                                         |
 |----------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -69,7 +69,7 @@ unclassified:
 ![Trending configuration](/images/trending_config.png "Generate LoadRunner Cloud trending report")
 
 2. **Pipeline**  
-   Below is an example on how to run a test and generate trending report in pipeline:
+  Below is an example on how to run a test and generate trending report in pipeline:
 
 ```groovy
 pipeline {
@@ -79,7 +79,7 @@ pipeline {
         stage('lrc') {    
             steps {
                 lrcRunTest testId: "2398", projectId:'45', sendEmail: false
-                lrcGenTrendingReport benchmark: 0, runsCount: 5, trtAvgThresholdImprovement: 5,trtAvgThresholdMajorRegression: 10, trtAvgThresholdMinorRegression: 5, trtPercentileThresholdImprovement: 5, trtPercentileThresholdMajorRegression: 10, trtPercentileThresholdMinorRegression: 5
+                lrcGenTrendingReport benchmark: 0, runsCount: 5, trtAvgThresholdImprovement: 5, trtAvgThresholdMajorRegression: 10, trtAvgThresholdMinorRegression: 5, trtPercentileThresholdImprovement: 5, trtPercentileThresholdMajorRegression: 10, trtPercentileThresholdMinorRegression: 5
             }
         }
     }
