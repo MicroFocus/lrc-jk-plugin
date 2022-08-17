@@ -105,6 +105,6 @@ See [GitHub Releases](https://github.com/MicroFocus/lrc-jk-plugin/releases)
 
 ## Notes
 - The plugin requires Jenkins version **2.289.3** or above.
-- It's highly recommended to use the latest Jenkins [LTS](https://get.jenkins.io/war-stable/) releases.
+- It's highly recommended to use the latest Jenkins [**LTS**](https://get.jenkins.io/war-stable/) release.
 - It's highly recommended to update the plugin to the latest version,  
-  **Manage Jenkins** &rarr; **Manage Plugins**, on the **Updates** tab, click **Check now** to check for the most recent plugin updates.
+  > **Tip**: **Manage Jenkins** &rarr; **Manage Plugins**, on the **Updates** tab, click **Check now** to check for the most recent plugin updates.
