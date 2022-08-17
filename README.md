@@ -15,19 +15,19 @@ Both of them are also exposed in pipeline job as `lrcRunTest` and `lrcGenTrendin
 ## Usage
 
 ### System configuration
-Go to **Manage Jenkins** &rarr; **System Configuration** &rarr; **Configure System** to specify below settings: 
- - **Username** and **Password**  
- - If you use [API Access keys](https://admhelp.microfocus.com/lrc/en/Latest/Content/Storm/Admin-APIAccess.htm), select the **Use OAuth token** checkbox, then input **Client Id** and **Client Secret**.
- - **Tenant Id**, for example: 652261300
- - **LoadRunner Cloud URL**, default: "https://loadrunner-cloud.saas.microfocus.com"
- - **Proxy** settings (optional)
-   - Proxy Host	- The proxy server host name.
-   - Proxy Port	- The proxy server port number.
-   - Proxy Username	- The username to log into the proxy server.
-   - Proxy Password	- The password to log into the proxy server.
-   > Above proxy settings are only effective for connections between Jenkins and LoadRunner Cloud.
+- Go to **Manage Jenkins** &rarr; **System Configuration** &rarr; **Configure System** to specify below settings: 
+  - **Username** and **Password**  
+  - If you use [API Access keys](https://admhelp.microfocus.com/lrc/en/Latest/Content/Storm/Admin-APIAccess.htm), select the **Use OAuth token** checkbox, then input **Client Id** and **Client Secret**.
+  - **Tenant Id**, for example: 652261300
+  - **LoadRunner Cloud URL**, default: "https://loadrunner-cloud.saas.microfocus.com"
+  - **Proxy** settings. If you need to use a proxy to access LoadRunner Cloud, select **Connect LoadRunner Cloud via proxy** checkbox, then input below fields.
+    - Proxy Host	- The proxy server host name.
+    - Proxy Port	- The proxy server port number.
+    - Proxy Username	- The username to log into the proxy server.
+    - Proxy Password	- The password to log into the proxy server.
+    > Above proxy settings are only effective for connections between Jenkins and LoadRunner Cloud.
 
- - Sample configuration for 
+- Sample configuration for 
 [Jenkins configuration as Code](https://github.com/jenkinsci/configuration-as-code-plugin):  
 ```yaml
 unclassified:
@@ -48,17 +48,17 @@ unclassified:
 
 ### Job configuration
 - **Freestyle**  
-   In a freestyle project, select "Run test in LoadRunner Cloud" in **Add build step**, then input **Test ID** and **Project ID**.  
-   > **Tip:**
-   To build a more flexible job, you can use string parameters (LRC_TEST_ID, LRC_PROJECT_ID) to override the **Test ID** and **Project ID**.  
+   - In a freestyle project, select "Run test in LoadRunner Cloud" in **Add build step**, then input **Test ID** and **Project ID**.  
+     > **Tip:**
+     To build a more flexible job, you can use string parameters (LRC_TEST_ID, LRC_PROJECT_ID) to override the **Test ID** and **Project ID**.  
 
-   If you need trending report, select "Generate LoadRunner Cloud trending report" in **Add post-build action**.    
+   - If you need trending report, select "Generate LoadRunner Cloud trending report" in **Add post-build action**.    
 
 | Item                         | Description                                                                                                                                                                                                                                                                                                         |
 |------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Number of Runs               | The number of last successful runs to include in the report. The valid range is 5-10.                                                                                                                                                                                                                               |
 | Benchmark                    | Enter a specific test run ID to use as a benchmark, or leave blank to compare a run to the previous run.<br/>**Note**: If you change the benchmark run ID, only those load tests that run after the change are compared to the new benchmark. Load tests that ran before the change show their original comparison. |
-| Thresholds: TRT (Avg)        | <Enter a positive integer between from 1 to 100 >                                                                                                                                                                                                                                                                   |
+| Thresholds: TRT (Avg)        | <Enter a positive integer between from 1 to 100>                                                                                                                                                                                                                                                                    |
 | Improvement                  | The percentage decrease in average transaction response time considered to be an improvement in performance.                                                                                                                                                                                                        |
 | Minor Regression             | The percentage increase in average transaction response time considered to be a minor regression in performance.                                                                                                                                                                                                    |
 | Major Regression             | The percentage increase in average transaction response time considered to be a major regression in performance.                                                                                                                                                                                                    |
@@ -84,7 +84,6 @@ pipeline {
     }
 }
 ```
-
 ### Results
 
 The plugin generates the following files (if they are available) in workspace folder after the build is completed.
@@ -103,7 +102,7 @@ The plugin generates the following files (if they are available) in workspace fo
 ### Trending
 If post-build action **Generate LoadRunner Cloud trending report** is configured, a menu named as "LoadRunner Cloud Trending" will be displayed. You can view the trending report by clicking the menu.
 > **Notes:**
-> - If you start multiple LoadRunner Cloud test runs in one Jenkins build, only last test run will be processed by **Generate LoadRunner Cloud trending report**.
+> - If you start multiple LoadRunner Cloud test runs in one Jenkins build, only the last test run will be processed by **Generate LoadRunner Cloud trending report**.
 
 ## Releases
 See [GitHub Releases](https://github.com/MicroFocus/lrc-jk-plugin/releases)
