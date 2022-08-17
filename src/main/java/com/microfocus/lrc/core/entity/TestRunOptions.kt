@@ -17,11 +17,10 @@ import java.io.Serializable
 class TestRunOptions(
     val testId: Int,
     val sendEmail: Boolean,
-    var skipLogin: Boolean,
     var skipPdfReport: Boolean,
     var isDebug: Boolean,
 ): Serializable {
     constructor(testId: Int, sendEmail: Boolean) : this(
-        testId, sendEmail, false, false, false
+        testId, sendEmail, false, false
     )
 }
