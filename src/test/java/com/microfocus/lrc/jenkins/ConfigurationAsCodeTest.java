@@ -84,9 +84,9 @@ public class ConfigurationAsCodeTest {
     }
 
     private static final String USERNAME = "lrc@microfocus.com";
-    private static final String TENANTID = "336275312";
+    private static final String TENANTID = "123456789";
     private static final String URL = "https://loadrunner-cloud.saas.microfocus.com";
     private static final String PROXYHOST = "172.31.128.1";
     private static final String PROXYPORT = "8080";
-    private static final String CLIENT_ID = "oauth2-EHHvbygKQtsorITXg5DZ@microfocus.com";
+    private static final String CLIENT_ID = "oauth2-XXXXXXXXXXXXXXXXXXXX@microfocus.com";
 }

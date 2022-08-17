@@ -1,11 +1,11 @@
 unclassified:
   lrcRunTest:
-    tenantId: "336275312"
+    tenantId: "123456789"
     url: "https://loadrunner-cloud.saas.microfocus.com"
     username: "lrc@microfocus.com"
     password: "{AQAAABAAAAAQ7AOV7yzN8M6BrDS+itSFLPOjhOUumxseRHkb0NhYuC0=}"
     useOAuth: true
-    clientId: "oauth2-EHHvbygKQtsorITXg5DZ@microfocus.com"
+    clientId: "oauth2-XXXXXXXXXXXXXXXXXXXX@microfocus.com"
     clientSecret: "{AQAAABAAAAAgfkVMlYtw5Idd/fl5a+BMRYmhXXu4BjJ88A0tyk8+tvJxa9lgj1/pNMsDwpJubGtR}"
     useProxy: false
     proxyHost: "172.31.128.1"
