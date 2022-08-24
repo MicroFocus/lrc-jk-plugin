@@ -17,7 +17,7 @@ import kotlin.math.pow
 
 class TestRunResultsResponseTest {
     @Test
-    fun rmThoughputUnit() {
+    fun rmThroughputUnit() {
         val withoutUnit = 123456789.toDouble()
         var withUnit = "$withoutUnit bytes/s"
         var rmThroughputUnit = TestRunResultsResponse.rmThroughputUnit(withUnit)

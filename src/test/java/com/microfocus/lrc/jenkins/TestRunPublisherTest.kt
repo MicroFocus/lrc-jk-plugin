@@ -26,14 +26,12 @@ import org.jvnet.hudson.test.JenkinsRule
 import org.jvnet.hudson.test.TestBuilder
 
 class TestRunPublisherTest {
-
-
     @get:Rule
     var jenkins = JenkinsRule()
 
     companion object {
-        var mockserver = MockWebServer()
-        var serverPort = 0
+        private var mockserver = MockWebServer()
+        private var serverPort = 0
 
         @BeforeClass
         @JvmStatic
