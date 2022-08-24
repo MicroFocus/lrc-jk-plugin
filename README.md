@@ -1,4 +1,4 @@
-[![CodeQL](https://github.com/MicroFocus/lrc-jk-plugin/actions/workflows/CodeQL.yml/badge.svg)](https://github.com/MicroFocus/lrc-jk-plugin/actions/workflows/CodeQL.yml)
+[![CodeQL](https://github.com/MicroFocus/lrc-jk-plugin/actions/workflows/codeql.yml/badge.svg)](https://github.com/MicroFocus/lrc-jk-plugin/actions/workflows/codeql.yml)
 [![Build](https://github.com/MicroFocus/lrc-jk-plugin/actions/workflows/build.yml/badge.svg)](https://github.com/MicroFocus/lrc-jk-plugin/actions/workflows/build.yml)
 [![Test](https://github.com/MicroFocus/lrc-jk-plugin/actions/workflows/test.yml/badge.svg)](https://github.com/MicroFocus/lrc-jk-plugin/actions/workflows/test.yml)
 
