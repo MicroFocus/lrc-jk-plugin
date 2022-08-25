@@ -23,19 +23,18 @@ import com.microfocus.lrc.core.service.Runner;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.*;
 import hudson.model.*;
-import hudson.remoting.Callable;
 import hudson.remoting.VirtualChannel;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
 import hudson.util.Secret;
 import hudson.util.VersionNumber;
+import jenkins.security.MasterToSlaveCallable;
 import org.apache.commons.lang.StringUtils;
 import jenkins.model.Jenkins;
 import jenkins.tasks.SimpleBuildStep;
 import net.sf.json.JSONObject;
 import org.jenkinsci.Symbol;
-import org.jenkinsci.remoting.RoleChecker;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
@@ -723,7 +722,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         }
     }
 
-    private static class RunTestCallable implements Callable<LoadTestRun, Exception> {
+    private static class RunTestCallable extends MasterToSlaveCallable<LoadTestRun, Exception> {
 
         private final ServerConfiguration serverConfiguration;
         private final TestRunOptions testRunOptions;
@@ -761,11 +760,6 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
             } finally {
                 runner.close();
             }
-        }
-
-        @Override
-        public void checkRoles(final RoleChecker roleChecker) throws SecurityException {
-            // noop
         }
     }
 }

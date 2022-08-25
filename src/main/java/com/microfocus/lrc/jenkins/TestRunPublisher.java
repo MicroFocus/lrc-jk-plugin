@@ -25,7 +25,6 @@ import hudson.model.AbstractProject;
 import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.TaskListener;
-import hudson.remoting.Callable;
 import hudson.remoting.VirtualChannel;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
@@ -33,9 +32,9 @@ import hudson.tasks.Publisher;
 import hudson.tasks.Recorder;
 import hudson.util.FormValidation;
 import jenkins.model.Jenkins;
+import jenkins.security.MasterToSlaveCallable;
 import jenkins.tasks.SimpleBuildStep;
 import org.jenkinsci.Symbol;
-import org.jenkinsci.remoting.RoleChecker;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
@@ -79,7 +78,7 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
         return BuildStepMonitor.NONE;
     }
 
-    private static class PublishReportCallable implements Callable<TrendingDataWrapper, RuntimeException> {
+    private static class PublishReportCallable extends MasterToSlaveCallable<TrendingDataWrapper, RuntimeException> {
 
         private final ServerConfiguration serverConfiguration;
         private final TrendingConfiguration trendingConfiguration;
@@ -119,11 +118,6 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
                 logger().println("Error while publishing report: " + e.getMessage());
                 return null;
             }
-        }
-
-        @Override
-        public void checkRoles(final RoleChecker roleChecker) throws SecurityException {
-            // noop
         }
     }
 
