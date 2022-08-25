@@ -40,6 +40,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.verb.POST;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -418,6 +419,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         //#endregion
 
         @SuppressWarnings({"java:S107", "checkstyle:ParameterNumber", "checkstyle:HiddenField"})
+        @POST
         public FormValidation doTestConnection(
                 @QueryParameter("username") final String username,
                 @QueryParameter("password") final Secret password,
