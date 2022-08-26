@@ -47,7 +47,7 @@ public final class TestRunReportProjectAction implements Action {
     }
 
     public String getUrlName() {
-        return "lrc_project_report";
+        return "lrc_report";
     }
 
     TestRunReportProjectAction(final Job<?, ?> project, final TrendingConfiguration trendingConfig) {
