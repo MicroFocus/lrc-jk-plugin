@@ -1,6 +1,6 @@
-[![CodeQL](https://github.com/MicroFocus/lrc-jk-plugin/actions/workflows/codeql.yml/badge.svg)](https://github.com/MicroFocus/lrc-jk-plugin/actions/workflows/codeql.yml)
-[![Build](https://github.com/MicroFocus/lrc-jk-plugin/actions/workflows/build.yml/badge.svg)](https://github.com/MicroFocus/lrc-jk-plugin/actions/workflows/build.yml)
-[![Test](https://github.com/MicroFocus/lrc-jk-plugin/actions/workflows/test.yml/badge.svg)](https://github.com/MicroFocus/lrc-jk-plugin/actions/workflows/test.yml)
+[![CodeQL](https://github.com/jenkinsci/loadrunner-cloud-plugin/actions/workflows/codeql.yml/badge.svg)](https://github.com/jenkinsci/loadrunner-cloud-plugin/actions/workflows/codeql.yml)
+[![Build](https://github.com/jenkinsci/loadrunner-cloud-plugin/actions/workflows/build.yml/badge.svg)](https://github.com/jenkinsci/loadrunner-cloud-plugin/actions/workflows/build.yml)
+[![Test](https://github.com/jenkinsci/loadrunner-cloud-plugin/actions/workflows/test.yml/badge.svg)](https://github.com/jenkinsci/loadrunner-cloud-plugin/actions/workflows/test.yml)
 
 # Jenkins plugin for LoadRunner Cloud
 
@@ -111,7 +111,7 @@ You can view the trending report by clicking the "**LoadRunner Cloud Trending**"
 > **Notes:** If you start multiple LoadRunner Cloud test runs in one Jenkins build, only the last test run will be processed by **Generate LoadRunner Cloud trending report**.
 
 ## Releases
-See [GitHub Releases](https://github.com/MicroFocus/lrc-jk-plugin/releases)
+See [GitHub Releases](https://github.com/jenkinsci/loadrunner-cloud-plugin/releases)
 
 ## Notes
 - Keep your password or secret safe.
