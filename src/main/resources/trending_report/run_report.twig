@@ -192,8 +192,6 @@
 
     var renderMetrics = function () {
         var metricsTableDOM = document.getElementById('metrics');
-        var metricsTmplStr = document.getElementById('tmpl_overview_item').innerHTML;
-        var metricsRowTmpl = _.template(metricsTmplStr);
 
         _.each(data.metrics, function (item) {
             var rowNode = document.createElement("tr");
@@ -209,7 +207,14 @@
             } else {
                 item.initDurationStr = 'N/A';
             }
-            rowNode.innerHTML = metricsRowTmpl(item);
+            item.errorsPerSec = item.errorsPerSec.toFixed(3);
+            item.tps = item.tps.toFixed(3);
+            var fields = ['runId', 'buildNo', 'avgHits', 'avgThroughput', 'errorsPerSec', 'tps', 'totalTxPassed', 'totalTxFailed', 'durationStr', 'vusers', 'status', 'date'];
+            _.each(fields, function (field) {
+                var colNode = document.createElement('td');
+                colNode.innerText = item[field];
+                rowNode.appendChild(colNode);
+            });
             metricsTableDOM.appendChild(rowNode);
         });
     };
@@ -217,31 +222,84 @@
         var trtTbodyDOM = document.getElementById('trt');
         var trtHeadsDOM = document.getElementById('trtHeads');
 
-        var trtRowTmpl = _.template('<td nowrap><%= transactionName %>, <%= scriptName %></td>');
-        var trtRowEachRunTmpl = _.template('' +
-            '<td class="trend ' +
-            '   <% if (isAvgImpr) {print(\"impr\")} ' +
-            '       else if (isAvgMinorRegr) {print(\"minorRegr\")} ' +
-            '       else if (isAvgMajorRegr) {print(\"majorRegr\")} %>' +
-            '">' +
-            '<% if (avg === 0 && avgTrend !== 0) { print("< 0.001") } else { print(avg) } %> <% if (avgTrend !== 0) {print("(" + avgTrend + "%)")} %>' +
-            '<% if (avgTrend > 0) { print("&#8593;") } else if (avgTrend < 0) { print("&#8595;") } %>' +
-            '<span><%= avgTrendCalc %></span>' +
-            '</td>' +
-            '<td class="trend ' +
-            '   <% if (is90thImpr) {print("impr")} ' +
-            '       else if (is90thMinorRegr) {print("minorRegr")} ' +
-            '       else if (is90thMajorRegr) {print("majorRegr")} %>' +
-            '">' +
-            '<% if (ninetieth === 0 && ninetiethTrend !== 0) { print("< 0.001") } else { print(ninetieth) } %> <% if (ninetiethTrend !== 0) {print("(" + ninetiethTrend + "%)")} %>' +
-            '<% if (ninetiethTrend > 0) { print("&#8593;") } else if (ninetiethTrend < 0) { print("&#8595;") } %>' +
-            '<span><%= ninetiethTrendCalc %></span>' +
-            '</td>' +
-            '<td><%= passed %></td>' +
-            '<td><%= failed %></td>');
-        var trtHeadTmlpStr = '<th>Transaction & Script</th>';
-        var trtRunHeadTmpl =_.template('<th nowrap colspan="4" id="<%= runId %>">Run#<%= runId %> (Build#<%= buildNo %>)</th>');
-        var trtSecondHeadTmplStr = '<th></th>';
+        var createTRTRowEachRunNodes = function (item) {
+            const getRegrClass = (isImpr, isMinorRegr, isMajorRegr) => {
+                if (isImpr) {
+                    return 'impr';
+                } else if (isMinorRegr) {
+                    return 'minorRegr';
+                } else if (isMajorRegr) {
+                    return 'majorRegr';
+                }
+            };
+            const getColText = (field, item) => {
+                const val = item[field];
+                const valTrend = item[`${field}Trend`];
+                let result = '';
+                if (val === 0 && valTrend !== 0) {
+                    result += '< 0.001';
+                } else {
+                    result += val;
+                }
+
+                if (valTrend !== 0) {
+                    result += `(${valTrend}%)`
+                }
+
+                if (valTrend > 0) {
+                    result += "&#8593;";
+                } else if (valTrend < 0) {
+                    result += "&#8595;";
+                }
+
+                return result;
+            };
+            const createTd = (field) => {
+                const col = document.createElement('td');
+                let fieldInitialCap = `${field[0].toUpperCase()}${field.slice(1)}`;
+                if (field === 'ninetieth') {
+                    fieldInitialCap = '90th';
+                }
+                col.classList.add(
+                    'trend',
+                    getRegrClass(
+                        item[`is${fieldInitialCap}Impr`],
+                        item[`is${fieldInitialCap}MinorRegr`],
+                        item[`is${fieldInitialCap}MajorRegr`]
+                    )
+                );
+                col.innerText = getColText(field, item);
+
+                const span = document.createElement('span');
+                span.innerText = item[`${field}TrendCalc`];
+
+                col.appendChild(span);
+
+                return col;
+            };
+            const passedCol = document.createElement('td');
+            passedCol.innerText = item.passed;
+            const failedCol = document.createElement('td');
+            failedCol.innerText = item.failed;
+
+            return [
+                createTd('avg'),
+                createTd('ninetieth'),
+                passedCol,
+                failedCol
+            ];
+        };
+
+        var trtHeadColNode1 = document.createElement('th');
+        trtHeadColNode1.innerText = 'Transaction & Script';
+
+        var trtHeadRow = document.createElement('tr');
+        var trt2ndHeadRow = document.createElement('tr');
+        var emptyCell = document.createElement('th');
+        trt2ndHeadRow.appendChild(emptyCell);
+
+        trtHeadRow.appendChild(trtHeadColNode1);
+
 
         var runsFromTrt = [];
         //sort the runIds desc first;
@@ -259,14 +317,30 @@
         runsFromTrt = _.reverse(runsFromTrt);
 
         _.each(runsFromTrt, function (transactionItem) {
-            trtHeadTmlpStr += trtRunHeadTmpl(transactionItem);
-            trtSecondHeadTmplStr += '<td> Avg </td><td>'+ transactionItem.percentile +'th% </td><td> Passed </td><td> Failed </td>';
+            var trtHeadColNode2 = document.createElement('th');
+            trtHeadColNode2.setAttribute('nowrap', '');
+            trtHeadColNode2.setAttribute('colspan', '4');
+            trtHeadColNode2.id = transactionItem.runId;
+            trtHeadColNode2.innerText = `Run#${transactionItem.runId} (Build#${transactionItem.buildNo})`;
+            trtHeadRow.appendChild(trtHeadColNode2);
+            var avgHeadCol = document.createElement('td');
+            avgHeadCol.innerText = 'Avg';
+
+            var percentileHeadCol = document.createElement('td');
+            percentileHeadCol.innerText = `${transactionItem.percentile}th%`;
+
+            var passedHeadCol = document.createElement('td');
+            passedHeadCol.innerText = 'Passed';
+
+            var failedHeadCol = document.createElement('td');
+            failedHeadCol.innerText = 'Failed';
+
+            trt2ndHeadRow.appendChild(avgHeadCol);
+            trt2ndHeadRow.appendChild(percentileHeadCol);
+            trt2ndHeadRow.appendChild(passedHeadCol);
+            trt2ndHeadRow.appendChild(failedHeadCol);
         });
 
-        var trtHeadRow = document.createElement('tr');
-        trtHeadRow.innerHTML = trtHeadTmlpStr;
-        var trt2ndHeadRow = document.createElement('tr');
-        trt2ndHeadRow.innerHTML = trtSecondHeadTmplStr;
         trtHeadsDOM.appendChild(trtHeadRow);
         trtHeadsDOM.appendChild(trt2ndHeadRow);
 
@@ -285,17 +359,31 @@
         }
 
         _.each(orderedTrt, function (item) {
-           var row = trtRowTmpl(item);
+            var rowDOM = document.createElement('tr');
+            var colNode = document.createElement('td');
+            colNode.setAttribute('nowrap', '');
+            colNode.innerText = `${item.transactionName}, ${item.scriptName}`;
+
+            rowDOM.appendChild(colNode);
+
            _.each(runsFromTrt, function (run) {
                var correspondRun = _.find(item.trtDataArr, {runId: run.runId});
                if (correspondRun) {
-                   row += trtRowEachRunTmpl(correspondRun);
+                   const cols = createTRTRowEachRunNodes(correspondRun);
+                   _.each(cols, (col) => rowDOM.appendChild(col));
                } else {
-                   row += '<td>N/A</td><td>N/A</td><td>N/A</td><td>N/A</td>';
+                   const naCol = () => {
+                       const col = document.createElement('td');
+                       col.innerText = 'N/A';
+                       return col;
+                   }
+
+                   _.range(0, 3).forEach(() => {
+                      rowDOM.appendChild(naCol());
+                   });
                }
            });
-           var rowDOM = document.createElement('tr');
-           rowDOM.innerHTML = row;
+
            trtTbodyDOM.appendChild(rowDOM);
         });
 
