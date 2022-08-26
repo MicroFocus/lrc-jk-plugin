@@ -48,7 +48,7 @@
 <body>
 <div class="pure-g">
     <div class="pure-u-3-24"></div>
-    <div class="pure-u-18-24" style="overflow-x: none;">
+    <div class="pure-u-18-24" style="overflow-x: scroll;">
         <h1 id="pageTitle">{{pageTitle}}</h1>
         <div>
             <h3>Test Id: {{testId}}</h3>
@@ -398,14 +398,13 @@
 
            trtTbodyDOM.appendChild(rowDOM);
         });
-
     };
 
     window.onload = function () {
         renderMetrics();
-
         renderTRT();
 
+        /*
         var pageTitleDOM = document.getElementById('pageTitle');
         var debugSwitcherTimer = null;
         var clickingFlag = 0;
@@ -432,6 +431,7 @@
                 }, 3000);
             }
         };
+        */
     };
 
 </script>
