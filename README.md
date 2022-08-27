@@ -1,6 +1,5 @@
+[![Build Status](https://ci.jenkins.io/job/Plugins/job/loadrunner-cloud-plugin/job/main/badge/icon)](https://ci.jenkins.io/job/Plugins/job/loadrunner-cloud-plugin/job/main/)
 [![CodeQL](https://github.com/jenkinsci/loadrunner-cloud-plugin/actions/workflows/codeql.yml/badge.svg)](https://github.com/jenkinsci/loadrunner-cloud-plugin/actions/workflows/codeql.yml)
-[![Build](https://github.com/jenkinsci/loadrunner-cloud-plugin/actions/workflows/build.yml/badge.svg)](https://github.com/jenkinsci/loadrunner-cloud-plugin/actions/workflows/build.yml)
-[![Test](https://github.com/jenkinsci/loadrunner-cloud-plugin/actions/workflows/test.yml/badge.svg)](https://github.com/jenkinsci/loadrunner-cloud-plugin/actions/workflows/test.yml)
 
 # Jenkins plugin for LoadRunner Cloud
 
