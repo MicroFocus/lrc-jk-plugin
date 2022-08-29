@@ -4,6 +4,11 @@
 
 # Jenkins plugin for LoadRunner Cloud
 
+- [Introduction](#introduction)
+- [Getting Started](#getting-started)
+- [Notes](#notes)
+- [Releases](#releases)
+
 ## Introduction
 
 The plugin lets you run a test in [LoadRunner Cloud](https://admhelp.microfocus.com/lrc/en/Latest/Content/Storm/c_Getting_started.htm) and collect results.  
@@ -110,12 +115,12 @@ You can view the trending report by clicking the "**LoadRunner Cloud Trending**"
 ![Trending menu](/images/trending_menu.png "LoadRunner Cloud Trending menu")
 > **Notes:** If you start multiple LoadRunner Cloud test runs in one Jenkins build, only the last test run will be processed by **Generate LoadRunner Cloud trending report**.
 
-## Releases
-See [GitHub Releases](https://github.com/MicroFocus/lrc-jk-plugin/releases)
-
 ## Notes
 - Keep your password or secret safe.
 - The plugin requires Jenkins version **2.289.3** or above.
 - It is recommended to use the latest Jenkins [**LTS**](https://get.jenkins.io/war-stable/) release.
 - It is recommended to update the plugin to the latest version.
   > **Tip**: **Manage Jenkins** &rarr; **Manage Plugins**, on the **Updates** tab, click **Check now** to check for the most recent plugin updates.
+
+## Releases
+See [GitHub Releases](https://github.com/MicroFocus/lrc-jk-plugin/releases)
