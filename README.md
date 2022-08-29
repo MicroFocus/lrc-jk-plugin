@@ -122,4 +122,4 @@ You can view the trending report by clicking the "**LoadRunner Cloud Trending**"
   > **Tip**: **Manage Jenkins** &rarr; **Manage Plugins**, on the **Updates** tab, click **Check now** to check for the most recent plugin updates.
 
 ## Releases
-See [GitHub Releases](https://github.com/MicroFocus/loadrunner-cloud-plugin/releases)
+See [GitHub Releases](https://github.com/jenkinsci/loadrunner-cloud-plugin/releases)
