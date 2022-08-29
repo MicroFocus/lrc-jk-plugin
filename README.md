@@ -5,6 +5,12 @@
 
 - [Introduction](#introduction)
 - [Getting Started](#getting-started)
+  - [System Configuraiton](#system-configuration)
+  - [Job Configuraiton](#job-configuration)
+    - [Freestyle](#freestyle)
+    - [Pipeline](#pipeline)
+  - [Results](#results)
+  - [Trending](#trending)
 - [Notes](#notes)
 - [Releases](#releases)
 
