@@ -1,6 +1,8 @@
 [![Build Status](https://ci.jenkins.io/job/Plugins/job/loadrunner-cloud-plugin/job/main/badge/icon)](https://ci.jenkins.io/job/Plugins/job/loadrunner-cloud-plugin/job/main/)
 [![CodeQL](https://github.com/jenkinsci/loadrunner-cloud-plugin/actions/workflows/codeql.yml/badge.svg)](https://github.com/jenkinsci/loadrunner-cloud-plugin/actions/workflows/codeql.yml)
 
+**NOTICE**: This is a **PRERELEASE** version  
+
 # Jenkins plugin for LoadRunner Cloud
 
 - [Introduction](#introduction)
