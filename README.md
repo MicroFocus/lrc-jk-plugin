@@ -3,8 +3,6 @@
 
 **NOTICE**: This is a **PRERELEASE** version  
 
-# Jenkins plugin for LoadRunner Cloud
-
 - [Introduction](#introduction)
 - [Getting Started](#getting-started)
   - [System Configuraiton](#system-configuration)
@@ -15,6 +13,8 @@
   - [Trending](#trending)
 - [Notes](#notes)
 - [Releases](#releases)
+
+# Jenkins plugin for LoadRunner Cloud
 
 ## Introduction
 
