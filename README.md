@@ -18,7 +18,8 @@
 
 ## Introduction
 
-The plugin lets you run a test in [LoadRunner Cloud](https://admhelp.microfocus.com/lrc/en/Latest/Content/Storm/c_Getting_started.htm) and collect results.  
+This is the official plugin for [LoadRunner Cloud](https://www.microfocus.com/en-us/products/loadrunner-cloud).  
+The plugin lets you run a test in LoadRunner Cloud and collect results.  
 It provides a build step **Run test in LoadRunner Cloud** to run tests, and a post-build action **Generate LoadRunner Cloud trending report** to generate trending reports.
 Both steps are also exposed in the pipeline job as `lrcRunTest` and `lrcGenTrendingReport`.
 
