@@ -332,7 +332,6 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
                 PERCENTAGE_DEFAULT_MIN
         );
 
-
         this.trtAvgThresholdMajorRegression = setDefaultValue(
                 trtAvgThresholdMajorRegression,
                 1,

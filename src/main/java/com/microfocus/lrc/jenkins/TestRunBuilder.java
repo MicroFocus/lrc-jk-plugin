@@ -46,6 +46,8 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.*;
 
+import static com.microfocus.lrc.jenkins.Utils.*;
+
 public final class TestRunBuilder extends Builder implements SimpleBuildStep {
 
     public String getTestId() {
@@ -519,6 +521,19 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         this.setSendEmail(sendEmail);
     }
 
+    private boolean validateParameters() {
+        if (!isPositiveInteger(this.projectId)) {
+            this.loggerProxy.error("invalid parameter. projectId: " + this.projectId);
+            return false;
+        }
+        if (!isPositiveInteger(this.testId)) {
+            this.loggerProxy.error("invalid parameter. testId: " + this.testId);
+            return false;
+        }
+
+        return true;
+    }
+
     @Override
     public void perform(
             final @NonNull Run<?, ?> run,
@@ -529,6 +544,11 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
     ) throws InterruptedException, IOException {
         PrintStream logger = listener.getLogger();
         this.loggerProxy = new LoggerProxy(logger, new LoggerOptions(false, ""));
+
+        if (!validateParameters()) {
+            run.setResult(Result.FAILURE);
+            return;
+        }
 
         printEnvInfo(env);
 
