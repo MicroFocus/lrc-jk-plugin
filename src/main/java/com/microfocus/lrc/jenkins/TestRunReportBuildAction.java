@@ -20,6 +20,7 @@ import hudson.model.Run;
 import jenkins.model.RunAction2;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.verb.POST;
 
 import javax.servlet.ServletException;
 import java.io.IOException;
@@ -61,6 +62,7 @@ public final class TestRunReportBuildAction implements RunAction2 {
      * @throws IOException
      * @throws ServletException
      */
+    @POST
     public void doDynamic(final StaplerRequest req, final StaplerResponse response)
             throws IOException, ServletException {
         String jsonStr = new Gson().toJson(this.trendingDataWrapper);

@@ -158,6 +158,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
 
         private String url;
 
+        @POST
         public FormValidation doCheckUrl(@QueryParameter final String value) {
             String errorMsg = "Please input a valid URL";
             if (value == null || value.trim().length() == 0) {
@@ -173,6 +174,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
 
         private String tenantId;
 
+        @POST
         public FormValidation doCheckTenantId(@QueryParameter final String value) {
             if (value == null || value.trim().length() == 0) {
                 return FormValidation.error("Please input a Tenant ID");
@@ -184,6 +186,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         private String username;
 
         @SuppressWarnings("checkstyle:HiddenField")
+        @POST
         public FormValidation doCheckUsername(
                 @QueryParameter final String value,
                 @QueryParameter final String useOAuth
@@ -202,6 +205,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         private Secret password;
 
         @SuppressWarnings("checkstyle:HiddenField")
+        @POST
         public FormValidation doCheckPassword(
                 @QueryParameter final String value,
                 final @QueryParameter String useOAuth
@@ -221,6 +225,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         private String clientId;
 
         @SuppressWarnings("checkstyle:HiddenField")
+        @POST
         public FormValidation doCheckClientId(
                 @QueryParameter final String value,
                 @QueryParameter final String useOAuth
@@ -239,6 +244,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         private Secret clientSecret;
 
         @SuppressWarnings("checkstyle:HiddenField")
+        @POST
         public FormValidation doCheckClientSecret(
                 @QueryParameter final String value,
                 @QueryParameter final String useOAuth
@@ -258,6 +264,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         private String proxyHost;
 
         @SuppressWarnings("checkstyle:HiddenField")
+        @POST
         public FormValidation doCheckProxyHost(
                 @QueryParameter final String value,
                 @QueryParameter final String useProxy
@@ -277,6 +284,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         private String proxyPort;
 
         @SuppressWarnings({"checkstyle:HiddenField", "checkstyle:MagicNumber"})
+        @POST
         public FormValidation doCheckProxyPort(
                 @QueryParameter final String value,
                 @QueryParameter final String useProxy
@@ -305,6 +313,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         private String proxyUsername;
         private Secret proxyPassword;
 
+        @POST
         public FormValidation doCheckProjectID(@QueryParameter final String value) {
             if (value == null || value.trim().length() == 0) {
                 return FormValidation.error("Please input a ProjectID");

@@ -18,6 +18,7 @@ import hudson.model.Job;
 import hudson.model.Run;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.verb.POST;
 
 import javax.servlet.ServletException;
 import java.io.IOException;
@@ -57,6 +58,7 @@ public final class TestRunReportProjectAction implements Action {
 
 
     @SuppressWarnings("java:S2629")
+    @POST
     public void doDynamic(final StaplerRequest req, final StaplerResponse response)
             throws IOException, ServletException {
         String htmlContent = null;

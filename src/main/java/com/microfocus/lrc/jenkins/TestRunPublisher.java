@@ -38,6 +38,7 @@ import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.verb.POST;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -459,6 +460,7 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
 
         //#region formValidation
         @SuppressWarnings({"checkstyle:MagicNumber"})
+        @POST
         public FormValidation doCheckRunsCount(final @QueryParameter String value) {
             Integer val = getIntegerSafely(value);
             if (val == null || val < 5 || val > 10) {
@@ -467,6 +469,7 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
             return FormValidation.ok();
         }
 
+        @POST
         public FormValidation doCheckBenchmark(final @QueryParameter String value) {
             if (StringUtils.isBlank(value) || StringUtils.isEmpty(value)) {
                 return FormValidation.ok();
@@ -478,27 +481,33 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
             return FormValidation.ok();
         }
 
+        @POST
         public FormValidation doCheckTrtPercentileThresholdImprovement(final @QueryParameter String value) {
             Integer val = getIntegerSafely(value);
             return checkThreshold(val);
         }
 
+        @POST
         public FormValidation doCheckTrtPercentileThresholdMinorRegression(final @QueryParameter String value) {
             return doCheckTrtPercentileThresholdImprovement(value);
         }
 
+        @POST
         public FormValidation doCheckTrtPercentileThresholdMajorRegression(final @QueryParameter String value) {
             return doCheckTrtPercentileThresholdImprovement(value);
         }
 
+        @POST
         public FormValidation doCheckTrtAvgThresholdImprovement(final @QueryParameter String value) {
             return doCheckTrtPercentileThresholdImprovement(value);
         }
 
+        @POST
         public FormValidation doCheckTrtAvgThresholdMinorRegression(final @QueryParameter String value) {
             return doCheckTrtPercentileThresholdImprovement(value);
         }
 
+        @POST
         public FormValidation doCheckTrtAvgThresholdMajorRegression(final @QueryParameter String value) {
             return doCheckTrtPercentileThresholdImprovement(value);
         }
