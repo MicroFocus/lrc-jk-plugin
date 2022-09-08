@@ -34,6 +34,7 @@ import hudson.util.FormValidation;
 import jenkins.model.Jenkins;
 import jenkins.security.MasterToSlaveCallable;
 import jenkins.tasks.SimpleBuildStep;
+import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
@@ -332,7 +333,6 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
                 PERCENTAGE_DEFAULT_MIN
         );
 
-
         this.trtAvgThresholdMajorRegression = setDefaultValue(
                 trtAvgThresholdMajorRegression,
                 1,
@@ -468,8 +468,11 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
         }
 
         public FormValidation doCheckBenchmark(final @QueryParameter String value) {
+            if (StringUtils.isBlank(value) || StringUtils.isEmpty(value)) {
+                return FormValidation.ok();
+            }
             Integer val = getIntegerSafely(value);
-            if (val != null && val < 0) {
+            if (val == null || val < 0) {
                 return FormValidation.error("Please input a valid run id or leave it blank or 0.");
             }
             return FormValidation.ok();
@@ -502,11 +505,7 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
 
         @SuppressWarnings({"checkstyle:MagicNumber"})
         private FormValidation checkThreshold(final Integer value) {
-            if (value == null) {
-                return FormValidation.ok();
-            }
-
-            if (value < 1 || value > 100) {
+            if (value == null || value < 1 || value > 100) {
                 return FormValidation.error("Threshold value should be an integer from 1 to 100.");
             }
 

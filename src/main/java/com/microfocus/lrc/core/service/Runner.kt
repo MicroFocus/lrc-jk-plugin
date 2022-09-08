@@ -108,7 +108,7 @@ class Runner(
                 this.loadTestRunService.fetch(testRun)
                 retryTimes = 0
                 loginRetryTimes = 0
-            } catch (e: IOException) {
+            } catch (e: Exception) {
                 if (e.message == "401") {
                     if (loginRetryTimes < maxLoginRetry) {
                         this.loggerProxy.error("Authentication failed, retrying ...")

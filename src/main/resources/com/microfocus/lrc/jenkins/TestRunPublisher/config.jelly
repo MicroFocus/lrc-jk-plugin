@@ -20,32 +20,32 @@
   -->
     <f:section title="Common">
         <f:entry title="Number of Runs" field="runsCount" description="The number of last successful runs initiated by Jenkins which will be included in the Trending Report. Valid range is from 5 to 10.">
-            <f:textbox default="5" />
+            <f:number clazz="positive-number" default="5" />
         </f:entry>
         <f:entry title="Benchmark" field="benchmark" description="Leave it blank or 0 to compare to previous run, or fill in a run id as a benchmark.">
-            <f:textbox default="0" />
+            <f:number clazz="non-negative-number" default="0" />
         </f:entry>
     </f:section>
     <f:section title="Thresholds: TRT [Avg]">
         <f:entry title="Improvement" field="trtAvgThresholdImprovement" description="">
-            <f:textbox default="5" />
+            <f:number clazz="positive-number" default="5" />
         </f:entry>
         <f:entry title="Minor Regression" field="trtAvgThresholdMinorRegression" description="">
-            <f:textbox default="5" />
+            <f:number clazz="positive-number" default="5" />
         </f:entry>
         <f:entry title="Major Regression" field="trtAvgThresholdMajorRegression" description="">
-            <f:textbox default="10" />
+            <f:number clazz="positive-number" default="10" />
         </f:entry>
     </f:section>
     <f:section title="Thresholds: TRT [Percentile]">
         <f:entry title="Improvement" field="trtPercentileThresholdImprovement" description="">
-            <f:textbox default="5" />
+            <f:number clazz="positive-number" default="5" />
         </f:entry>
         <f:entry title="Minor Regression" field="trtPercentileThresholdMinorRegression" description="">
-            <f:textbox default="5" />
+            <f:number clazz="positive-number" default="5" />
         </f:entry>
         <f:entry title="Major Regression" field="trtPercentileThresholdMajorRegression" description="">
-            <f:textbox default="10" />
+            <f:number clazz="positive-number" default="10" />
         </f:entry>
     </f:section>
 </j:jelly>

@@ -54,7 +54,7 @@ public class TestRunBuilderTest {
     @Test
     public void testConfigRoundtrip() throws Exception {
         FreeStyleProject project = jenkins.createFreeStyleProject();
-        TestRunBuilder builder = new TestRunBuilder("FAKEPROJECT", "FAKETESTID", false);
+        TestRunBuilder builder = new TestRunBuilder("1", "1234", false);
         TestRunBuilder.DescriptorImpl descriptor = jenkins.get(TestRunBuilder.DescriptorImpl.class);
         String baseUrl = mockserver.url("/").toString();
         descriptor.setUrl(baseUrl);
@@ -144,55 +144,188 @@ public class TestRunBuilderTest {
         MockServerResponseGenerator.mockTransactions();
     }
 
+    private void mockResponseWithError() {
+        MockServerResponseGenerator.mockLogin();
+
+        MockResponse responseGetLoadTest = new MockResponse();
+        JsonObject loadTestResObj = new JsonObject();
+        loadTestResObj.addProperty("name", "fake_load_test");
+        responseGetLoadTest.setBody(loadTestResObj.toString());
+        mockserver.enqueue(responseGetLoadTest);
+
+        MockResponse responseStartTest = new MockResponse();
+        JsonObject startTestResObj = new JsonObject();
+        startTestResObj.addProperty("runId", -1);
+        responseStartTest.setBody(startTestResObj.toString());
+        mockserver.enqueue(responseStartTest);
+
+        MockResponse responseRunStatus = new MockResponse();
+        JsonObject runStatusResObj = new JsonObject();
+        runStatusResObj.addProperty("status", "INIT");
+        runStatusResObj.addProperty("uiStatus", "INITIALIZING");
+        runStatusResObj.addProperty("isTerminated", false);
+        responseRunStatus.setBody(runStatusResObj.toString());
+        for (int i = 0; i < 2; i++) {
+            mockserver.enqueue(responseRunStatus);
+        }
+        MockResponse responseLoginExpired = new MockResponse();
+        responseLoginExpired.setBody("whatever error");
+        responseLoginExpired.setResponseCode(500);
+        mockserver.enqueue(responseLoginExpired);
+
+
+        runStatusResObj.addProperty("status", TestRunStatus.PASSED.getStatusName());
+        runStatusResObj.addProperty("uiStatus", TestRunStatus.PASSED.getStatusName());
+        runStatusResObj.addProperty("isTerminated", true);
+        MockResponse responseRunStatusDone = new MockResponse().setBody(runStatusResObj.toString());
+        mockserver.enqueue(responseRunStatusDone);
+
+        runStatusResObj.addProperty("hasReport", true);
+        MockResponse responseRunStatusHasReport = new MockResponse().setBody(runStatusResObj.toString());
+        mockserver.enqueue(responseRunStatusHasReport);
+
+        // repeat 2 times for csv and pdf
+        for (int i = 0; i < 2; i += 1) {
+            JsonObject genReportResObj = new JsonObject();
+            genReportResObj.addProperty("reportId", -999);
+            MockResponse responseGenReport = new MockResponse().setBody(genReportResObj.toString());
+            mockserver.enqueue(responseGenReport);
+
+            JsonObject reportStatusResObj = new JsonObject();
+            reportStatusResObj.addProperty("message", "In progress");
+            MockResponse responseReportStatus = new MockResponse().setBody(reportStatusResObj.toString());
+            responseReportStatus.setHeader("Content-Type", Constants.APPLICATION_JSON);
+            mockserver.enqueue(responseReportStatus);
+
+            String fakeReportContent = "FAKE_REPORT_CONTENT";
+            MockResponse responseReportContent = new MockResponse().setBody(fakeReportContent);
+            responseReportContent.setHeader("Content-Type", "application/octet-stream");
+            mockserver.enqueue(responseReportContent);
+        }
+
+        MockServerResponseGenerator.mockTransactions();
+    }
+
+    private void mockResponseWithLoginExpired() {
+        MockServerResponseGenerator.mockLogin();
+
+        MockResponse responseGetLoadTest = new MockResponse();
+        JsonObject loadTestResObj = new JsonObject();
+        loadTestResObj.addProperty("name", "fake_load_test");
+        responseGetLoadTest.setBody(loadTestResObj.toString());
+        mockserver.enqueue(responseGetLoadTest);
+
+        MockResponse responseStartTest = new MockResponse();
+        JsonObject startTestResObj = new JsonObject();
+        startTestResObj.addProperty("runId", -1);
+        responseStartTest.setBody(startTestResObj.toString());
+        mockserver.enqueue(responseStartTest);
+
+        MockResponse responseRunStatus = new MockResponse();
+        JsonObject runStatusResObj = new JsonObject();
+        runStatusResObj.addProperty("status", "INIT");
+        runStatusResObj.addProperty("uiStatus", "INITIALIZING");
+        runStatusResObj.addProperty("isTerminated", false);
+        responseRunStatus.setBody(runStatusResObj.toString());
+        for (int i = 0; i < 2; i++) {
+            mockserver.enqueue(responseRunStatus);
+        }
+        MockResponse responseLoginExpired = new MockResponse();
+        responseLoginExpired.setBody("login failed");
+        responseLoginExpired.setResponseCode(200);
+        mockserver.enqueue(responseLoginExpired);
+
+        MockServerResponseGenerator.mockLogin();
+
+        runStatusResObj.addProperty("status", TestRunStatus.PASSED.getStatusName());
+        runStatusResObj.addProperty("uiStatus", TestRunStatus.PASSED.getStatusName());
+        runStatusResObj.addProperty("isTerminated", true);
+        MockResponse responseRunStatusDone = new MockResponse().setBody(runStatusResObj.toString());
+        mockserver.enqueue(responseRunStatusDone);
+
+        runStatusResObj.addProperty("hasReport", true);
+        MockResponse responseRunStatusHasReport = new MockResponse().setBody(runStatusResObj.toString());
+        mockserver.enqueue(responseRunStatusHasReport);
+
+        // repeat 2 times for csv and pdf
+        for (int i = 0; i < 2; i += 1) {
+            JsonObject genReportResObj = new JsonObject();
+            genReportResObj.addProperty("reportId", -999);
+            MockResponse responseGenReport = new MockResponse().setBody(genReportResObj.toString());
+            mockserver.enqueue(responseGenReport);
+
+            JsonObject reportStatusResObj = new JsonObject();
+            reportStatusResObj.addProperty("message", "In progress");
+            MockResponse responseReportStatus = new MockResponse().setBody(reportStatusResObj.toString());
+            responseReportStatus.setHeader("Content-Type", Constants.APPLICATION_JSON);
+            mockserver.enqueue(responseReportStatus);
+
+            String fakeReportContent = "FAKE_REPORT_CONTENT";
+            MockResponse responseReportContent = new MockResponse().setBody(fakeReportContent);
+            responseReportContent.setHeader("Content-Type", "application/octet-stream");
+            mockserver.enqueue(responseReportContent);
+        }
+
+        MockServerResponseGenerator.mockTransactions();
+    }
+
     @Test
     public void testBuild() throws Exception {
         EnvVars.masterEnvVars.put(OptionInEnvVars.LRC_DEBUG_LOG.name(), "false");
 
-        FreeStyleProject project = jenkins.createFreeStyleProject();
-        TestRunBuilder builder = new TestRunBuilder("99", "999", false);
-        project.getBuildersList().add(builder);
-        project.getBuildersList().add(new TestBuilder() {
-            @Override
-            public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
-                String runId = EnvVarsUtil.getEnvVar(build, launcher, "LRC_RUN_ID");
-                Assert.assertEquals("-1", runId);
-                listener.getLogger().println("got LRC_RUN_ID: " + runId);
-                Assert.assertEquals("BAR", EnvVarsUtil.getEnvVar(build, launcher, "FOO"));
-                return true;
+        for (int i = 0; i < 3; i += 1) {
+            FreeStyleProject project = jenkins.createFreeStyleProject();
+            TestRunBuilder builder = new TestRunBuilder("99", "999", false);
+            project.getBuildersList().add(builder);
+            project.getBuildersList().add(new TestBuilder() {
+                @Override
+                public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
+                    String runId = EnvVarsUtil.getEnvVar(build, launcher, "LRC_RUN_ID");
+                    Assert.assertEquals("-1", runId);
+                    listener.getLogger().println("got LRC_RUN_ID: " + runId);
+                    Assert.assertEquals("BAR", EnvVarsUtil.getEnvVar(build, launcher, "FOO"));
+                    return true;
+                }
+            });
+            TestRunBuilder.DescriptorImpl descriptor = jenkins.get(TestRunBuilder.DescriptorImpl.class);
+            String baseUrl = mockserver.url("/").toString();
+            descriptor.setUrl(baseUrl);
+            descriptor.setClientId("FAKE_CLIENT_ID");
+            descriptor.setClientSecret("FAKE_CLIENT_SECRET");
+            descriptor.setTenantId("FAKE_TENANT_ID");
+            descriptor.setUseOAuth(true);
+
+            descriptor.save();
+
+            switch (i) {
+                case 0: this.mockResponseNormal();break;
+                case 1: this.mockResponseWithError();break;
+                case 2: this.mockResponseWithLoginExpired();break;
+                default: break;
             }
-        });
-        TestRunBuilder.DescriptorImpl descriptor = jenkins.get(TestRunBuilder.DescriptorImpl.class);
-        String baseUrl = mockserver.url("/").toString();
-        descriptor.setUrl(baseUrl);
-        descriptor.setClientId("FAKE_CLIENT_ID");
-        descriptor.setClientSecret("FAKE_CLIENT_SECRET");
-        descriptor.setTenantId("FAKE_TENANT_ID");
-        descriptor.setUseOAuth(true);
 
-        descriptor.save();
+            ParametersAction a = new ParametersAction(
+                    new StringParameterValue("LRC_RUN_ID", ""),
+                    new StringParameterValue("FOO", "BAR")
+            );
+            Future<FreeStyleBuild> f = project.scheduleBuild2(0, a);
+            assert f != null;
+            FreeStyleBuild b = f.get();
 
-        this.mockResponseNormal();
-        ParametersAction a = new ParametersAction(
-                new StringParameterValue("LRC_RUN_ID", ""),
-                new StringParameterValue("FOO", "BAR")
-        );
-        Future<FreeStyleBuild> f = project.scheduleBuild2(0, a);
-        assert f != null;
-        FreeStyleBuild b = f.get();
-
-        jenkins.assertBuildStatusSuccess(b);
-        BufferedReader rd = new BufferedReader(b.getLogReader());
-        while (rd.ready()) {
-            // print jenkins logs for debugging
-            System.out.println(rd.readLine());
+            jenkins.assertBuildStatusSuccess(b);
+            BufferedReader rd = new BufferedReader(b.getLogReader());
+            while (rd.ready()) {
+                // print jenkins logs for debugging
+                System.out.println(rd.readLine());
+            }
+            jenkins.assertLogContains("Staring load test \"fake_load_test\" ...", b);
+            // assert workspace has report files
+            FilePath workspace = b.getWorkspace();
+            assert workspace != null;
+            Assert.assertTrue(workspace.child("lrc_report_FAKE_TENANT_ID--1.xml").exists());
+            Assert.assertTrue(workspace.child("lrc_report_FAKE_TENANT_ID--1.pdf").exists());
+            Assert.assertTrue(workspace.child("lrc_report_FAKE_TENANT_ID--1.csv").exists());
+            Assert.assertTrue(workspace.child("lrc_report_trans_FAKE_TENANT_ID--1.csv").exists());
         }
-        jenkins.assertLogContains("Staring load test \"fake_load_test\" ...", b);
-        // assert workspace has report files
-        FilePath workspace = b.getWorkspace();
-        assert workspace != null;
-        Assert.assertTrue(workspace.child("lrc_report_FAKE_TENANT_ID--1.xml").exists());
-        Assert.assertTrue(workspace.child("lrc_report_FAKE_TENANT_ID--1.pdf").exists());
-        Assert.assertTrue(workspace.child("lrc_report_FAKE_TENANT_ID--1.csv").exists());
-        Assert.assertTrue(workspace.child("lrc_report_trans_FAKE_TENANT_ID--1.csv").exists());
     }
 }

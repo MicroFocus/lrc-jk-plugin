@@ -34,10 +34,10 @@
             <f:password />
         </f:entry>
         <f:entry title="URL" field="url">
-            <f:textbox default="https://loadrunner-cloud.saas.microfocus.com" />
+            <f:textbox clazz="required" default="https://loadrunner-cloud.saas.microfocus.com" />
         </f:entry>
         <f:entry title="Tenant ID" field="tenantId">
-            <f:textbox />
+            <f:textbox clazz="required" />
         </f:entry>
         <f:block>
             <f:optionalBlock checked="${descriptor.useOAuth}" name="useOAuth" field="useOAuth" inline="true" title="Use OAuth token">
