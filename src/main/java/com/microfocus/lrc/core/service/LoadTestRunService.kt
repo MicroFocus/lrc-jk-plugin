@@ -43,7 +43,8 @@ class LoadTestRunService(
 
             return testRun
         } else {
-            loggerProxy.error("Failed to fetch run $runId: ${response.code}")
+            loggerProxy.error("Failed to fetch run $runId. HTTP status code: ${response.code}, " +
+                    "body: ${response.body?.string()?.take(512)}")
             return null
         }
     }
@@ -65,7 +66,8 @@ class LoadTestRunService(
             }
             testRun.update(jsonObj)
         } else {
-            throw IOException("Failed to fetch run ${testRun.id}: ${response.code}")
+            throw IOException("Failed to fetch run ${testRun.id}. HTTP status code: ${response.code}, " +
+                    "body: ${response.body?.string()?.take(512)}")
         }
     }
 
