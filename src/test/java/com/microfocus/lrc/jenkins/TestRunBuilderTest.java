@@ -54,7 +54,7 @@ public class TestRunBuilderTest {
     @Test
     public void testConfigRoundtrip() throws Exception {
         FreeStyleProject project = jenkins.createFreeStyleProject();
-        TestRunBuilder builder = new TestRunBuilder("FAKEPROJECT", "FAKETESTID", false);
+        TestRunBuilder builder = new TestRunBuilder("1", "1234", false);
         TestRunBuilder.DescriptorImpl descriptor = jenkins.get(TestRunBuilder.DescriptorImpl.class);
         String baseUrl = mockserver.url("/").toString();
         descriptor.setUrl(baseUrl);
