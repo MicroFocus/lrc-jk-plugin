@@ -19,6 +19,7 @@ import com.microfocus.lrc.core.Constants
 import com.microfocus.lrc.core.entity.*
 import com.microfocus.lrc.jenkins.LoggerProxy
 import java.io.IOException
+import java.lang.Exception
 
 class LoadTestRunService(
     private val client: ApiClient,
@@ -54,8 +55,14 @@ class LoadTestRunService(
         val response = client.get(apiPath)
         if (response.isSuccessful) {
             val json = response.body?.string()
-            val jsonObj = Gson().fromJson(json, JsonObject::class.java)
-
+            val jsonObj: JsonObject
+            try {
+                jsonObj = Gson().fromJson(json, JsonObject::class.java)
+            } catch (ex: Exception) {
+                this.loggerProxy.error("Failed to parse run status")
+                this.loggerProxy.debug("Got run status response: $json")
+                throw IOException("401")
+            }
             testRun.update(jsonObj)
         } else {
             throw IOException("Failed to fetch run ${testRun.id}: ${response.code}")
