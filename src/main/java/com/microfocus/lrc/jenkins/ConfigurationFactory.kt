@@ -77,10 +77,8 @@ class ConfigurationFactory {
                         "  Proxy setting found in plugin setting: ${proxyConfiguration.proxy.address()}"
                     )
                 } catch (ex: IllegalArgumentException) {
-                    loggerProxy.info("  No proxy setting found in plugin setting.")
+                    loggerProxy.info("  No valid proxy setting found in plugin setting.")
                 }
-            } else {
-                loggerProxy.info("  No proxy setting found in plugin setting.")
             }
 
             if (proxyConfiguration == null) {

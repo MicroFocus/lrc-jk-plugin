@@ -55,7 +55,7 @@
                     <f:textbox />
                 </f:entry>
                 <f:entry title="Proxy Port" field="proxyPort" >
-                    <f:textbox />
+                    <f:number clazz="positive-number" />
                 </f:entry>
                 <f:entry title="Proxy Username" field="proxyUsername" >
                     <f:textbox />
