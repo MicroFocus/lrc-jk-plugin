@@ -317,7 +317,7 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
             final Integer trtPercentileThresholdMinorRegression,
             final Integer trtPercentileThresholdMajorRegression
     ) {
-        this.benchmark = (benchmark == null) ? 0 : benchmark;
+        this.benchmark = this.checkBenchmark(benchmark);
         this.runsCount = this.checkRunsCount(runsCount, RUN_COUNT_MIN, RUN_COUNT_MAX);
 
         this.trtAvgThresholdImprovement = setDefaultValue(
@@ -395,6 +395,18 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
             return min;
         } else if (val > max) {
             return max;
+        }
+
+        return val;
+    }
+
+    private Integer checkBenchmark(final Integer val) {
+        if (val == null) {
+            return 0;
+        }
+
+        if (val < 0) {
+            return 0;
         }
 
         return val;
