@@ -756,7 +756,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         if (Utils.isEmpty(username)) {
             username = "";
         } else {
-            username = Utils.maskString(username);
+            username = Utils.maskString(username, MASK_PREFIX_LEN, MASK_SUFFIX_LEN);
         }
         display.addProperty("username", username);
 
