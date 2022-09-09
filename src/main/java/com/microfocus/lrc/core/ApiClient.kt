@@ -156,13 +156,13 @@ class ApiClient internal constructor(
         }
     }
 
-    fun getProjects() : JsonObject {
+    fun validateTenant() : JsonObject {
         val res = this.get("v1/projects")
         if (res.code != 200) {
-            throw IOException("Failed to get project: ${res.code}, ${res.body?.string()}")
+            throw IOException("Failed to retrieve projects from tenant: ${res.code}, ${res.body?.string()}")
         }
 
-        return Utils.parseJsonString(res.body?.string(), "Failed to parse projects response data")
+        return Utils.parseJsonString(res.body?.string(), "Failed to retrieve projects from tenant")
     }
 
     private fun loginOAuth() {
