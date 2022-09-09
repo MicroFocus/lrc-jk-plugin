@@ -11,6 +11,8 @@
  */
 package com.microfocus.lrc.core.entity;
 
+import hudson.util.Secret;
+
 import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
@@ -23,7 +25,7 @@ public final class ProxyConfiguration implements Serializable {
     private final String host;
     private final int port;
     private String username;
-    private String password;
+    private Secret password;
     private transient Proxy proxy;
 
     // #region getter/setter
@@ -43,7 +45,7 @@ public final class ProxyConfiguration implements Serializable {
 
         if (username != null && password != null && username.length() > 0 && password.length() > 0) {
             this.username = username;
-            this.password = password;
+            this.password = Secret.fromString(password);
         }
     }
 
@@ -67,7 +69,7 @@ public final class ProxyConfiguration implements Serializable {
 
         if (username != null && password != null && username.length() > 0 && password.length() > 0) {
             this.username = username;
-            this.password = password;
+            this.password = Secret.fromString(password);
         }
     }
 
@@ -94,6 +96,6 @@ public final class ProxyConfiguration implements Serializable {
     }
 
     public String getPassword() {
-        return this.password;
+        return this.password.getPlainText();
     }
 }
