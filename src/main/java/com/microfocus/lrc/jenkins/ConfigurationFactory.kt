@@ -37,8 +37,9 @@ class ConfigurationFactory {
                 val serverUrlObj = URL(serverUrl)
                 serverHost = serverUrlObj.host
             } catch (e: MalformedURLException) {
-                loggerProxy.info("Failed to parse server URL, you may need to check it again.")
+                loggerProxy.info("Failed to parse URL: $serverUrl")
             }
+
             loggerProxy.info("Proxy settings:")
             //check JVM properties
             try {

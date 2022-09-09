@@ -41,7 +41,7 @@
         </f:entry>
         <f:block>
             <f:optionalBlock checked="${descriptor.useOAuth}" name="useOAuth" field="useOAuth" inline="true" title="Use OAuth token">
-                <f:entry title="Client ID" field="clientId" description="If it's set, jobs will use client id and secret.">
+                <f:entry title="Client ID" field="clientId" description="If it's set, jobs will use client id and client secret.">
                     <f:textbox />
                 </f:entry>
                 <f:entry title="Client Secret" field="clientSecret">
@@ -51,11 +51,11 @@
         </f:block>
         <f:block>
             <f:optionalBlock checked="${descriptor.useProxy}" name="useProxy" field="useProxy" inline="true" title="Connect LoadRunner Cloud via proxy">
-                <f:entry title="Proxy Host" field="proxyHost" description="If it's set, all other proxy settings will be ignored while connecting LoadRunner Cloud.">
+                <f:entry title="Proxy Host" field="proxyHost" description="If a valid proxy setting is specified here, all other proxy settings will be ignored while connecting LoadRunner Cloud.">
                     <f:textbox />
                 </f:entry>
                 <f:entry title="Proxy Port" field="proxyPort" >
-                    <f:number clazz="positive-number" />
+                    <f:number clazz="non-negative-number" max="65535" />
                 </f:entry>
                 <f:entry title="Proxy Username" field="proxyUsername" >
                     <f:textbox />

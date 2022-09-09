@@ -12,6 +12,8 @@
 
 package com.microfocus.lrc.jenkins;
 
+import org.apache.commons.lang.StringUtils;
+
 public final class Utils {
     public static boolean isPositiveInteger(final String str) {
         int val;
@@ -22,6 +24,10 @@ public final class Utils {
         }
 
         return (val > 0);
+    }
+
+    public static boolean isEmpty(final String str) {
+        return StringUtils.isEmpty(str) || StringUtils.isBlank(str);
     }
 
     private Utils() {
