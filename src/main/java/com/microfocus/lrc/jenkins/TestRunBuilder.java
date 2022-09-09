@@ -655,7 +655,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
             loggerProxy.info("Test run interrupted");
             throw e;
         } catch (Exception e) {
-            loggerProxy.error(e.getMessage());
+            Utils.logException(loggerProxy, "Test run exception. ", e);
         }
 
         if (testRun == null) {

@@ -70,6 +70,14 @@ public final class Utils {
         return new String(chars);
     }
 
+    public static void logException(final LoggerProxy logger, final String msg, final Exception ex) {
+        if (ex.getMessage() != null) {
+            logger.error(msg + ex.getMessage());
+        } else {
+            logger.error(msg);
+        }
+    }
+
     private Utils() {
         throw new IllegalStateException("Utility class");
     }
