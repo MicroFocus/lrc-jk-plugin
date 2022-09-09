@@ -17,6 +17,8 @@ import com.google.gson.JsonObject;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public final class Utils {
     public static boolean isPositiveInteger(final String str) {
@@ -39,6 +41,15 @@ public final class Utils {
             return new Gson().fromJson(str, JsonObject.class);
         } catch (Exception ex) {
             throw new IOException(errMsg);
+        }
+    }
+
+    public static boolean isValidUrl(final String url) {
+        try {
+            new URL(url);
+            return true;
+        } catch (MalformedURLException ex) {
+            return false;
         }
     }
 
