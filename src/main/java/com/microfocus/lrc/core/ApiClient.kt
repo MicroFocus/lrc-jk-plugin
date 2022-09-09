@@ -240,6 +240,7 @@ class ApiClientFactory {
         ): ApiClient {
             val client = ApiClient(serverConfiguration, loggerProxy)
             client.login()
+            client.validateTenant()
 
             return client
         }
