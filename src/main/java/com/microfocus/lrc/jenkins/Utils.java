@@ -19,6 +19,7 @@ import org.apache.commons.lang.StringUtils;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 
 public final class Utils {
     public static boolean isPositiveInteger(final String str) {
@@ -50,6 +51,30 @@ public final class Utils {
             return true;
         } catch (MalformedURLException ex) {
             return false;
+        }
+    }
+
+    public static String maskString(final String str) {
+        if (Utils.isEmpty(str)) {
+            return str;
+        }
+
+        int len = str.length();
+        if (len <= 6) {
+            return str;
+        }
+
+        char[] chars = str.toCharArray();
+        Arrays.fill(chars, 3, len - 3, '*');
+
+        return new String(chars);
+    }
+
+    public static void logException(final LoggerProxy logger, final String msg, final Exception ex) {
+        if (ex.getMessage() != null) {
+            logger.error(msg + ex.getMessage());
+        } else {
+            logger.error(msg);
         }
     }
 

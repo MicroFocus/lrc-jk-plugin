@@ -12,10 +12,10 @@
 
 package com.microfocus.lrc.core
 
-import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.microfocus.lrc.core.entity.ServerConfiguration
 import com.microfocus.lrc.jenkins.LoggerProxy
+import com.microfocus.lrc.jenkins.Utils
 import okhttp3.*
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.MediaType.Companion.toMediaType
@@ -145,14 +145,24 @@ class ApiClient internal constructor(
 
         val res = this.post("v1/auth", payload = payload)
         if (res.code != 200) {
-            throw IOException("login to ${this.serverConfiguration.url} failed: ${res.code}, ${res.body?.string()}, ${res.message}")
+            throw IOException("login to ${this.serverConfiguration.url} failed: ${res.code}, ${res.body?.string()}")
         }
-        val resObj = Gson().fromJson(res.body?.string(), JsonObject::class.java)
+
+        val resObj = Utils.parseJsonString(res.body?.string(), "Failed to parse authentication response data")
         if (resObj.has("token")) {
             this.csrfCookieStr = resObj["token"].asString
         } else {
             throw IOException("login to ${this.serverConfiguration.url} failed, invalid response ${res.body?.string()}")
         }
+    }
+
+    fun validateTenant() : JsonObject {
+        val res = this.get("v1/projects")
+        if (res.code != 200) {
+            throw IOException("Failed to retrieve projects from tenant: ${res.code}, ${res.body?.string()}")
+        }
+
+        return Utils.parseJsonString(res.body?.string(), "Failed to retrieve projects from tenant")
     }
 
     private fun loginOAuth() {
@@ -165,7 +175,7 @@ class ApiClient internal constructor(
             throw IOException("login to ${this.serverConfiguration.url} failed: ${res.code}, ${res.body?.string()}, ${res.message}")
         }
         val body = res.body?.string()
-        val resObj = Gson().fromJson(body, JsonObject::class.java)
+        val resObj = Utils.parseJsonString(body, "Failed to parse authentication response data")
         if (resObj.has("token")) {
             this.tokenAuth = resObj["token"].asString
         } else {
@@ -230,6 +240,7 @@ class ApiClientFactory {
         ): ApiClient {
             val client = ApiClient(serverConfiguration, loggerProxy)
             client.login()
+            client.validateTenant()
 
             return client
         }

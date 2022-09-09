@@ -26,6 +26,10 @@ class MockServerResponseGenerator {
             loginResObj.addProperty("token", "fake_token")
             responseLogin.setBody(loginResObj.toString())
             TestRunBuilderTest.mockserver.enqueue(responseLogin)
+
+            val responseProjects = MockResponse()
+            responseProjects.setBody("{}");
+            TestRunBuilderTest.mockserver.enqueue(responseProjects)
         }
 
         @JvmStatic

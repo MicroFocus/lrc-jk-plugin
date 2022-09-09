@@ -222,11 +222,7 @@ public final class TestRunPublisher extends Recorder implements SimpleBuildStep 
                 wrapper = channel.call(callable);
             }
         } catch (IOException e) {
-            if (e.getMessage() != null) {
-                loggerProxy.error("PublishReport failed. " + e.getMessage());
-            } else {
-                loggerProxy.error("PublishReport failed.");
-            }
+            Utils.logException(loggerProxy, "PublishReport failed. ", e);
         }
 
         if (wrapper == null) {

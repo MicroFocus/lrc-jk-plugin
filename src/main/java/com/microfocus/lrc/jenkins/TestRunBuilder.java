@@ -481,6 +481,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
             config.setProxyConfiguration(proxyConfiguration);
             try (ApiClient c = ApiClientFactory.getClient(config, new LoggerProxy())) {
                 c.login();
+                c.validateTenant();
                 return FormValidation.ok("Test connection succeeded!");
             } catch (Exception e) {
                 return FormValidation.error("Test connection failed, error: " + e.getMessage());
@@ -654,7 +655,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
             loggerProxy.info("Test run interrupted");
             throw e;
         } catch (Exception e) {
-            loggerProxy.error(e.getMessage());
+            Utils.logException(loggerProxy, "Test run exception. ", e);
         }
 
         if (testRun == null) {
@@ -748,7 +749,16 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         JsonObject display = new Gson().toJsonTree(config).getAsJsonObject();
 
         display.remove("password");
+        display.remove("username");
         display.remove("proxyConfiguration");
+
+        String username = config.getUsername();
+        if (Utils.isEmpty(username)) {
+            username = "";
+        } else {
+            username = Utils.maskString(username);
+        }
+        display.addProperty("username", username);
 
         this.loggerProxy.info("Job started with parameters: ");
         this.loggerProxy.info(display.toString());
