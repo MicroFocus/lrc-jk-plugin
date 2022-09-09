@@ -18,6 +18,7 @@ import com.microfocus.lrc.core.ApiClient
 import com.microfocus.lrc.core.Constants
 import com.microfocus.lrc.core.entity.*
 import com.microfocus.lrc.jenkins.LoggerProxy
+import com.microfocus.lrc.jenkins.Utils
 import java.io.IOException
 import java.lang.Exception
 
@@ -32,7 +33,7 @@ class LoadTestRunService(
         val response = client.get(apiPath)
         if (response.isSuccessful) {
             val json = response.body?.string() ?: return null
-            val jsonObj = Gson().fromJson(json, JsonObject::class.java)
+            val jsonObj = Utils.parseJsonString(json, "Failed to parse test run data for #${runId}")
             val lt = LoadTest(client.getServerConfiguration().projectId, jsonObj.get("testId").asInt)
             val testRun = LoadTestRun(
                 runId.toInt(),
@@ -90,7 +91,7 @@ class LoadTestRunService(
         }
         val body = res.body?.string()
         this.loggerProxy.debug("Fetching test run status got $code, $body")
-        val obj = Gson().fromJson(body, JsonObject::class.java)
+        val obj = Utils.parseJsonString(body, "Failed to parse test run status data for #${testRun.id}")
         testRun.update(obj)
     }
 

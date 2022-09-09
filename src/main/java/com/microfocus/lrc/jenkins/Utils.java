@@ -12,7 +12,11 @@
 
 package com.microfocus.lrc.jenkins;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import org.apache.commons.lang.StringUtils;
+
+import java.io.IOException;
 
 public final class Utils {
     public static boolean isPositiveInteger(final String str) {
@@ -28,6 +32,14 @@ public final class Utils {
 
     public static boolean isEmpty(final String str) {
         return StringUtils.isEmpty(str) || StringUtils.isBlank(str);
+    }
+
+    public static JsonObject parseJsonString(final String str, final String errMsg) throws IOException {
+        try {
+            return new Gson().fromJson(str, JsonObject.class);
+        } catch (Exception ex) {
+            throw new IOException(errMsg);
+        }
     }
 
     private Utils() {
