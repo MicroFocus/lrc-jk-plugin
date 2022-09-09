@@ -532,13 +532,51 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         this.setSendEmail(sendEmail);
     }
 
-    private boolean validateParameters() {
+    private boolean validateJobParameters() {
         if (!isPositiveInteger(this.projectId)) {
             this.loggerProxy.error("invalid parameter. projectId: " + this.projectId);
             return false;
         }
         if (!isPositiveInteger(this.testId)) {
             this.loggerProxy.error("invalid parameter. testId: " + this.testId);
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean validateSystemParameters(final DescriptorImpl descriptor) {
+        if (Boolean.TRUE.equals(descriptor.getUseOAuth())) {
+            if (Utils.isEmpty(descriptor.getClientId())) {
+                this.loggerProxy.error("invalid parameter: clientId");
+                return false;
+            }
+
+            Secret clientSecret = descriptor.getClientSecret();
+            if (clientSecret == null || Utils.isEmpty(clientSecret.getPlainText())) {
+                this.loggerProxy.error("invalid parameter: clientSecret");
+                return false;
+            }
+        } else {
+            if (Utils.isEmpty(descriptor.getUsername())) {
+                this.loggerProxy.error("invalid parameter: username");
+                return false;
+            }
+
+            Secret pswd = descriptor.getPassword();
+            if (pswd == null || Utils.isEmpty(pswd.getPlainText())) {
+                this.loggerProxy.error("invalid parameter: password");
+                return false;
+            }
+        }
+
+        if (Utils.isEmpty(descriptor.getTenantId())) {
+            this.loggerProxy.error("invalid parameter: tenant");
+            return false;
+        }
+
+        if (Utils.isEmpty(descriptor.getUrl()) || !Utils.isValidUrl(descriptor.getUrl())) {
+            this.loggerProxy.error("invalid parameter: url");
             return false;
         }
 
@@ -556,7 +594,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         PrintStream logger = listener.getLogger();
         this.loggerProxy = new LoggerProxy(logger, new LoggerOptions(false, ""));
 
-        if (!validateParameters()) {
+        if (!validateJobParameters()) {
             run.setResult(Result.FAILURE);
             return;
         }
@@ -569,6 +607,11 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
                     "Failed to read configuration of LoadRunner Cloud plugin. "
                             + "Please check configuration and try again."
             );
+            run.setResult(Result.FAILURE);
+            return;
+        }
+
+        if (!validateSystemParameters(descriptor)) {
             run.setResult(Result.FAILURE);
             return;
         }
