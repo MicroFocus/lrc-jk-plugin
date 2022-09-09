@@ -54,18 +54,20 @@ public final class Utils {
         }
     }
 
-    public static String maskString(final String str) {
+    public static final int MASK_PREFIX_LEN = 3;
+    public static final int MASK_SUFFIX_LEN = 3;
+    public static String maskString(final String str, final int prefixLen, final int suffixLen) {
         if (Utils.isEmpty(str)) {
             return str;
         }
 
         int len = str.length();
-        if (len <= 6) {
+        if (len <= prefixLen + suffixLen) {
             return str;
         }
 
         char[] chars = str.toCharArray();
-        Arrays.fill(chars, 3, len - 3, '*');
+        Arrays.fill(chars, prefixLen, len - suffixLen, '*');
 
         return new String(chars);
     }
