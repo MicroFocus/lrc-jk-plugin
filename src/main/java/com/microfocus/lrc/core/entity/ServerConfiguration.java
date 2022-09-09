@@ -12,12 +12,14 @@
 
 package com.microfocus.lrc.core.entity;
 
+import hudson.util.Secret;
+
 import java.io.Serializable;
 
 public final class ServerConfiguration implements Serializable {
     private final String url;
     private final String username;
-    private final String password;
+    private final Secret password;
     private final String tenantId;
     private final int projectId;
     private ProxyConfiguration proxyConfiguration;
@@ -33,7 +35,7 @@ public final class ServerConfiguration implements Serializable {
     }
 
     public String getPassword() {
-        return password;
+        return password.getPlainText();
     }
 
     public String getTenantId() {
@@ -66,7 +68,7 @@ public final class ServerConfiguration implements Serializable {
             final int projectId, final boolean sendEmail) {
         this.url = url;
         this.username = username;
-        this.password = password;
+        this.password = Secret.fromString(password);
         this.tenantId = tenantId;
         this.projectId = projectId;
         this.sendEmail = sendEmail;

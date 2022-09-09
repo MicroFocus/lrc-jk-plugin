@@ -134,19 +134,21 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
             this.username = this.getStringConfig(formData, Constants.USERNAME);
             this.password = this.getPasswordConfig(formData, Constants.PASSWORD);
             this.url = StringUtils.stripEnd(this.getStringConfig(formData, Constants.URL), "/");
+
             this.useProxy = this.getBooleanConfig(formData, "useProxy");
             this.proxyHost = this.getStringConfig(formData, "proxyHost");
             this.proxyPort =  this.getStringConfig(formData, "proxyPort");
-            if (this.proxyPort.length() == 0) {
-                this.proxyPort = "80";
+            if (Utils.isEmpty(this.proxyPort)) {
+                this.proxyPort = null;
             }
 
             this.proxyUsername = this.getStringConfig(formData, "proxyUsername");
-            if (StringUtils.isBlank(this.proxyUsername)) {
+            if (Utils.isEmpty(this.proxyUsername)) {
                 this.proxyUsername = null;
             }
 
             this.proxyPassword = this.getPasswordConfig(formData, "proxyPassword");
+
             this.useOAuth = this.getBooleanConfig(formData, Constants.USE_OAUTH);
             this.clientId = this.getStringConfig(formData, Constants.CLIENT_ID);
             this.clientSecret = this.getPasswordConfig(formData, Constants.CLIENT_SECRET);
