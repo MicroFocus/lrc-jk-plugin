@@ -14,6 +14,7 @@ package com.microfocus.lrc.jenkins;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import net.sf.json.JSONArray;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
@@ -54,8 +55,8 @@ public final class Utils {
         }
     }
 
-    public static final int MASK_PREFIX_LEN = 3;
-    public static final int MASK_SUFFIX_LEN = 3;
+    public static final int MASK_PREFIX_LEN = 4;
+    public static final int MASK_SUFFIX_LEN = 4;
     public static String maskString(final String str, final int prefixLen, final int suffixLen) {
         if (Utils.isEmpty(str)) {
             return str;
@@ -77,6 +78,15 @@ public final class Utils {
             logger.error(msg + ex.getMessage());
         } else {
             logger.error(msg);
+        }
+    }
+
+    public static boolean isValidJsonArray(final String str) {
+        try {
+            JSONArray.fromObject(str);
+            return true;
+        } catch (Exception e) {
+            return false;
         }
     }
 

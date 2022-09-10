@@ -31,7 +31,7 @@ public class ConfigurationAsCodeTest {
 
     @Test
     @ConfiguredWithCode("configuration-as-code.yml")
-    public void should_support_configuration_as_code() throws Exception {
+    public void shouldSupportCACS() throws Exception {
         TestRunBuilder.DescriptorImpl descriptor = new TestRunBuilder.DescriptorImpl();
 
         assertEquals(USERNAME, descriptor.getUsername());
@@ -53,7 +53,7 @@ public class ConfigurationAsCodeTest {
 
     @Test
     @ConfiguredWithCode("configuration-as-code.yml")
-    public void should_support_configuration_export() throws Exception {
+    public void shouldSupportCACSExport() throws Exception {
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
         ConfigurationContext context = new ConfigurationContext(registry);
         CNode yourAttribute = getUnclassifiedRoot(context).get("lrcRunTest");

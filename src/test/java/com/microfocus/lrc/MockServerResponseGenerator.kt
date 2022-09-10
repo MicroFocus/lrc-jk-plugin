@@ -28,7 +28,7 @@ class MockServerResponseGenerator {
             TestRunBuilderTest.mockserver.enqueue(responseLogin)
 
             val responseProjects = MockResponse()
-            responseProjects.setBody("{}");
+            responseProjects.setBody("[]")
             TestRunBuilderTest.mockserver.enqueue(responseProjects)
         }
 

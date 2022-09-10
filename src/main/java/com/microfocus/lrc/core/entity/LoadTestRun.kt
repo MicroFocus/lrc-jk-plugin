@@ -13,6 +13,7 @@
 package com.microfocus.lrc.core.entity
 
 import com.google.gson.JsonObject
+import java.io.InputStream
 import java.io.Serializable
 
 class LoadTestRun(
@@ -24,7 +25,8 @@ class LoadTestRun(
     var detailedStatus: String = "NA"
     var status: String = "NA"
     var isTerminated: Boolean = false
-    val reports: MutableMap<String, ByteArray> = mutableMapOf()
+    val reports: MutableMap<String, InputStream> = mutableMapOf()
+    val reportsByteArray: MutableMap<String, ByteArray> = mutableMapOf()
     var startTime: Long = -1
     var endTime: Long = -1
 

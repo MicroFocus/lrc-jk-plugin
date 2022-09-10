@@ -19,6 +19,7 @@ import org.w3c.dom.Element
 import java.io.StringWriter
 import java.nio.charset.StandardCharsets
 import javax.xml.parsers.DocumentBuilderFactory
+import javax.xml.transform.OutputKeys
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
@@ -110,8 +111,10 @@ class XmlReport {
 
             val source = DOMSource(xml)
 
-            val trans2Str =
-                TransformerFactory.newInstance().newTransformer()
+            val trans2Str = TransformerFactory.newInstance().newTransformer()
+            trans2Str.setOutputProperty(OutputKeys.ENCODING, "UTF-8")
+            trans2Str.setOutputProperty(OutputKeys.INDENT, "yes")
+
             val sw = StringWriter()
             trans2Str.transform(source, StreamResult(sw))
 
