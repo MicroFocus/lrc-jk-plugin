@@ -116,6 +116,7 @@ class Runner(
 
                         try {
                             this.apiClient.login()
+                            this.apiClient.validateTenant()
                         } catch (ee: IOException) {
                             this.loggerProxy.error("Login failed: ${ee.message}")
                         }

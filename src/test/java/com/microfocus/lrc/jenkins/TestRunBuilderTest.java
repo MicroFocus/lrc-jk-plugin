@@ -171,7 +171,6 @@ public class TestRunBuilderTest {
         responseLoginExpired.setResponseCode(500);
         mockserver.enqueue(responseLoginExpired);
 
-
         runStatusResObj.addProperty("status", TestRunStatus.PASSED.getStatusName());
         runStatusResObj.addProperty("uiStatus", TestRunStatus.PASSED.getStatusName());
         runStatusResObj.addProperty("isTerminated", true);

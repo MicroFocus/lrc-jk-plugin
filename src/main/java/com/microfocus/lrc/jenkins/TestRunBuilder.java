@@ -584,6 +584,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         return true;
     }
 
+    @SuppressWarnings("java:S3776")
     @Override
     public void perform(
             final @NonNull Run<?, ?> run,
@@ -664,20 +665,33 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
             return;
         }
 
-        List<String> fileNames = new ArrayList<>();
-        testRun.getReports().forEach((fileName, content) -> fileNames.add(fileName));
+        LoadTestRun finalTestRun = testRun;
+        testRun.getReports().forEach((fileName, content) -> {
+            FilePath file = workspace.child(fileName);
+            try {
+                file.copyFrom(finalTestRun.getReports().get(fileName));
 
-        for (String fileName : fileNames) {
-            byte[] content = testRun.getReports().get(fileName);
+                this.loggerProxy.info("Report file " + file.getRemote() + " created.");
+            } catch (IOException e) {
+                this.loggerProxy.error("Failed to create report file " + file.getRemote());
+            } catch (InterruptedException e) {
+                this.loggerProxy.error("Interrupted. Failed to create report file " + file.getRemote());
+                Thread.currentThread().interrupt();
+            }
+        });
+
+        testRun.getReportsByteArray().forEach((fileName, content) -> {
             FilePath file = workspace.child(fileName);
             try (OutputStream out = file.write()) {
                 out.write(content);
                 this.loggerProxy.info("Report file " + file.getRemote() + " created.");
             } catch (IOException e) {
                 this.loggerProxy.error("Failed to create report file " + file.getRemote());
-                this.loggerProxy.error(e.getMessage());
+            } catch (InterruptedException e) {
+                this.loggerProxy.error("Interrupted. Failed to create report file " + file.getRemote());
+                Thread.currentThread().interrupt();
             }
-        }
+        });
 
         // output vars to jenkins env
         EnvVarsUtil.putEnvVar(run, "LRC_RUN_ID", String.valueOf(testRun.getId()));

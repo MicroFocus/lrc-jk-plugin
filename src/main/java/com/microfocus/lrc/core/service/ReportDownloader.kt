@@ -22,6 +22,7 @@ import com.microfocus.lrc.core.entity.*
 import com.microfocus.lrc.jenkins.LoggerProxy
 import java.io.ByteArrayOutputStream
 import java.io.IOException
+import java.io.InputStream
 
 class ReportDownloader(
     private val apiClient: ApiClient,
@@ -63,7 +64,7 @@ class ReportDownloader(
             val reportId = this.requestReportId(testRun.id, reportType)
             // wait for the report to be ready
             var retryWaitingTimes = 0
-            var reportContent: ByteArray? = null
+            var reportContent: InputStream? = null
             var maxRetry = 6
             if (reportType == "pdf") {
                 maxRetry = 24  // max 8 minutes for pdf report generation
@@ -117,7 +118,7 @@ class ReportDownloader(
         return reportId
     }
 
-    private fun isReportReady(reportId: Int): ByteArray? {
+    private fun isReportReady(reportId: Int): InputStream? {
         val apiPath = ApiTestRunReport(
             mapOf(
                 "reportId" to "$reportId",
@@ -144,7 +145,7 @@ class ReportDownloader(
         if (contentType?.contains("application/octet-stream") == true) {
             this.loggerProxy.info("Report #$reportId is ready.")
 
-            return res.body?.bytes()
+            return res.body?.byteStream()
         }
 
         throw Exception("Unknown content type: $contentType")
@@ -156,7 +157,7 @@ class ReportDownloader(
 
     fun genXmlFile(testRun: LoadTestRun) {
         val fileName = genFileName("xml", testRun)
-        val reportUrl ="${this.apiClient.getServerConfiguration().url}/run-overview/${testRun.id}/report/?TENANTID=${this.apiClient.getServerConfiguration().tenantId}&projectId=${this.apiClient.getServerConfiguration().projectId}"
+        val reportUrl = "${this.apiClient.getServerConfiguration().url}/run-overview/${testRun.id}/report/?TENANTID=${this.apiClient.getServerConfiguration().tenantId}&projectId=${this.apiClient.getServerConfiguration().projectId}"
         val dashboardUrl = "${this.apiClient.getServerConfiguration().url}/run-overview/${testRun.id}/dashboard/?TENANTID=${this.apiClient.getServerConfiguration().tenantId}&projectId=${this.apiClient.getServerConfiguration().projectId}"
         this.loggerProxy.info("View report at: $reportUrl")
         this.loggerProxy.info("View dashboard at: $dashboardUrl")
@@ -165,7 +166,7 @@ class ReportDownloader(
             reportUrl,
             dashboardUrl
         )
-        testRun.reports[fileName] = content
+        testRun.reportsByteArray[fileName] = content
     }
 
     private fun fetchTestRunResults(runId: Int): TestRunResultsResponse {
@@ -219,7 +220,7 @@ class ReportDownloader(
     private fun genTxCsv(testRun: LoadTestRun) {
         val txArr = fetchTestRunTx(testRun.id)
         val fileName = "lrc_report_trans_${this.apiClient.getServerConfiguration().tenantId}-${testRun.id}.csv"
-        testRun.reports[fileName] = writeCsvBytesArray(txArr)
+        testRun.reportsByteArray[fileName] = writeCsvBytesArray(txArr)
     }
 
     fun fetchTrending(testRun: LoadTestRun, benchmark: TrendingDataWrapper?): TrendingDataWrapper {

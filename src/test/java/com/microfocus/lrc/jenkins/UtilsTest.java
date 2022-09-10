@@ -20,9 +20,9 @@ public class UtilsTest {
 
     @Test
     public void maskString() {
-        assertEquals("no change on string <= 6", "abcdef", Utils.maskString("abcdef", Utils.MASK_PREFIX_LEN, Utils.MASK_SUFFIX_LEN));
-        assertEquals("string > 6", "abc**def", Utils.maskString("abc12def", Utils.MASK_PREFIX_LEN, Utils.MASK_SUFFIX_LEN));
-        assertEquals("email address", "abc************com", Utils.maskString("abc@microfocus.com", Utils.MASK_PREFIX_LEN, Utils.MASK_SUFFIX_LEN));
+        assertEquals("no change on string", "abcdef", Utils.maskString("abcdef", Utils.MASK_PREFIX_LEN, Utils.MASK_SUFFIX_LEN));
+        assertEquals("string", "abc1**4def", Utils.maskString("abc1234def", Utils.MASK_PREFIX_LEN, Utils.MASK_SUFFIX_LEN));
+        assertEquals("email address", "abc@**********.com", Utils.maskString("abc@microfocus.com", Utils.MASK_PREFIX_LEN, Utils.MASK_SUFFIX_LEN));
         assertEquals("email address 2 + 3", "ab*************com", Utils.maskString("abc@microfocus.com", 2, 3));
     }
 
