@@ -36,14 +36,12 @@ import java.util.concurrent.Future;
 
 public class TestRunBuilderTest {
     public static MockWebServer mockserver = new MockWebServer();
-    static int serverPort = 0;
     @Rule
     public JenkinsRule jenkins = new JenkinsRule();
 
     @BeforeClass
     public static void setUp() throws IOException {
         mockserver.start();
-        serverPort = mockserver.getPort();
     }
 
     @AfterClass
@@ -279,7 +277,7 @@ public class TestRunBuilderTest {
             project.getBuildersList().add(builder);
             project.getBuildersList().add(new TestBuilder() {
                 @Override
-                public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
+                public boolean perform(final AbstractBuild<?, ?> build, final Launcher launcher, final BuildListener listener) throws InterruptedException, IOException {
                     String runId = EnvVarsUtil.getEnvVar(build, launcher, "LRC_RUN_ID");
                     Assert.assertEquals("-1", runId);
                     listener.getLogger().println("got LRC_RUN_ID: " + runId);
@@ -298,10 +296,17 @@ public class TestRunBuilderTest {
             descriptor.save();
 
             switch (i) {
-                case 0: this.mockResponseNormal();break;
-                case 1: this.mockResponseWithError();break;
-                case 2: this.mockResponseWithLoginExpired();break;
-                default: break;
+                case 0:
+                    this.mockResponseNormal();
+                    break;
+                case 1:
+                    this.mockResponseWithError();
+                    break;
+                case 2:
+                    this.mockResponseWithLoginExpired();
+                    break;
+                default:
+                    break;
             }
 
             ParametersAction a = new ParametersAction(

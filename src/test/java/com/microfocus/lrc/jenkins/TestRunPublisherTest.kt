@@ -31,13 +31,11 @@ class TestRunPublisherTest {
 
     companion object {
         private var mockserver = MockWebServer()
-        private var serverPort = 0
 
         @BeforeClass
         @JvmStatic
         fun setup() {
             mockserver.start()
-            serverPort = mockserver.port
         }
 
         @AfterClass
