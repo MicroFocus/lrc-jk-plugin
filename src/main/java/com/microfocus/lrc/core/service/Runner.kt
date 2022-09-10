@@ -109,7 +109,7 @@ class Runner(
                 retryTimes = 0
                 loginRetryTimes = 0
             } catch (e: Exception) {
-                if (e.message == "401") {
+                if (e.message == "Unauthorized") {
                     if (loginRetryTimes < maxLoginRetry) {
                         this.loggerProxy.error("Authentication failed, retrying ...")
                         loginRetryTimes += 1

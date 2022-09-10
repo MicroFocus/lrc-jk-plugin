@@ -63,10 +63,14 @@ class LoadTestRunService(
             } catch (ex: Exception) {
                 this.loggerProxy.error("Failed to parse run status")
                 this.loggerProxy.debug("Got run status response: $json")
-                throw IOException("401")
+                throw IOException("Unauthorized")
             }
             testRun.update(jsonObj)
         } else {
+            if (response.code == 401) {
+                throw IOException("Unauthorized")
+            }
+
             throw IOException("Failed to fetch run ${testRun.id}. HTTP status code: ${response.code}, " +
                     "body: ${response.body?.string()?.take(512)}")
         }
