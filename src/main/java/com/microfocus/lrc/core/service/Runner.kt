@@ -102,8 +102,10 @@ class Runner(
         var retryTimes = 0
         var loginRetryTimes = 0
 
+        val polling_interval = if (testRunOptions.isTestMode) Constants.TEST_RUN_END_POLLING_INTERVAL else 100
+
         while (!testRun.testRunCompletelyEnded()) {
-            Thread.sleep(Constants.TEST_RUN_END_POLLING_INTERVAL)
+            Thread.sleep(polling_interval)
             try {
                 this.loadTestRunService.fetch(testRun)
                 retryTimes = 0

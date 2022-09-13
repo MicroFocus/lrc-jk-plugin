@@ -19,8 +19,9 @@ class TestRunOptions(
     val sendEmail: Boolean,
     var skipPdfReport: Boolean,
     var isDebug: Boolean,
+    var isTestMode: Boolean
 ): Serializable {
     constructor(testId: Int, sendEmail: Boolean) : this(
-        testId, sendEmail, false, false
+        testId, sendEmail, false, false, false
     )
 }

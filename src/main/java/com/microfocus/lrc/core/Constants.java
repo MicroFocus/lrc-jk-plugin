@@ -25,9 +25,9 @@ public final class Constants {
     public static final String SEPARATOR_LINE = "=====================================";
     public static final String INITIATOR = "jenkins-plugin-new";
 
-    public static final long REPORT_DOWNLOAD_POLLING_INTERVAL = 1000;
+    public static final long REPORT_DOWNLOAD_POLLING_INTERVAL = 10000;
 
-    public static final long TEST_RUN_END_POLLING_INTERVAL = 1000;
+    public static final long TEST_RUN_END_POLLING_INTERVAL = 10000;
     public static final long TEST_RUN_END_LOGIN_MAXRETRY = 3;
     public static final long TEST_RUN_END_MAXRETRY = 5;
 

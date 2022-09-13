@@ -638,7 +638,8 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
                 testIdVal,
                 this.sendEmail,
                 Boolean.parseBoolean(envVarsObj.get(OptionInEnvVars.LRC_SKIP_PDF_REPORT.name())),
-                Boolean.parseBoolean(envVarsObj.get(OptionInEnvVars.LRC_DEBUG_LOG.name()))
+                Boolean.parseBoolean(envVarsObj.get(OptionInEnvVars.LRC_DEBUG_LOG.name())),
+                Boolean.parseBoolean(envVarsObj.get(OptionInEnvVars.LRC_TEST_MODE.name()))
         );
 
         RunTestCallable callable = new RunTestCallable(

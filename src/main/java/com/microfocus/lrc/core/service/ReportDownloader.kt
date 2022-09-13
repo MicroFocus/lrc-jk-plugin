@@ -22,7 +22,6 @@ import com.microfocus.lrc.core.entity.*
 import com.microfocus.lrc.jenkins.LoggerProxy
 import java.io.ByteArrayOutputStream
 import java.io.IOException
-import java.io.InputStream
 
 class ReportDownloader(
     private val apiClient: ApiClient,
@@ -70,8 +69,10 @@ class ReportDownloader(
                 maxRetry = 24  // max 8 minutes for pdf report generation
             }
 
+            val report_polling_interval = if (testRunOptions.isTestMode) Constants.REPORT_DOWNLOAD_POLLING_INTERVAL else 100
+
             while (retryWaitingTimes < maxRetry && !this.isReportReady(reportId)) {
-                Thread.sleep(Constants.REPORT_DOWNLOAD_POLLING_INTERVAL)
+                Thread.sleep(report_polling_interval)
                 retryWaitingTimes += 1
             }
 

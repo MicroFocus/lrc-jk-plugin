@@ -15,4 +15,5 @@ package com.microfocus.lrc.core.entity
 enum class OptionInEnvVars {
     LRC_SKIP_PDF_REPORT,
     LRC_DEBUG_LOG,
+    LRC_TEST_MODE
 }
