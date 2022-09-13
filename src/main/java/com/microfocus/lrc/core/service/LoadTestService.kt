@@ -19,7 +19,7 @@ import com.microfocus.lrc.core.entity.ApiGetLoadTest
 import com.microfocus.lrc.core.entity.ApiStartTestRun
 import com.microfocus.lrc.core.entity.LoadTest
 import com.microfocus.lrc.jenkins.LoggerProxy
-import com.microfocus.lrc.jenkins.Utils
+import com.microfocus.lrc.core.Utils
 import java.io.IOException
 
 class LoadTestService(

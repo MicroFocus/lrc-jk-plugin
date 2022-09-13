@@ -10,10 +10,11 @@
  * limitations under the License.
  */
 
-package com.microfocus.lrc.jenkins;
+package com.microfocus.lrc.core;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.microfocus.lrc.jenkins.LoggerProxy;
 import net.sf.json.JSONArray;
 import org.apache.commons.lang.StringUtils;
 
