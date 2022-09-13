@@ -17,6 +17,7 @@ import com.google.gson.JsonObject;
 import com.microfocus.lrc.core.ApiClient;
 import com.microfocus.lrc.core.ApiClientFactory;
 import com.microfocus.lrc.core.Constants;
+import com.microfocus.lrc.core.Utils;
 import com.microfocus.lrc.core.entity.ProxyConfiguration;
 import com.microfocus.lrc.core.entity.*;
 import com.microfocus.lrc.core.service.Runner;
@@ -47,7 +48,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.*;
 
-import static com.microfocus.lrc.jenkins.Utils.*;
+import static com.microfocus.lrc.core.Utils.*;
 
 public final class TestRunBuilder extends Builder implements SimpleBuildStep {
 
@@ -637,7 +638,8 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
                 testIdVal,
                 this.sendEmail,
                 Boolean.parseBoolean(envVarsObj.get(OptionInEnvVars.LRC_SKIP_PDF_REPORT.name())),
-                Boolean.parseBoolean(envVarsObj.get(OptionInEnvVars.LRC_DEBUG_LOG.name()))
+                Boolean.parseBoolean(envVarsObj.get(OptionInEnvVars.LRC_DEBUG_LOG.name())),
+                Boolean.parseBoolean(envVarsObj.get(OptionInEnvVars.LRC_TEST_MODE.name()))
         );
 
         RunTestCallable callable = new RunTestCallable(
@@ -672,14 +674,17 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
             FilePath file = workspace.child(fileName);
             try {
                 InputStream reportStream = apiClient.getReport(finalTestRun.getReports().get(fileName));
-                file.copyFrom(reportStream);
-
-                this.loggerProxy.info("Report file " + file.getRemote() + " created.");
-            } catch (IOException e) {
-                this.loggerProxy.error("Failed to create report file " + file.getRemote());
+                if (reportStream != null) {
+                    file.copyFrom(reportStream);
+                    this.loggerProxy.info("Report file " + file.getRemote() + " created.");
+                } else {
+                    this.loggerProxy.info("Report data for " + file.getRemote() + " is not available.");
+                }
             } catch (InterruptedException e) {
                 this.loggerProxy.error("Interrupted. Failed to create report file " + file.getRemote());
                 Thread.currentThread().interrupt();
+            } catch (Exception e) {
+                this.loggerProxy.error("Failed to create report file " + file.getRemote());
             }
         });
 

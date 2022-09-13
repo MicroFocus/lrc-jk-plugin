@@ -16,7 +16,6 @@ import com.google.gson.JsonObject
 import com.microfocus.lrc.core.entity.ApiTestRunReport
 import com.microfocus.lrc.core.entity.ServerConfiguration
 import com.microfocus.lrc.jenkins.LoggerProxy
-import com.microfocus.lrc.jenkins.Utils
 import okhttp3.*
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.MediaType.Companion.toMediaType
@@ -181,12 +180,14 @@ class ApiClient internal constructor(
             this.loggerProxy.info("Report #$reportId is not ready: ${res.code}, ${res.body?.string()}")
             return null
         }
+
         val contentType = res.header("content-type", null)
         if (contentType?.contains("application/octet-stream") == true) {
             return res.body?.byteStream()
+        } else {
+            this.loggerProxy.info("Unknown content type: $contentType")
+            return null
         }
-
-        throw IOException("Unknown content type: $contentType")
     }
 
     private fun loginOAuth() {

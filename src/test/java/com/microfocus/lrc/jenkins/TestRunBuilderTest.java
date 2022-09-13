@@ -281,6 +281,7 @@ public class TestRunBuilderTest {
     @Test
     public void testBuild() throws Exception {
         EnvVars.masterEnvVars.put(OptionInEnvVars.LRC_DEBUG_LOG.name(), "false");
+        EnvVars.masterEnvVars.put(OptionInEnvVars.LRC_TEST_MODE.name(), "true");
 
         for (int i = 0; i < 3; i += 1) {
             FreeStyleProject project = jenkins.createFreeStyleProject();

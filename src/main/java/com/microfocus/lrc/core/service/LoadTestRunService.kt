@@ -18,7 +18,7 @@ import com.microfocus.lrc.core.ApiClient
 import com.microfocus.lrc.core.Constants
 import com.microfocus.lrc.core.entity.*
 import com.microfocus.lrc.jenkins.LoggerProxy
-import com.microfocus.lrc.jenkins.Utils
+import com.microfocus.lrc.core.Utils
 import java.io.IOException
 import java.lang.Exception
 
@@ -116,23 +116,5 @@ class LoadTestRunService(
         }
 
         this.loggerProxy.info("Aborting test run successfully.")
-    }
-
-    fun stop(testRun: LoadTestRun) {
-        this.abort(testRun)
-        this.loggerProxy.info("Waiting for test run [${testRun.id}] to stop...")
-
-        var retryTimes = 0
-        while (retryTimes < Constants.STOP_RUN_POLLING_MAXRETRY && !testRun.statusEnum.isEnded) {
-            Thread.sleep(Constants.STOP_RUN_POLLING_INTERVAL)
-            this.fetchStatus(testRun)
-            retryTimes += 1
-        }
-
-        if (testRun.statusEnum.isEnded) {
-            this.loggerProxy.info("Test run #${testRun.id} stopped.")
-        } else {
-            this.loggerProxy.info("Test run #${testRun.id} failed to stop.")
-        }
     }
 }
