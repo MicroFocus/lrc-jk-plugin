@@ -61,30 +61,27 @@ class ReportDownloader(
 
         // request reports generating
         filteredReportTypes.map { reportType ->
+            this.loggerProxy.info("Requesting $reportType report ...")
             val reportId = this.requestReportId(testRun.id, reportType)
             // wait for the report to be ready
             var retryWaitingTimes = 0
-            var reportContent: InputStream? = null
             var maxRetry = 6
             if (reportType == "pdf") {
                 maxRetry = 24  // max 8 minutes for pdf report generation
             }
-            while (retryWaitingTimes < maxRetry && reportContent == null) {
-                reportContent = this.isReportReady(reportId)
-                if (reportContent == null) {
-                    Thread.sleep(Constants.REPORT_DOWNLOAD_POLLING_INTERVAL)
-                    retryWaitingTimes += 1
-                }
+
+            while (retryWaitingTimes < maxRetry && !this.isReportReady(reportId)) {
+                Thread.sleep(Constants.REPORT_DOWNLOAD_POLLING_INTERVAL)
+                retryWaitingTimes += 1
             }
 
-            if (reportContent == null) {
+            if (retryWaitingTimes >= maxRetry) {
                 this.loggerProxy.info("Report #$reportId is not ready after $retryWaitingTimes retries")
                 return
             }
 
             val fileName = genFileName(reportType, testRun)
-            testRun.reports[fileName] = reportContent
-            this.loggerProxy.info("Report $fileName downloaded.")
+            testRun.reports[fileName] = reportId
         }
 
         genXmlFile(testRun)
@@ -118,7 +115,7 @@ class ReportDownloader(
         return reportId
     }
 
-    private fun isReportReady(reportId: Int): InputStream? {
+    private fun isReportReady(reportId: Int): Boolean {
         val apiPath = ApiTestRunReport(
             mapOf(
                 "reportId" to "$reportId",
@@ -128,7 +125,7 @@ class ReportDownloader(
         val res = this.apiClient.get(apiPath)
         if (res.code != 200) {
             this.loggerProxy.info("Report #$reportId is not ready: ${res.code}, ${res.body?.string()}")
-            return null
+            return false
         }
         val contentType = res.header("content-type", null)
         if (contentType?.contains(Constants.APPLICATION_JSON) == true) {
@@ -136,7 +133,7 @@ class ReportDownloader(
             val result = Gson().fromJson(body, JsonObject::class.java)
             if (result["message"]?.asString == "In progress") {
                 this.loggerProxy.info("Report #$reportId is not ready yet...")
-                return null
+                return false
             } else {
                 throw Exception("Report #$reportId invalid status: $body")
             }
@@ -145,7 +142,7 @@ class ReportDownloader(
         if (contentType?.contains("application/octet-stream") == true) {
             this.loggerProxy.info("Report #$reportId is ready.")
 
-            return res.body?.byteStream()
+            return true
         }
 
         throw Exception("Unknown content type: $contentType")
