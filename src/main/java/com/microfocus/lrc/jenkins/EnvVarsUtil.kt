@@ -32,14 +32,16 @@ class EnvVarsUtil {
             return try {
                 if (action != null) {
                     val param = action.getParameter(/* name = */ key)
-                    var paramValue = ""
-                    if (param is StringParameterValue) {
-                        paramValue = param.getValue().toString()
-                    } else if (param is BooleanParameterValue) {
-                        paramValue = param.getValue().toString()
-                    }
+                    if (param != null) {
+                        var paramValue = ""
+                        if (param is StringParameterValue) {
+                            paramValue = param.getValue().toString()
+                        } else if (param is BooleanParameterValue) {
+                            paramValue = param.getValue().toString()
+                        }
 
-                    return paramValue
+                        return paramValue
+                    }
                  }
 
                 //or try the system env var

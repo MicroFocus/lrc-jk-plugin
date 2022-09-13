@@ -69,10 +69,10 @@ class ReportDownloader(
                 maxRetry = 24  // max 8 minutes for pdf report generation
             }
 
-            val report_polling_interval = if (testRunOptions.isTestMode) Constants.REPORT_DOWNLOAD_POLLING_INTERVAL else 100
+            val pollingInterval = if (testRunOptions.isTestMode) 100 else Constants.REPORT_DOWNLOAD_POLLING_INTERVAL
 
             while (retryWaitingTimes < maxRetry && !this.isReportReady(reportId)) {
-                Thread.sleep(report_polling_interval)
+                Thread.sleep(pollingInterval)
                 retryWaitingTimes += 1
             }
 
@@ -111,9 +111,7 @@ class ReportDownloader(
             throw Exception("Failed to request report: $body")
         }
 
-        val reportId = result.get("reportId").asInt
-
-        return reportId
+        return result.get("reportId").asInt
     }
 
     private fun isReportReady(reportId: Int): Boolean {
