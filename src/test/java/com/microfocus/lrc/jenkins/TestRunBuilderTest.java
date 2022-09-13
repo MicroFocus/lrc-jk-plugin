@@ -140,6 +140,10 @@ public class TestRunBuilderTest {
         }
 
         MockServerResponseGenerator.mockTransactions();
+
+        // for report downloading in TestRunBuilder.perform
+        MockServerResponseGenerator.mockLogin();
+        MockServerResponseGenerator.mockReports();
     }
 
     private void mockResponseWithError() {
@@ -201,6 +205,10 @@ public class TestRunBuilderTest {
         }
 
         MockServerResponseGenerator.mockTransactions();
+
+        // for report downloading in TestRunBuilder.perform
+        MockServerResponseGenerator.mockLogin();
+        MockServerResponseGenerator.mockReports();
     }
 
     private void mockResponseWithLoginExpired() {
@@ -264,6 +272,10 @@ public class TestRunBuilderTest {
         }
 
         MockServerResponseGenerator.mockTransactions();
+
+        // for report downloading in TestRunBuilder.perform
+        MockServerResponseGenerator.mockLogin();
+        MockServerResponseGenerator.mockReports();
     }
 
     @Test

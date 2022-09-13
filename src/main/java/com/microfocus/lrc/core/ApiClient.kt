@@ -13,6 +13,7 @@
 package com.microfocus.lrc.core
 
 import com.google.gson.JsonObject
+import com.microfocus.lrc.core.entity.ApiTestRunReport
 import com.microfocus.lrc.core.entity.ServerConfiguration
 import com.microfocus.lrc.jenkins.LoggerProxy
 import com.microfocus.lrc.jenkins.Utils
@@ -22,6 +23,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.Closeable
 import java.io.IOException
+import java.io.InputStream
 import java.net.UnknownHostException
 import java.util.concurrent.TimeUnit
 import javax.net.ssl.SSLHandshakeException
@@ -165,6 +167,26 @@ class ApiClient internal constructor(
         if (!Utils.isValidJsonArray(res.body?.string())) {
             throw IOException("Failed to retrieve projects from tenant")
         }
+    }
+
+    fun getReport(reportId: Int) : InputStream? {
+        val apiPath = ApiTestRunReport(
+            mapOf(
+                "reportId" to "$reportId",
+            )
+        ).path
+
+        val res = this.get(apiPath)
+        if (res.code != 200) {
+            this.loggerProxy.info("Report #$reportId is not ready: ${res.code}, ${res.body?.string()}")
+            return null
+        }
+        val contentType = res.header("content-type", null)
+        if (contentType?.contains("application/octet-stream") == true) {
+            return res.body?.byteStream()
+        }
+
+        throw IOException("Unknown content type: $contentType")
     }
 
     private fun loginOAuth() {

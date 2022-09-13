@@ -15,7 +15,6 @@ package com.microfocus.lrc
 import com.google.gson.JsonObject
 import com.microfocus.lrc.jenkins.TestRunBuilderTest
 import okhttp3.mockwebserver.MockResponse
-import okhttp3.mockwebserver.MockWebServer
 
 class MockServerResponseGenerator {
     companion object {
@@ -30,6 +29,15 @@ class MockServerResponseGenerator {
             val responseProjects = MockResponse()
             responseProjects.setBody("[]")
             TestRunBuilderTest.mockserver.enqueue(responseProjects)
+        }
+
+        @JvmStatic
+        fun mockReports() {
+            val fakeReportContent = "FAKE_REPORT_CONTENT"
+            val responseReportContent = MockResponse().setBody(fakeReportContent)
+            responseReportContent.setHeader("Content-Type", "application/octet-stream")
+            TestRunBuilderTest.mockserver.enqueue(responseReportContent)
+            TestRunBuilderTest.mockserver.enqueue(responseReportContent)
         }
 
         @JvmStatic

@@ -42,6 +42,7 @@ import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.verb.POST;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.*;
@@ -665,11 +666,13 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
             return;
         }
 
+        ApiClient apiClient = ApiClientFactory.getClient(serverConfiguration, new LoggerProxy());
         LoadTestRun finalTestRun = testRun;
         testRun.getReports().forEach((fileName, content) -> {
             FilePath file = workspace.child(fileName);
             try {
-                file.copyFrom(finalTestRun.getReports().get(fileName));
+                InputStream reportStream = apiClient.getReport(finalTestRun.getReports().get(fileName));
+                file.copyFrom(reportStream);
 
                 this.loggerProxy.info("Report file " + file.getRemote() + " created.");
             } catch (IOException e) {
@@ -699,6 +702,7 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
         if (testRun.getHasReport()) {
             // remove reports data to write a smaller json
             testRun.getReports().clear();
+            testRun.getReportsByteArray().clear();
             JsonObject buildResult = new JsonObject();
             buildResult.addProperty("testOptions", new Gson().toJson(opt));
             buildResult.addProperty("testRun", new Gson().toJson(testRun));
