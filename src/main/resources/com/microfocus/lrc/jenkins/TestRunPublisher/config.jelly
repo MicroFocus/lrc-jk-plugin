@@ -19,7 +19,7 @@
     See global.jelly for a general discussion about jelly script.
   -->
     <f:section title="Common">
-        <f:entry title="Number of Runs" field="runsCount" description="The number of last successful runs initiated by Jenkins which will be included in the Trending Report. Valid range is from 5 to 10.">
+        <f:entry title="Number of Runs" field="runsCount" description="The number of last successful runs initiated by Jenkins which will be included in the trending report. Valid range is from 5 to 10.">
             <f:number clazz="positive-number" default="5" min="5" max="10" />
         </f:entry>
         <f:entry title="Benchmark" field="benchmark" description="Leave it blank or 0 to compare to previous run, or fill in a run id as a benchmark.">
