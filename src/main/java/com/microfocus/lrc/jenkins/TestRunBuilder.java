@@ -526,8 +526,8 @@ public final class TestRunBuilder extends Builder implements SimpleBuildStep {
 
     @DataBoundConstructor
     public TestRunBuilder(
-            final String projectId,
-            final String testId,
+            final @NonNull String projectId,
+            final @NonNull String testId,
             final boolean sendEmail
     ) {
         this.setProjectId(projectId.trim());

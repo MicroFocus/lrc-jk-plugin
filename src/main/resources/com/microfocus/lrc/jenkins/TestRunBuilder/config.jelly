@@ -19,8 +19,7 @@
         <f:number clazz="required positive-number" />
     </f:entry>
     <f:advanced>
-        <f:entry title="Send Email" field="sendEmail"
-                 description="Send email after test run">
+        <f:entry title="Send Email" field="sendEmail">
             <f:checkbox />
         </f:entry>
     </f:advanced>
