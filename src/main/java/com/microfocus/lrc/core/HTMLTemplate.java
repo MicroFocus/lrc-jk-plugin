@@ -29,7 +29,9 @@ public final class HTMLTemplate {
     }
 
     public static String generateByPebble(final String template, final JsonObject data) throws IOException {
-        PebbleEngine engine = new PebbleEngine.Builder().build();
+        PebbleEngine engine = new PebbleEngine.Builder().methodAccessValidator(
+                (object, method) -> false
+        ).build();
         PebbleTemplate compiledTemplate = engine.getLiteralTemplate(template);
 
         Map<String, Object> context = new HashMap<>();
