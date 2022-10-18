@@ -26,8 +26,8 @@ class LoggerProxy(
         val sysLogger: Logger = Logger.getLogger(LoggerProxy::class.java.`package`.name)
     }
 
-    private val moduleNameStr: String = if (this.options.isDebugEnabled) {
-        this.options.moduleName
+    private val moduleNameStr: String = if (this.options.isDebugEnabled && this.options.moduleName.isNotBlank()) {
+        " " + this.options.moduleName
     } else {
         ""
     }
