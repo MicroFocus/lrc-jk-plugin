@@ -1,8 +1,8 @@
-[![CodeQL](https://github.com/MicroFocus/lrc-jk-plugin/actions/workflows/codeql.yml/badge.svg)](https://github.com/MicroFocus/lrc-jk-plugin/actions/workflows/codeql.yml)
-[![Build](https://github.com/MicroFocus/lrc-jk-plugin/actions/workflows/build.yml/badge.svg)](https://github.com/MicroFocus/lrc-jk-plugin/actions/workflows/build.yml)
-[![Test](https://github.com/MicroFocus/lrc-jk-plugin/actions/workflows/test.yml/badge.svg)](https://github.com/MicroFocus/lrc-jk-plugin/actions/workflows/test.yml)
+[![Build Status](https://ci.jenkins.io/job/Plugins/job/loadrunner-cloud-plugin/job/main/badge/icon)](https://ci.jenkins.io/job/Plugins/job/loadrunner-cloud-plugin/job/main/)
+[![CodeQL](https://github.com/jenkinsci/loadrunner-cloud-plugin/actions/workflows/codeql.yml/badge.svg)](https://github.com/jenkinsci/loadrunner-cloud-plugin/actions/workflows/codeql.yml)
+[![Jenkins Security Scan](https://github.com/jenkinsci/loadrunner-cloud-plugin/actions/workflows/jenkins-security-scan.yml/badge.svg)](https://github.com/jenkinsci/loadrunner-cloud-plugin/actions/workflows/jenkins-security-scan.yml)
 
-# Jenkins plugin for LoadRunner Cloud
+**NOTICE**: This is a **PRERELEASE** version  
 
 - [Introduction](#introduction)
 - [Getting Started](#getting-started)
@@ -15,9 +15,12 @@
 - [Notes](#notes)
 - [Releases](#releases)
 
+# Jenkins plugin for LoadRunner Cloud
+
 ## Introduction
 
-The plugin lets you run a test in [LoadRunner Cloud](https://admhelp.microfocus.com/lrc/en/Latest/Content/Storm/c_Getting_started.htm) and collect results.  
+This is the official plugin for [LoadRunner Cloud](https://www.microfocus.com/en-us/products/loadrunner-cloud).  
+The plugin lets you run a test in LoadRunner Cloud and collect results.  
 It provides a build step **Run test in LoadRunner Cloud** to run tests, and a post-build action **Generate LoadRunner Cloud trending report** to generate trending reports.
 Both steps are also exposed in the pipeline job as `lrcRunTest` and `lrcGenTrendingReport`.
 
@@ -129,4 +132,4 @@ You can view the trending report by clicking the "**LoadRunner Cloud Trending**"
   > **Tip**: **Manage Jenkins** &rarr; **Manage Plugins**, on the **Updates** tab, click **Check now** to check for the most recent plugin updates.
 
 ## Releases
-See [GitHub Releases](https://github.com/MicroFocus/lrc-jk-plugin/releases)
+See [GitHub Releases](https://github.com/jenkinsci/loadrunner-cloud-plugin/releases)
