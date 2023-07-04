@@ -109,6 +109,8 @@ public final class TrendingDataWrapper implements Serializable {
         private int passed;
         private int failed;
 
+        private int testScriptID;
+
         //#region accessors
         public String getName() {
             return name;
@@ -189,6 +191,14 @@ public final class TrendingDataWrapper implements Serializable {
         public void setFailed(final int failed) {
             this.failed = failed;
         }
+
+        public int getTestScriptID() {
+            return testScriptID;
+        }
+
+        public void setTestScriptID(final int testScriptID) {
+            this.testScriptID = testScriptID;
+        }
         //#endregion
 
         public TransactionData(final JsonObject json) {
@@ -208,6 +218,7 @@ public final class TrendingDataWrapper implements Serializable {
         public TransactionData(final TestRunTransactionsResponse tx) {
             this.name = tx.getName();
             this.script = tx.getScriptName();
+            this.testScriptID = tx.getLoadTestScriptId();
             this.min = tx.getMinTRT();
             this.max = tx.getMaxTRT();
             this.avg = tx.getAvgTRT();

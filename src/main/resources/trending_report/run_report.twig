@@ -372,6 +372,36 @@
             });
         }
 
+        // filter out those old tx data (testScriptID = 0), assign testScriptID according to others with same
+        // scriptName & txName
+        orderedTrt = _.chain(orderedTrt)
+            .forEach(function (x) {
+                if (x.testScriptID !== 0) {
+                    return;
+                }
+                const sameScriptName = orderedTrt.find(function (y) {
+                    return y.scriptName === x.scriptName
+                        && y.transactionName === x.transactionName
+                        && y.testScriptID !== 0;
+                });
+                if (sameScriptName) {
+                    sameScriptName.trtDataArr = sameScriptName.trtDataArr.concat(x.trtDataArr);
+                    x.testScriptID = -1;
+                }
+            }).filter(function (x) { return x.testScriptID !== -1; }).value();
+
+        orderedTrt.forEach(function (x) {
+            var sameScriptNames = orderedTrt.filter(function (y) {
+                return y.scriptName === x.scriptName && y.transactionName === x.transactionName;
+            });
+
+            if (sameScriptNames.length > 1) {
+                sameScriptNames.forEach(function (item) {
+                    item.scriptName = item.testScriptID + '_' + item.scriptName;
+                });
+            }
+        });
+
         _.each(orderedTrt, function (item) {
             var rowDOM = document.createElement('tr');
             var colNode = document.createElement('td');

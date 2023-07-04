@@ -19,6 +19,7 @@ import com.microfocus.lrc.core.Constants
 import com.microfocus.lrc.core.HTMLTemplate
 import com.microfocus.lrc.core.entity.TrendingConfiguration
 import com.microfocus.lrc.core.entity.TrendingDataWrapper
+import com.microfocus.lrc.core.entity.TrendingDataWrapper.TransactionData
 import hudson.model.Job
 import hudson.model.Run
 import jenkins.model.Jenkins
@@ -117,6 +118,7 @@ class TrendingReport {
                 }
             )
 
+            val latestTrans = latestBuildAction.trendingDataWrapper.trendingData.transactions
             var latestBenchmark: TrendingDataWrapper.TrendingData? = latestBuildAction.trendingDataWrapper.benchmark
             if (latestBenchmark == null) {
                 LoggerProxy.sysLogger.log(
@@ -154,7 +156,7 @@ class TrendingReport {
             }
 
             val trts = JsonArray()
-            val transactionsGroup: Map<Pair<String, String>, List<JsonObject>> =
+            val transactionsGroup: Map<Pair<String, Int>, List<JsonObject>> =
                 trendingDataWrapperList.stream().flatMap { t: JsonObject ->
                     (Gson().fromJson(
                         t.get("data").asString,
@@ -168,8 +170,11 @@ class TrendingReport {
                             tempTrans.addProperty("buildId", t.get("buildId").asInt)
                             tempTrans.addProperty("runId", trendingDataWrapper.trendingData.runId)
                             tempTrans.addProperty("percentile", trendingDataWrapper.trendingData.percentile)
-                            tempTrans
+                            return@map tempTrans
                         }
+                }.filter{transJSON ->
+                    val trans = Gson().fromJson(transJSON.get("data").asString, TrendingDataWrapper.TransactionData::class.java)
+                    return@filter latestTrans.stream().anyMatch{ x -> x.testScriptID == trans.testScriptID }
                 }.collect(
                     Collectors.groupingBy { transJSON ->
                         val trans: TrendingDataWrapper.TransactionData =
@@ -177,21 +182,23 @@ class TrendingReport {
                                 transJSON.get("data").asString,
                                 TrendingDataWrapper.TransactionData::class.java
                             )
-                        return@groupingBy Pair(trans.name, trans.script)
+                        return@groupingBy Pair(trans.name, trans.testScriptID)
                     }
                 )
 
-            transactionsGroup.forEach { (transScriptName: Pair<String?, String?>, transJSONList: List<JsonObject>) ->
+            transactionsGroup.forEach { (transScriptPair: Pair<String, Int>, transJSONList: List<JsonObject>) ->
                 generatorLogs.append(
                     String.format(
                         "processing transaction group: %1\$s - %2\$s%n",
-                        transScriptName.first,
-                        transScriptName.second
+                        transScriptPair.first,
+                        transScriptPair.second,
                     )
                 )
                 val trtGroup = JsonObject()
-                trtGroup.addProperty("transactionName", transScriptName.first)
-                trtGroup.addProperty("scriptName", transScriptName.second)
+                trtGroup.addProperty("transactionName", transScriptPair.first)
+                trtGroup.addProperty("testScriptID", transScriptPair.second)
+                val trans = Gson().fromJson(transJSONList[0].get("data").asString, TransactionData::class.java)
+                trtGroup.addProperty("scriptName", trans.script)
                 trtGroup.add("trtDataArr", JsonArray())
                 //transJSONList: {buildId, runId, percentile, data: TransactionData}[]
                 transJSONList.stream()
@@ -204,7 +211,10 @@ class TrendingReport {
                         )
                         //here is the default benchmark transaction
                         var benchmarkTrans: TrendingDataWrapper.TransactionData? = benchmark.transactions.stream()
-                            .filter { t -> (transScriptName.first == t.name) && (transScriptName.second == t.script) }
+                            .filter { t ->
+                                (transScriptPair.first == t.name)
+                                && (transScriptPair.second == t.testScriptID)
+                            }
                             .findAny().orElse(null)
                         var benchmarkRunId: Int = benchmark.runId
                         if (latestBuildAction.trendingDataWrapper.benchmarkId == null) {
@@ -239,8 +249,8 @@ class TrendingReport {
                                 generatorLogs.append(
                                     String.format(
                                         "\t\t\t\tcannot find benchmark for %1\$s - %2\$s%n",
-                                        transScriptName.first,
-                                        transScriptName.second
+                                        transScriptPair.first,
+                                        transScriptPair.second
                                     )
                                 )
                             }
@@ -257,7 +267,7 @@ class TrendingReport {
                             benchmarkTrans,
                             trendingConfig
                         )
-                        trt
+                        return@map trt
                     }.forEach { trtJSON ->
                         trtGroup.getAsJsonArray("trtDataArr").add(trtJSON)
                     }
